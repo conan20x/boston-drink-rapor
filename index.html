@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,6 +16,7 @@
             background-color: #F0F4F8;
             color: #073B4C;
         }
+
         .chart-container {
             position: relative;
             width: 100%;
@@ -24,11 +26,13 @@
             height: 350px;
             max-height: 400px;
         }
+
         @media (min-width: 768px) {
             .chart-container {
                 height: 400px;
             }
         }
+
         .kpi-card {
             background-color: white;
             border-radius: 0.75rem;
@@ -36,16 +40,19 @@
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
+
         .kpi-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
         }
+
         .card {
-             background-color: white;
+            background-color: white;
             border-radius: 0.75rem;
             padding: 1.5rem;
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
         }
+
         .total-label {
             position: absolute;
             top: 50%;
@@ -58,12 +65,18 @@
         }
     </style>
 </head>
+
 <body class="antialiased">
-    <div class="container mx-auto p-4 sm:p-6 md:p-8">
+    <div id="loading-spinner" class="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-50">
+        <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+        <div class="absolute text-xl font-semibold text-gray-700">Rapor Yükleniyor...</div>
+    </div>
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 hidden" id="report-container">
         <header class="text-center mb-10 flex flex-col items-center">
             <img src="https://placehold.co/200x50/F0F4F8/000000?text=BOSTON+DRINK+%26+DESSERT" alt="Boston Drink & Dessert Logo" class="mb-4">
             <h1 class="text-4xl font-bold text-[#073B4C]">Boston Drink & Dessert Cadde Şube Ağustos 2025 Raporu</h1>
-            <p class="text-lg text-[#118AB2] mt-2">Dönem: 01.08.2025 - 04.09.2025</p>
+            <p class="text-lg text-[#118AB2] mt-2" id="report-period">Dönem: Yükleniyor...</p>
         </header>
 
         <section id="overview" class="mb-12">
@@ -71,80 +84,38 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="kpi-card text-center">
                     <h3 class="text-lg font-semibold text-[#118AB2]">Brüt Gelir (Kasa Raporu)</h3>
-                    <p class="text-4xl font-bold text-[#06D6A0] mt-2">1.704.018,00 ₺</p>
+                    <p class="text-4xl font-bold text-[#06D6A0] mt-2" id="brut-gelir">Yükleniyor...</p>
                 </div>
                 <div class="kpi-card text-center">
                     <h3 class="text-lg font-semibold text-[#118AB2]">Toplam Gider (Banka + Nakit)</h3>
-                    <p class="text-4xl font-bold text-[#FF6B6B] mt-2">1.347.540,82 ₺</p>
+                    <p class="text-4xl font-bold text-[#FF6B6B] mt-2" id="toplam-gider">Yükleniyor...</p>
                 </div>
                 <div class="kpi-card text-center">
                     <h3 class="text-lg font-semibold text-[#118AB2]">Net Dönem Kârı (Nakit Akışı)</h3>
-                    <p class="text-4xl font-bold text-[#FFD166] mt-2">109.550,17 ₺</p>
+                    <p class="text-4xl font-bold text-[#FFD166] mt-2" id="net-kar">Yükleniyor...</p>
                 </div>
             </div>
         </section>
-        
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
             <section id="gross-income" class="card">
                 <h2 class="text-2xl font-bold text-center mb-2">Brüt Gelirlerin Dağılımı</h2>
-                <p class="text-center text-gray-600 mb-6">Kasa raporuna göre toplam 1.704.018,00 ₺'lik brüt gelirin kaynaklara göre dökümü.</p>
+                <p class="text-center text-gray-600 mb-6" id="gross-income-subtitle">Yükleniyor...</p>
                 <div class="chart-container mb-6">
                     <canvas id="grossIncomeChart"></canvas>
-                     <div class="total-label" id="grossIncomeTotal"></div>
+                    <div class="total-label" id="grossIncomeTotal"></div>
                 </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                        <span class="font-medium">Kredi Kartı</span>
-                        <span class="font-bold text-green-700">728.958,00 ₺</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                        <span class="font-medium">Yemeksepeti Online</span>
-                        <span class="font-bold text-green-700">547.510,00 ₺</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                        <span class="font-medium">Getir Online</span>
-                        <span class="font-bold text-green-700">162.820,00 ₺</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                        <span class="font-medium">Trendyol Online</span>
-                        <span class="font-bold text-green-700">142.555,00 ₺</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                        <span class="font-medium">Nakit</span>
-                        <span class="font-bold text-green-700">122.175,00 ₺</span>
-                    </div>
-                </div>
+                <div id="gross-income-list" class="space-y-3"></div>
             </section>
 
             <section id="net-income" class="card">
                 <h2 class="text-2xl font-bold text-center mb-2">Net Gelirlerin Dağılımı</h2>
-                <p class="text-center text-gray-600 mb-6">Bankaya yatan ve kasadaki net gelirin kaynaklara göre dökümü.</p>
+                <p class="text-center text-gray-600 mb-6" id="net-income-subtitle">Yükleniyor...</p>
                 <div class="chart-container mb-6">
                     <canvas id="netIncomeChart"></canvas>
                     <div class="total-label" id="netIncomeTotal"></div>
                 </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                        <span class="font-medium">Kredi Kartı</span>
-                        <span class="font-bold text-green-700">729.092,33 ₺</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                        <span class="font-medium">Yemeksepeti Online</span>
-                        <span class="font-bold text-green-700">396.173,05 ₺</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                        <span class="font-medium">Getir Online</span>
-                        <span class="font-bold text-green-700">104.019,71 ₺</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                        <span class="font-medium">Trendyol Online</span>
-                        <span class="font-bold text-green-700">96.789,04 ₺</span>
-                    </div>
-                    <div class="flex justify-between items-center p-3 bg-green-50 rounded-lg">
-                        <span class="font-medium">Nakit</span>
-                        <span class="font-bold text-green-700">122.175,00 ₺</span>
-                    </div>
-                </div>
+                <div id="net-income-list" class="space-y-3"></div>
             </section>
         </div>
 
@@ -155,28 +126,7 @@
                 <canvas id="chocolateChart"></canvas>
                 <div class="total-label" id="chocolateTotal"></div>
             </div>
-            <div class="space-y-3">
-                <div class="flex justify-between items-center p-3 bg-amber-50 rounded-lg">
-                    <span class="font-medium">Sütlü Çikolata</span>
-                    <span class="font-bold text-amber-700">360 KG (248.400 ₺)</span>
-                </div>
-                <div class="flex justify-between items-center p-3 bg-gray-600 bg-opacity-20 rounded-lg">
-                    <span class="font-medium">Bitter Çikolata</span>
-                    <span class="font-bold text-gray-800">40 KG (29.200 ₺)</span>
-                </div>
-                <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg">
-                    <span class="font-medium">Beyaz Çikolata</span>
-                    <span class="font-bold text-gray-800">60 KG (41.400 ₺)</span>
-                </div>
-                <div class="flex justify-between items-center p-3 bg-pink-100 rounded-lg">
-                    <span class="font-medium">Ruby Çikolata</span>
-                    <span class="font-bold text-pink-700">12.5 KG (10.437,50 ₺)</span>
-                </div>
-                <div class="flex justify-between items-center p-3 bg-yellow-100 rounded-lg">
-                    <span class="font-medium">Gold Çikolata</span>
-                    <span class="font-bold text-yellow-700">15 KG (14.250 ₺)</span>
-                </div>
-            </div>
+            <div id="chocolate-list" class="space-y-3"></div>
         </section>
 
         <section id="expenses" class="card mb-12">
@@ -184,34 +134,39 @@
             <p class="text-center text-gray-600 mb-6">Tüm banka ve kasadan yapılan giderlerin detaylı dökümü.</p>
             <div class="chart-container mb-6">
                 <canvas id="expenseChart"></canvas>
-                 <div class="total-label" id="expenseTotal"></div>
+                <div class="total-label" id="expenseTotal"></div>
             </div>
-             <div class="space-y-3 max-h-64 overflow-y-auto pr-2">
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Genel Merkeze Ödeme</span><span class="font-bold text-red-700">-426.283,57 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Personel Maaşları (Banka)</span><span class="font-bold text-red-700">-116.000,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Personel Maaşları (Nakit)</span><span class="font-bold text-red-700">-76.115,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Stajyer Maaşı</span><span class="font-bold text-red-700">-30.050,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Kredi Kartı Borç Ödemesi</span><span class="font-bold text-red-700">-175.177,17 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Dükkan Kirası</span><span class="font-bold text-red-700">-92.000,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Ev Kirası</span><span class="font-bold text-red-700">-25.000,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Manav Ödemesi</span><span class="font-bold text-red-700">-100.280,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Elektrik Faturası</span><span class="font-bold text-red-700">-71.310,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Geçici Vergi Ödemesi</span><span class="font-bold text-red-700">-65.946,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Yemek Kartları Ödemesi</span><span class="font-bold text-red-700">-20.001,54 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>İçim Süt Ödemesi</span><span class="font-bold text-red-700">-24.697,62 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Nakit Diğer Ödemeler</span><span class="font-bold text-red-700">-12.730,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Arıtma Değişim Ücreti</span><span class="font-bold text-red-700">-8.400,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Su Faturası</span><span class="font-bold text-red-700">-5.126,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Cam Temizlik Ödeme</span><span class="font-bold text-red-700">-4.800,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Vantilatör Lamba Ödemesi</span><span class="font-bold text-red-700">-2.000,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Filtre Bakım Ödemesi</span><span class="font-bold text-red-700">-1.500,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>İlaçlama Ödeme</span><span class="font-bold text-red-700">-1.500,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Yazılım Bakım Ücreti</span><span class="font-bold text-red-700">-798,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Telefon Faturası</span><span class="font-bold text-red-700">-781,50 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>İnternet Faturası</span><span class="font-bold text-red-700">-420,00 ₺</span></div>
-                <div class="flex justify-between items-center p-3 bg-red-50 rounded-lg"><span>Havale Ücreti</span><span class="font-bold text-red-700">-409,42 ₺</span></div>
+            <div id="expense-list" class="space-y-3 max-h-64 overflow-y-auto pr-2"></div>
+        </section>
+
+        <!-- YENİ BÖLÜM: YEMEK KARTLARI -->
+        <section id="food-cards" class="card mb-12">
+            <h2 class="text-2xl font-bold text-center mb-2">Personel Yemek Kartları Analizi</h2>
+            <p class="text-center text-gray-600 mb-6">Personele ait yemek kartlarına yüklenen toplam tutarlar.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="chart-container">
+                    <canvas id="foodCardChart"></canvas>
+                    <div class="total-label" id="foodCardTotal"></div>
+                </div>
+                <div id="food-card-list" class="space-y-3 max-h-96 overflow-y-auto pr-2 border-l-2 pl-4">
+                    <!-- Liste JavaScript ile doldurulacak -->
+                </div>
             </div>
         </section>
+
+        <!-- YENİ BÖLÜM: SEVKİYAT DETAYLARI -->
+        <section id="shipment" class="card mb-12">
+            <h2 class="text-2xl font-bold text-center mb-2">Genel Merkez Sevkiyat Detayları</h2>
+            <p class="text-center text-gray-600 mb-6">Dönem içinde genel merkezden yapılan ürün sevkiyatlarının dökümü.</p>
+            <div id="shipment-list" class="space-y-3">
+                <!-- Sevkiyat listesi JavaScript ile doldurulacak -->
+            </div>
+            <div id="shipment-total-container" class="mt-6 pt-4 border-t-2 border-dashed text-right">
+                <span class="text-lg font-semibold text-gray-600">Sevkiyat Toplam Tutarı:</span>
+                <span id="shipment-total" class="text-2xl font-bold text-[#073B4C] ml-2">Yükleniyor...</span>
+            </div>
+        </section>
+
 
         <section id="cashflow" class="card mb-12">
             <h2 class="text-2xl font-bold text-center mb-2">Nakit Akışı ve Banka Analizi</h2>
@@ -219,265 +174,419 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div>
                     <h3 class="font-bold text-lg mb-4 text-center">Online Platform Komisyon Analizi</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <div class="flex justify-between font-semibold"><span>Yemeksepeti</span><span class="text-red-600">-151.336,95 ₺ (%27.6)</span></div>
-                            <div class="w-full bg-gray-200 rounded-full h-4 mt-1"><div class="bg-[#FF6B6B] h-4 rounded-full" style="width: 27.6%"></div></div>
-                            <div class="flex justify-between text-sm text-gray-500 mt-1"><span>Brüt: 547.510,00 ₺</span><span>Net Gelen: 396.173,05 ₺</span></div>
-                        </div>
-                         <div>
-                            <div class="flex justify-between font-semibold"><span>Getir</span><span class="text-red-600">-58.800,29 ₺ (%36.1)</span></div>
-                            <div class="w-full bg-gray-200 rounded-full h-4 mt-1"><div class="bg-[#FF6B6B] h-4 rounded-full" style="width: 36.1%"></div></div>
-                            <div class="flex justify-between text-sm text-gray-500 mt-1"><span>Brüt: 162.820,00 ₺</span><span>Net Gelen: 104.019,71 ₺</span></div>
-                        </div>
-                        <div>
-                            <div class="flex justify-between font-semibold"><span>Trendyol</span><span class="text-red-600">-45.765,96 ₺ (%32.1)</span></div>
-                            <div class="w-full bg-gray-200 rounded-full h-4 mt-1"><div class="bg-[#FF6B6B] h-4 rounded-full" style="width: 32.1%"></div></div>
-                            <div class="flex justify-between text-sm text-gray-500 mt-1"><span>Brüt: 142.555,00 ₺</span><span>Net Gelen: 96.789,04 ₺</span></div>
-                        </div>
-                    </div>
-                     <div class="mt-6 p-4 bg-blue-100 border-l-4 border-blue-500 rounded-r-lg">
-                        <h4 class="font-bold text-blue-800">Toplam Komisyon Gideri: 255.903,20 ₺</h4>
-                        <p class="text-blue-700">Online platformlardan elde edilen 852.885,00 ₺ brüt cironun bankaya yatan net karşılığı 597.000,00 ₺'dir. Aradaki fark, platformların hizmet bedeli ve komisyonlarıdır.</p>
+                    <div id="online-commission-list" class="space-y-4"></div>
+                    <div class="mt-6 p-4 bg-blue-100 border-l-4 border-blue-500 rounded-r-lg">
+                        <h4 class="font-bold text-blue-800" id="total-commission-header"></h4>
+                        <p class="text-blue-700" id="total-commission-text"></p>
                     </div>
                 </div>
                 <div>
                     <h3 class="font-bold text-lg mb-4 text-center">Dönem Sonu Finansal Durum</h3>
-                     <div class="space-y-3">
-                        <div class="flex justify-between p-3 rounded-lg bg-gray-50"><span>Toplam Banka Gelirleri</span><span class="font-medium text-green-600">1.334.915,99 ₺</span></div>
-                        <div class="flex justify-between p-3 rounded-lg bg-gray-50"><span>Toplam Banka Giderleri</span><span class="font-medium text-red-600">-1.258.695,82 ₺</span></div>
-                        <div class="flex justify-between p-3 rounded-lg bg-blue-100 font-bold"><span>Banka Net Akışı</span><span>+76.220,17 ₺</span></div>
-                        <hr class="my-3">
-                         <div class="flex justify-between p-3 rounded-lg bg-gray-50"><span>Nakit Gelir (Kasa)</span><span class="font-medium text-green-600">122.175,00 ₺</span></div>
-                        <div class="flex justify-between p-3 rounded-lg bg-gray-50"><span>Nakit Gider (Kasa)</span><span class="font-medium text-red-600">-88.845,00 ₺</span></div>
-                        <div class="flex justify-between p-3 rounded-lg bg-blue-100 font-bold"><span>Kasa Net Akışı</span><span>+33.330,00 ₺</span></div>
-                        <hr class="my-3 border-2 border-dashed">
-                        <div class="flex justify-between p-4 rounded-lg bg-yellow-100 text-yellow-800 font-bold text-lg"><span>Toplam Nakit + Banka Varlığı</span><span>+109.550,17 ₺</span></div>
-                    </div>
+                    <div id="financial-status-list" class="space-y-3"></div>
                 </div>
             </div>
         </section>
 
+        <section id="admin-panel" class="card mt-12 mb-12">
+            <h2 class="text-2xl font-bold text-center mb-4">Veri Yönetimi (Gizli)</h2>
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <p>Bu bölüm yalnızca yetkili kullanıcılar içindir.</p>
+                <button id="updateDataBtn" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700 transition duration-300 shadow-lg">Örnek Veriyi Güncelle</button>
+            </div>
+        </section>
+
         <footer class="text-center text-sm text-gray-500 mt-12">
-            <p>Bu rapor, sağlanan verilere dayanarak oluşturulmuş olup, finansal danışmanlık yerine geçmez.</p>
-            <p>Rapor Tarihi: 5 Eylül 2025</p>
+            <p>Bu rapor, güvenli veri kaynaklarına dayanarak oluşturulmuştur ve finansal danışmanlık yerine geçmez.</p>
+            <p>Rapor Tarihi: 6 Eylül 2025</p>
         </footer>
     </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    
-    const wrapLabel = (label, maxLength) => {
-        if (label.length <= maxLength) {
-            return label;
-        }
-        const words = label.split(' ');
-        const lines = [];
-        let currentLine = '';
-        words.forEach(word => {
-            if ((currentLine + word).length > maxLength) {
-                lines.push(currentLine.trim());
-                currentLine = '';
-            }
-            currentLine += word + ' ';
-        });
-        lines.push(currentLine.trim());
-        return lines;
-    };
-    
-    const tooltipTitleCallback = (tooltipItems) => {
-        const item = tooltipItems[0];
-        let label = item.chart.data.labels[item.dataIndex];
-        if (Array.isArray(label)) {
-            return label.join(' ');
-        }
-        return label;
-    };
-    
-    const palette = {
-        red: '#FF6B6B',
-        yellow: '#FFD166',
-        green: '#06D6A0',
-        blue: '#118AB2',
-        darkBlue: '#073B4C'
-    };
-    
-    const totalGrossIncome = 1704018.00;
-    const grossIncomeCtx = document.getElementById('grossIncomeChart').getContext('2d');
-    const grossIncomeLabels = ['Kredi Kartı', 'YS Online', 'Getir Online', 'Trendyol Online', 'Nakit'];
-    new Chart(grossIncomeCtx, {
-        type: 'doughnut',
-        data: {
-            labels: grossIncomeLabels,
-            datasets: [{
-                label: 'Gelir Kaynağı (Brüt)',
-                data: [728958, 547510, 162820, 142555, 122175],
-                backgroundColor: [palette.blue, palette.green, palette.yellow, palette.red, palette.darkBlue],
-                borderColor: '#FFFFFF',
-                borderWidth: 3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '60%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 15,
-                        font: { size: 12 }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        title: tooltipTitleCallback
-                    }
-                }
-            }
-        }
-    });
-    document.getElementById('grossIncomeTotal').textContent = totalGrossIncome.toLocaleString('tr-TR') + ' ₺';
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, onSnapshot, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-    const totalNetIncome = 1448249.13;
-    const netIncomeCtx = document.getElementById('netIncomeChart').getContext('2d');
-    const netIncomeLabels = ['Kredi Kartı', 'YS Online', 'Getir Online', 'Trendyol Online', 'Nakit'];
-    new Chart(netIncomeCtx, {
-        type: 'doughnut',
-        data: {
-            labels: netIncomeLabels,
-            datasets: [{
-                label: 'Gelir Kaynağı (Net)',
-                data: [729092.33, 396173.05, 104019.71, 96789.04, 122175],
-                backgroundColor: [palette.blue, palette.green, palette.yellow, palette.red, palette.darkBlue],
-                borderColor: '#FFFFFF',
-                borderWidth: 3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '60%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 15,
-                        font: { size: 12 }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        title: tooltipTitleCallback
-                    }
-                }
-            }
-        }
-    });
-    document.getElementById('netIncomeTotal').textContent = totalNetIncome.toLocaleString('tr-TR') + ' ₺';
+        // Firebase ve Uygulama Ayarları 
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-    const chocolateData = [
-        360 * 690,      // Sütlü Çikolata
-        40 * 730,       // Bitter Çikolata
-        60 * 690,       // Beyaz Çikolata
-        12.5 * 835,     // Ruby Çikolata
-        15 * 950        // Gold Çikolata
-    ];
-    const totalChocolateCost = chocolateData.reduce((sum, value) => sum + value, 0);
-    const chocolateLabels = ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'];
-    const chocolateCtx = document.getElementById('chocolateChart').getContext('2d');
-    new Chart(chocolateCtx, {
-        type: 'doughnut',
-        data: {
-            labels: chocolateLabels,
-            datasets: [{
-                label: 'Çikolata Maliyeti',
-                data: chocolateData,
-                backgroundColor: ['#A0522D', '#2F2F2F', '#F5F5DC', '#E91E63', '#FFD700'],
-                borderColor: '#FFFFFF',
-                borderWidth: 3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '60%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 15,
-                        font: { size: 12 }
-                    }
+        let app;
+        let db;
+        let auth;
+        let userId;
+        let charts = {};
+
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const reportContainer = document.getElementById('report-container');
+
+        // Örnek Rapor Verileri (Bu veriler veritabanına kaydedilecek) 
+        const sampleReportData = {
+            period: '01.08.2025 - 04.09.2025',
+            kpi: {
+                brutGelir: 1704018.00,
+                toplamGider: 1347540.82,
+                netKar: 109550.17
+            },
+            grossIncome: {
+                labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
+                data: [728958, 547510, 162820, 142555, 122175]
+            },
+            netIncome: {
+                labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
+                data: [729092.33, 396173.05, 104019.71, 96789.04, 122175]
+            },
+            chocolate: {
+                labels: ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'],
+                costs: [
+                    { name: 'Sütlü Çikolata', kg: 360, pricePerKg: 690 },
+                    { name: 'Bitter Çikolata', kg: 40, pricePerKg: 730 },
+                    { name: 'Beyaz Çikolata', kg: 60, pricePerKg: 690 },
+                    { name: 'Ruby Çikolata', kg: 12.5, pricePerKg: 835 },
+                    { name: 'Gold Çikolata', kg: 15, pricePerKg: 950 }
+                ],
+                colors: ['#A0522D', '#2F2F2F', '#F5F5DC', '#E91E63', '#FFD700']
+            },
+            expenses: {
+                labels: [
+                    'Genel Merkeze Ödeme', 'Personel Maaşları (Banka)', 'Personel Maaşları (Nakit)', 'Stajyer Maaşı',
+                    'Kredi Kartı Borç Ödemesi', 'Dükkan Kirası', 'Ev Kirası', 'Manav Ödemesi', 'Elektrik Faturası',
+                    'Geçici Vergi Ödemesi', 'Yemek Kartları Ödemesi', 'İçim Süt Ödemesi', 'Nakit Diğer Ödemeler',
+                    'Arıtma Değişim Ücreti', 'Su Faturası', 'Cam Temizlik Ödeme', 'Vantilatör Lamba Ödemesi',
+                    'Filtre Bakım Ödemesi', 'İlaçlama Ödeme', 'Yazılım Bakım Ücreti', 'Telefon Faturası',
+                    'İnternet Faturası', 'Havale Ücreti'
+                ],
+                data: [
+                    426283.57, 116000.00, 76115.00, 30050.00, 175177.17, 92000.00, 25000.00, 100280.00, 71310.00,
+                    65946.00, 20001.54, 24697.62, 12730.00, 8400.00, 5126.00, 4800.00, 2000.00, 1500.00,
+                    1500.00, 798.00, 781.50, 420.00, 409.42
+                ]
+            },
+            foodCards: {
+                labels: ['Merve', 'Nesibe', 'Hacer', 'Enise', 'Ezel', 'Berkay', 'Emre Albay', 'Furkan', 'İbrahim', 'Emre Yeşilçayır', 'Taha', 'Aslı', 'Alp', 'Yeşim'],
+                data: [3030, 2042.54, 3030, 3000, 1900, 1590, 2176, 2170, 441, 1465, 1235, 370, 1820, 1792]
+            },
+            shipmentDetails: [
+                { name: 'CALLEBAUT BEYAZ ÇİKOLATA (10 KG)', quantity: 60, unit: 'KG', price: 41814.00 },
+                { name: 'CALLEBAUT BITTER ÇİKOLATA (10 KG)', quantity: 40, unit: 'KG', price: 29492.00 },
+                { name: 'CALLEBAUT RUBY ÇİKOLATA (10 KG)', quantity: 10, unit: 'KG', price: 8433.50 },
+                { name: 'CALLEBAUT SÜTLÜ ÇİKOLATA (10 KG)', quantity: 300, unit: 'KG', price: 209070.00 },
+                { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/1', quantity: 1, unit: 'PAKET', price: 3600.00 },
+                { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/2', quantity: 1, unit: 'PAKET', price: 2760.00 },
+                { name: 'BOSTON BASKILI KRAFT SAPLI ÇANTA', quantity: 1, unit: 'KOLİ', price: 1500.00 },
+                { name: 'BASKILI KRAFT KESE KAĞIDI KG', quantity: 1, unit: 'KOLİ', price: 3240.00 },
+                { name: 'BOSTON BASKILI PEÇETE', quantity: 2, unit: 'ADET', price: 2040.00 },
+                { name: 'BOSTON CRUST MIX WAFFLE KUTU', quantity: 1, unit: 'PAKET', price: 2100.00 },
+                { name: 'BOSTON BASKILI MİNİ KAP', quantity: 2, unit: 'KOLİ', price: 4320.00 },
+                { name: 'BOSTON BASKILI TAM KAP', quantity: 1, unit: 'KOLİ', price: 1710.00 },
+                { name: 'BOSTON BASKILI ŞEFFAF BARDAK 12 OZ', quantity: 1, unit: 'KOLİ', price: 3840.00 },
+                { name: 'TORKU TAM BUĞDAYLI BİSKÜVİ TOZU', quantity: 2, unit: 'KOLİ', price: 1575.60 },
+                { name: 'CALLEBAUT KREP KIRIĞI (10 KG)', quantity: 20, unit: 'KG', price: 13332.00 },
+                { name: 'BOSTON BASKILI DEMLİK POŞET ÇAY', quantity: 1, unit: 'KOLİ', price: 1818.00 },
+                { name: 'DVG BAR SOS KARAMEL (2KG)', quantity: 1, unit: 'ADET', price: 1187.76 },
+                { name: 'CALLEBAUT GOLD KARAMEL ÇİKOLATA (10KG)', quantity: 10, unit: 'KG', price: 9595.00 }
+            ],
+            onlineCommissions: [
+                { name: 'Yemeksepeti', gross: 547510.00, net: 396173.05, color: '#FF6B6B' },
+                { name: 'Getir', gross: 162820.00, net: 104019.71, color: '#FFD166' },
+                { name: 'Trendyol', gross: 142555.00, net: 96789.04, color: '#06D6A0' }
+            ],
+            financialStatus: {
+                bankaGelirleri: 1334915.99,
+                bankaGiderleri: 1258695.82,
+                nakitGelir: 122175.00,
+                nakitGider: 88845.00
+            }
+        };
+
+        // Veri Formatlama ve Grafik Fonksiyonları 
+        const formatCurrency = (value) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(value);
+        const formatAmountWithSign = (amount) => {
+            const formatted = formatCurrency(Math.abs(amount));
+            return amount < 0 ? `-` + formatted : formatted;
+        };
+        const createDoughnutChart = (ctxId, labels, data, colors, totalElementId) => {
+            const ctx = document.getElementById(ctxId).getContext('2d');
+            const total = data.reduce((sum, val) => sum + val, 0);
+            document.getElementById(totalElementId).textContent = formatCurrency(total);
+
+             // Mevcut bir grafik varsa yok et
+            if (charts[ctxId]) {
+                charts[ctxId].destroy();
+            }
+
+            const newChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderColor: '#FFFFFF',
+                        borderWidth: 3
+                    }]
                 },
-                tooltip: {
-                    callbacks: {
-                        title: tooltipTitleCallback,
-                        label: function(context) {
-                            let label = context.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            label += new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(context.raw);
-                            return label;
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { 
+                                padding: 15, 
+                                font: { size: 12 } 
+                            } 
+                        },
+                        tooltip: { 
+                            callbacks: { 
+                                label: (context) => `${context.label}: ${formatCurrency(context.raw)}` 
+                            } 
                         }
                     }
                 }
-            }
-        }
-    });
-    document.getElementById('chocolateTotal').textContent = totalChocolateCost.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' });
+            });
+             charts[ctxId] = newChart;
+        };
+        const createList = (listId, data, colorClass, formatFunc) => {
+            const listContainer = document.getElementById(listId);
+            listContainer.innerHTML = '';
+            data.forEach(item => {
+                const div = document.createElement('div');
+                div.className = `flex justify-between items-center p-3 rounded-lg ${colorClass}`;
+                div.innerHTML = `<span class="font-medium">${item.label}</span><span class="font-bold">${formatFunc(item.value)}</span>`;
+                listContainer.appendChild(div);
+            });
+        };
 
-    const expenseCtx = document.getElementById('expenseChart').getContext('2d');
-    const expenseData = {
-        'Genel Merkeze Ödeme': 426283.57,
-        'Personel Maaşları': 222165.00,
-        'Kredi Kartı Borcu': 175177.17,
-        'Kiralar': 117000.00,
-        'Manav Ödemesi': 100280.00,
-        'Vergi & Faturalar': 163585.04,
-        'Diğer Giderler': 56835.04
-    };
-    const totalExpenses = Object.values(expenseData).reduce((sum, value) => sum + value, 0);
-    const expenseLabels = Object.keys(expenseData).map(label => wrapLabel(label, 16));
-    
-    new Chart(expenseCtx, {
-        type: 'doughnut',
-        data: {
-            labels: expenseLabels,
-            datasets: [{
-                label: 'Gider Kategorisi',
-                data: Object.values(expenseData),
-                backgroundColor: [
-                    palette.red, palette.darkBlue, palette.blue, '#F79256', '#7DCFB6', 
-                    '#FBD1A2', '#BDB2FF', '#E63946', '#A8DADC', '#457B9D'
-                ],
-                borderColor: '#FFFFFF',
-                borderWidth: 3
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '60%',
-            plugins: {
-                legend: {
-                    position: 'bottom',
-                    labels: {
-                        padding: 15,
-                        font: { size: 12 }
-                    }
-                },
-                tooltip: {
-                    callbacks: {
-                        title: tooltipTitleCallback
-                    }
-                }
+        const renderReport = (reportData) => {
+            if (!reportData) {
+                console.error("Rapor verisi bulunamadı.");
+                return;
             }
-        }
-    });
-    document.getElementById('expenseTotal').textContent = totalExpenses.toLocaleString('tr-TR') + ' ₺';
-});
-</script>
+
+            document.getElementById('report-period').textContent = `Dönem: ${reportData.period}`;
+            document.getElementById('brut-gelir').textContent = formatCurrency(reportData.kpi.brutGelir);
+            document.getElementById('toplam-gider').textContent = formatCurrency(reportData.kpi.toplamGider);
+            document.getElementById('net-kar').textContent = formatCurrency(reportData.kpi.netKar);
+
+            // Brut Gelir Listesi ve Grafiği 
+            document.getElementById('gross-income-subtitle').textContent = `Kasa raporuna göre toplam ${formatCurrency(reportData.grossIncome.data.reduce((sum, val) => sum + val, 0))}'lik brüt gelirin kaynaklara göre dökümü.`;
+            createList('gross-income-list', reportData.grossIncome.labels.map((label, i) => ({
+                label: label,
+                value: reportData.grossIncome.data[i]
+            })).sort((a, b) => b.value - a.value), 'bg-green-50', formatCurrency);
+            createDoughnutChart('grossIncomeChart', reportData.grossIncome.labels, reportData.grossIncome.data, ['#118AB2', '#06D6A0', '#FFD166', '#FF6B6B', '#073B4C'], 'grossIncomeTotal');
+
+            // Net Gelir Listesi ve Grafiği 
+            document.getElementById('net-income-subtitle').textContent = `Bankaya yatan ve kasadaki net gelirin kaynaklara göre dökümü.`;
+            createList('net-income-list', reportData.netIncome.labels.map((label, i) => ({
+                label: label,
+                value: reportData.netIncome.data[i]
+            })).sort((a, b) => b.value - a.value), 'bg-green-50', formatCurrency);
+            createDoughnutChart('netIncomeChart', reportData.netIncome.labels, reportData.netIncome.data, ['#118AB2', '#06D6A0', '#FFD166', '#FF6B6B', '#073B4C'], 'netIncomeTotal');
+
+            // Çikolata Gider Listesi ve Grafiği (Büyükten Küçüğe Sıralı)
+            const chocolateDetails = reportData.chocolate.costs.map((c, i) => ({
+                ...c,
+                totalCost: c.kg * c.pricePerKg,
+                color: reportData.chocolate.colors[i]
+            })).sort((a, b) => b.totalCost - a.totalCost);
+
+            const chocolateData = chocolateDetails.map(c => c.totalCost);
+            const chocolateLabels = chocolateDetails.map(c => c.name);
+            const chocolateColors = chocolateDetails.map(c => c.color);
+            createDoughnutChart('chocolateChart', chocolateLabels, chocolateData, chocolateColors, 'chocolateTotal');
+
+            const chocolateList = document.getElementById('chocolate-list');
+            chocolateList.innerHTML = '';
+            chocolateDetails.forEach(c => {
+                const div = document.createElement('div');
+                div.className = `flex justify-between items-center p-3 rounded-lg ${c.name === 'Sütlü Çikolata' ? 'bg-amber-50' : c.name === 'Bitter Çikolata' ? 'bg-gray-600 bg-opacity-20' : c.name === 'Beyaz Çikolata' ? 'bg-gray-100' : c.name === 'Ruby Çikolata' ? 'bg-pink-100' : 'bg-yellow-100'}`;
+                const textColor = c.name === 'Sütlü Çikolata' ? 'text-amber-700' : c.name === 'Ruby Çikolata' ? 'text-pink-700' : c.name === 'Gold Çikolata' ? 'text-yellow-700' : 'text-gray-800';
+                div.innerHTML = `<span class="font-medium">${c.name}</span><span class="font-bold ${textColor}">${c.kg} KG (${formatCurrency(c.totalCost)})</span>`;
+                chocolateList.appendChild(div);
+            });
+
+            // Giderler Listesi ve Grafiği (Büyükten Küçüğe Sıralı)
+            const categorizedExpenses = {
+                'Genel Merkeze Ödeme': reportData.expenses.data[0],
+                'Personel Maaşları': reportData.expenses.data[1] + reportData.expenses.data[2] + reportData.expenses.data[3],
+                'Kredi Kartı Borcu': reportData.expenses.data[4],
+                'Kiralar': reportData.expenses.data[5] + reportData.expenses.data[6],
+                'Manav Ödemesi': reportData.expenses.data[7],
+                'Vergi & Faturalar': reportData.expenses.data[8] + reportData.expenses.data[9] + reportData.expenses.data[14] + reportData.expenses.data[20] + reportData.expenses.data[21],
+                'Diğer Giderler': [10, 11, 12, 13, 15, 16, 17, 18, 19, 22].reduce((sum, i) => sum + reportData.expenses.data[i], 0)
+            };
+            
+            const sortedCategorizedExpenses = Object.entries(categorizedExpenses).sort(([, a], [, b]) => b - a);
+            const sortedCategorizedLabels = sortedCategorizedExpenses.map(([label]) => label);
+            const sortedCategorizedData = sortedCategorizedExpenses.map(([, value]) => value);
+            const expenseColors = ['#FF6B6B', '#073B4C', '#118AB2', '#F79256', '#7DCFB6', '#FBD1A2', '#BDB2FF'];
+            createDoughnutChart('expenseChart', sortedCategorizedLabels, sortedCategorizedData, expenseColors, 'expenseTotal');
+
+            const expenseList = document.getElementById('expense-list');
+            expenseList.innerHTML = '';
+            const combinedExpenses = reportData.expenses.labels.map((label, i) => ({
+                label: label,
+                value: reportData.expenses.data[i]
+            })).sort((a, b) => b.value - a.value);
+
+            combinedExpenses.forEach(expense => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center p-3 bg-red-50 rounded-lg';
+                div.innerHTML = `<span>${expense.label}</span><span class="font-bold text-red-700">${formatAmountWithSign(-expense.value)}</span>`;
+                expenseList.appendChild(div);
+            });
+
+            // YEMEK KARTLARI (Büyükten Küçüğe Sıralı)
+            const combinedFoodCards = reportData.foodCards.labels.map((label, i) => ({
+                label: label,
+                value: reportData.foodCards.data[i]
+            })).sort((a, b) => b.value - a.value);
+            
+            const sortedFoodCardLabels = combinedFoodCards.map(item => item.label);
+            const sortedFoodCardData = combinedFoodCards.map(item => item.value);
+            const foodCardColors = ['#8E44AD', '#3498DB', '#1ABC9C', '#F1C40F', '#E67E22', '#E74C3C', '#95A5A6', '#34495E', '#2ECC71', '#D35400', '#C0392B', '#7F8C8D', '#16A085', '#2980B9'];
+            createDoughnutChart('foodCardChart', sortedFoodCardLabels, sortedFoodCardData, foodCardColors, 'foodCardTotal');
+            createList('food-card-list', combinedFoodCards, 'bg-indigo-50', formatCurrency);
+
+            // SEVKİYAT LİSTESİ (Büyükten Küçüğe Sıralı)
+            const shipmentListContainer = document.getElementById('shipment-list');
+            shipmentListContainer.innerHTML = '';
+            let totalShipmentCost = 0;
+            const sortedShipments = [...reportData.shipmentDetails].sort((a, b) => b.price - a.price);
+
+            sortedShipments.forEach(item => {
+                totalShipmentCost += item.price;
+                const div = document.createElement('div');
+                div.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-gray-50 rounded-lg';
+                div.innerHTML = `
+                    <div class="font-medium text-gray-800">${item.name} <span class="text-sm text-gray-500 font-normal">(${item.quantity} ${item.unit})</span></div>
+                    <div class="font-bold text-lg text-gray-900 mt-1 sm:mt-0">${formatCurrency(item.price)}</div>
+                `;
+                shipmentListContainer.appendChild(div);
+            });
+            document.getElementById('shipment-total').textContent = formatCurrency(totalShipmentCost);
+
+            // Nakit Akışı ve Komisyon Analizi 
+            const onlineCommissionList = document.getElementById('online-commission-list');
+            onlineCommissionList.innerHTML = '';
+            let totalCommission = 0;
+            reportData.onlineCommissions.forEach(platform => {
+                const commission = platform.gross - platform.net;
+                totalCommission += commission;
+                const commissionPercentage = ((commission / platform.gross) * 100).toFixed(1);
+
+                const div = document.createElement('div');
+                div.innerHTML = ` 
+                    <div> 
+                        <div class="flex justify-between font-semibold"><span>${platform.name}</span><span class="text-red-600">${formatAmountWithSign(-commission)} ₺ (%${commissionPercentage})</span></div> 
+                        <div class="w-full bg-gray-200 rounded-full h-4 mt-1"><div class="bg-[#FF6B6B] h-4 rounded-full" style="width: ${commissionPercentage}%"></div></div> 
+                        <div class="flex justify-between text-sm text-gray-500 mt-1"><span>Brüt: ${formatCurrency(platform.gross)}</span><span>Net Gelen: ${formatCurrency(platform.net)}</span></div> 
+                    </div> 
+                `;
+                onlineCommissionList.appendChild(div);
+            });
+
+            document.getElementById('total-commission-header').textContent = `Toplam Komisyon Gideri: ${formatCurrency(totalCommission)}`;
+            document.getElementById('total-commission-text').textContent = `Online platformlardan elde edilen ${formatCurrency(reportData.onlineCommissions.reduce((sum, p) => sum + p.gross, 0))} brüt cironun bankaya yatan net karşılığı ${formatCurrency(reportData.onlineCommissions.reduce((sum, p) => sum + p.net, 0))}'dir. Aradaki fark, platformların hizmet bedeli ve komisyonlarıdır.`;
+
+            const financialStatusList = document.getElementById('financial-status-list');
+            financialStatusList.innerHTML = '';
+            const bankNetFlow = reportData.financialStatus.bankaGelirleri - reportData.financialStatus.bankaGiderleri;
+            const cashNetFlow = reportData.financialStatus.nakitGelir - reportData.financialStatus.nakitGider;
+            const totalAssets = bankNetFlow + cashNetFlow;
+
+            financialStatusList.innerHTML = ` 
+                <div class="flex justify-between p-3 rounded-lg bg-gray-50"><span>Toplam Banka Gelirleri</span><span class="font-medium text-green-600">${formatCurrency(reportData.financialStatus.bankaGelirleri)}</span></div> 
+                <div class="flex justify-between p-3 rounded-lg bg-gray-50"><span>Toplam Banka Giderleri</span><span class="font-medium text-red-600">${formatAmountWithSign(-reportData.financialStatus.bankaGiderleri)}</span></div> 
+                <div class="flex justify-between p-3 rounded-lg bg-blue-100 font-bold"><span>Banka Net Akışı</span><span>${formatAmountWithSign(bankNetFlow)} ₺</span></div> 
+                <hr class="my-3"> 
+                <div class="flex justify-between p-3 rounded-lg bg-gray-50"><span>Nakit Gelir (Kasa)</span><span class="font-medium text-green-600">${formatCurrency(reportData.financialStatus.nakitGelir)}</span></div> 
+                <div class="flex justify-between p-3 rounded-lg bg-gray-50"><span>Nakit Gider (Kasa)</span><span class="font-medium text-red-600">${formatAmountWithSign(-reportData.financialStatus.nakitGider)}</span></div> 
+                <div class="flex justify-between p-3 rounded-lg bg-blue-100 font-bold"><span>Kasa Net Akışı</span><span>${formatAmountWithSign(cashNetFlow)} ₺</span></div> 
+                <hr class="my-3 border-2 border-dashed"> 
+                <div class="flex justify-between p-4 rounded-lg bg-yellow-100 text-yellow-800 font-bold text-lg"><span>Toplam Nakit + Banka Varlığı</span><span>${formatAmountWithSign(totalAssets)} ₺</span></div> 
+            `;
+
+            loadingSpinner.classList.add('hidden');
+            reportContainer.classList.remove('hidden');
+        };
+
+        // Veritabanı ve kimlik doğrulama işlemleri 
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
+                    app = initializeApp(firebaseConfig);
+                    db = getFirestore(app);
+                    auth = getAuth(app);
+                    setLogLevel('debug');
+
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            console.log("Firebase'e başarılı bir şekilde giriş yapıldı. UID:", userId);
+
+                            // Veritabanından veriyi dinle 
+                            const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
+                            onSnapshot(docRef, (docSnap) => {
+                                if (docSnap.exists()) {
+                                    renderReport(docSnap.data());
+                                } else {
+                                    console.log("Rapor verisi bulunamadı. Örnek veriyi kaydediyor...");
+                                    // Eğer rapor yoksa, örnek veriyi kaydet 
+                                    setDoc(docRef, sampleReportData)
+                                        .then(() => console.log("Örnek veri başarıyla kaydedildi."))
+                                        .catch(error => console.error("Veri kaydetme hatası:", error));
+                                }
+                            }, (error) => {
+                                console.error("Veritabanı dinleme hatası:", error);
+                                loadingSpinner.classList.add('hidden');
+                                document.getElementById('report-container').innerHTML = '<p class="text-center text-red-500 text-xl font-bold mt-10">Rapor yüklenirken bir hata oluştu. Lütfen konsolu kontrol edin.</p>';
+                            });
+
+                        } else {
+                            console.log("Kullanıcı oturumu açılmadı. Yerel örnek veri kullanılıyor.");
+                            renderReport(sampleReportData);
+                        }
+                    });
+
+                } else {
+                    console.error("Firebase yapılandırması eksik. Yerel örnek veri kullanılıyor.");
+                    renderReport(sampleReportData);
+                }
+
+                // Veri güncelleme butonu işlevi 
+                document.getElementById('updateDataBtn').addEventListener('click', async () => {
+                    if (!db) {
+                        alert("Veritabanı bağlantısı henüz kurulmadı.");
+                        return;
+                    }
+                    const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
+                    try {
+                        await setDoc(docRef, sampleReportData);
+                        console.log("Veri güncelleme isteği gönderildi.");
+                    } catch (e) {
+                        console.error("Veri güncelleme hatası:", e);
+                    }
+                });
+
+            } catch (error) {
+                console.error("Uygulama başlatılırken hata:", error);
+                loadingSpinner.classList.add('hidden');
+                document.getElementById('report-container').innerHTML = '<p class="text-center text-red-500 text-xl font-bold mt-10">Uygulama başlatılırken bir hata oluştu. Lütfen konsolu kontrol edin.</p>';
+            }
+        });
+
+    </script>
 </body>
+
 </html>
+
