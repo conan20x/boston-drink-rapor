@@ -148,6 +148,37 @@
             </section>
         </div>
 
+        <section id="chocolate-analysis" class="card mb-12">
+            <h2 class="text-2xl font-bold text-center mb-2">Çikolata Kullanım ve Gider Analizi</h2>
+            <p class="text-center text-gray-600 mb-6">Kullanılan çikolataların miktar (KG) ve toplam maliyet (₺) dökümü.</p>
+            <div class="chart-container mb-6">
+                <canvas id="chocolateChart"></canvas>
+                <div class="total-label" id="chocolateTotal"></div>
+            </div>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center p-3 bg-amber-50 rounded-lg">
+                    <span class="font-medium">Sütlü Çikolata</span>
+                    <span class="font-bold text-amber-700">360 KG (248.400 ₺)</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-gray-600 bg-opacity-20 rounded-lg">
+                    <span class="font-medium">Bitter Çikolata</span>
+                    <span class="font-bold text-gray-800">40 KG (29.200 ₺)</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-gray-100 rounded-lg">
+                    <span class="font-medium">Beyaz Çikolata</span>
+                    <span class="font-bold text-gray-800">60 KG (41.400 ₺)</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-pink-100 rounded-lg">
+                    <span class="font-medium">Ruby Çikolata</span>
+                    <span class="font-bold text-pink-700">12.5 KG (10.437,50 ₺)</span>
+                </div>
+                <div class="flex justify-between items-center p-3 bg-yellow-100 rounded-lg">
+                    <span class="font-medium">Gold Çikolata</span>
+                    <span class="font-bold text-yellow-700">15 KG (14.250 ₺)</span>
+                </div>
+            </div>
+        </section>
+
         <section id="expenses" class="card mb-12">
             <h2 class="text-2xl font-bold text-center mb-2">Giderlerin Dağılımı</h2>
             <p class="text-center text-gray-600 mb-6">Tüm banka ve kasadan yapılan giderlerin detaylı dökümü.</p>
@@ -344,6 +375,58 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     document.getElementById('netIncomeTotal').textContent = totalNetIncome.toLocaleString('tr-TR') + ' ₺';
+
+    const chocolateData = [
+        360 * 690,      // Sütlü Çikolata
+        40 * 730,       // Bitter Çikolata
+        60 * 690,       // Beyaz Çikolata
+        12.5 * 835,     // Ruby Çikolata
+        15 * 950        // Gold Çikolata
+    ];
+    const totalChocolateCost = chocolateData.reduce((sum, value) => sum + value, 0);
+    const chocolateLabels = ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'];
+    const chocolateCtx = document.getElementById('chocolateChart').getContext('2d');
+    new Chart(chocolateCtx, {
+        type: 'doughnut',
+        data: {
+            labels: chocolateLabels,
+            datasets: [{
+                label: 'Çikolata Maliyeti',
+                data: chocolateData,
+                backgroundColor: ['#A0522D', '#2F2F2F', '#F5F5DC', '#E91E63', '#FFD700'],
+                borderColor: '#FFFFFF',
+                borderWidth: 3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '60%',
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        font: { size: 12 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback,
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(context.raw);
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    document.getElementById('chocolateTotal').textContent = totalChocolateCost.toLocaleString('tr-TR', { style: 'currency', currency: 'TRY' });
 
     const expenseCtx = document.getElementById('expenseChart').getContext('2d');
     const expenseData = {
