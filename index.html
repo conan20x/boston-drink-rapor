@@ -239,376 +239,282 @@
             </div>
         </section>
 
-        <section id="admin-panel" class="card mt-12 mb-12">
-            <h2 class="text-2xl font-bold text-center mb-4">Veri Yönetimi (Gizli)</h2>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <p>Bu bölüm yalnızca yetkili kullanıcılar içindir.</p>
-                <button id="updateDataBtn" class="bg-blue-500 text-white font-bold py-2 px-6 rounded-full hover:bg-blue-700 transition duration-300 shadow-lg">Örnek Veriyi Güncelle</button>
-            </div>
-        </section>
-
         <footer class="text-center text-sm text-gray-400 mt-12">
             <p>Bu rapor, güvenli veri kaynaklarına dayanarak oluşturulmuştur ve finansal danışmanlık yerine geçmez.</p>
             <p>Rapor Tarihi: 6 Eylül 2025</p>
         </footer>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            let charts = {};
+            let reportDataCache = null;
 
-        // Firebase ve Uygulama Ayarları 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        
-        let firebaseConfig = {};
-        try {
-            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
-                firebaseConfig = JSON.parse(__firebase_config);
-            }
-        } catch (e) {
-            console.error("Firebase config parsing error:", e);
-        }
-
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        let app;
-        let db;
-        let auth;
-        let userId;
-        let charts = {};
-        let reportDataCache = null;
-
-        const loadingSpinner = document.getElementById('loading-spinner');
-        const reportContainer = document.getElementById('report-container');
-        
-        const chartStates = {
-            grossIncomeChart: 'doughnut',
-            netIncomeChart: 'doughnut',
-            chocolateChart: 'doughnut',
-            expenseChart: 'doughnut',
-            foodCardChart: 'doughnut'
-        };
-
-        const icons = {
-            'Kredi Kartı': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-blue-500"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>`,
-            'Nakit': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-green-500"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
-            'Yemeksepeti Online': `<svg class="w-6 h-6 mr-2" viewBox="0 0 512 512"><path fill="#ED5058" d="M351.9,4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZV"/></svg>`,
-            'Getir Online': `<svg class="w-6 h-6 mr-2" viewBox="0 0 24 24"><path fill="#5D3EBC" d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Z"/><path fill="#FFD440" d="M12.6,13.4l-1.8-3-1.8,3H6.5l3.6-5.5h3.3l1.3,2,2-3.2,2,3.2,1.3-2h2L17,17l-4.4-3.6Z"/></svg>`,
-            'Trendyol Online': `<svg class="w-6 h-6 mr-2" viewBox="0 0 100 100"><path fill="#f27a13" d="M88.7 72.1L69.3 61.4c-2-1.2-4.6-.1-6 1.7l-9.2 10.8c-.2 0-.5-.1-.7-.2l-17-9.9c-5.9-3.4-10.1-9.8-10.1-16.4l3.8-4.4c-2.1-1.8-3.9-4.3-4.3-6.5L35.1 22c-.3-1.9-1.7-3.4-3.4-3.4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZV"/></svg>`
-        };
-        
-        const chocolateColorMap = {
-            'Sütlü Çikolata': { bg: 'bg-amber-900/30', text: 'text-amber-400' },
-            'Bitter Çikolata': { bg: 'bg-gray-700/30', text: 'text-gray-300' },
-            'Beyaz Çikolata': { bg: 'bg-yellow-900/20', text: 'text-yellow-400' },
-            'Ruby Çikolata': { bg: 'bg-pink-900/30', text: 'text-pink-400' },
-            'Gold Çikolata': { bg: 'bg-yellow-800/30', text: 'text-yellow-300' },
-        };
-
-        const sampleReportData = {
-            period: '01.08.2025 - 04.09.2025',
-            kpi: { brutGelir: 1704018.00, toplamGider: 1347540.82, netKar: 109550.17 },
-            grossIncome: { labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'], data: [728958, 547510, 162820, 142555, 122175] },
-            netIncome: { labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'], data: [729092.33, 396173.05, 104019.71, 96789.04, 122175] },
-            chocolate: {
-                labels: ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'],
-                costs: [
-                    { name: 'Sütlü Çikolata', kg: 360, pricePerKg: 690 }, { name: 'Bitter Çikolata', kg: 40, pricePerKg: 730 }, { name: 'Beyaz Çikolata', kg: 60, pricePerKg: 690 },
-                    { name: 'Ruby Çikolata', kg: 12.5, pricePerKg: 835 }, { name: 'Gold Çikolata', kg: 15, pricePerKg: 950 }
-                ],
-                colors: ['#A0522D', '#3B2F2F', '#F5F5DC', '#E91E63', '#FFD700']
-            },
-            expenses: {
-                labels: [ 'Genel Merkeze Ödeme', 'Personel Maaşları (Banka)', 'Personel Maaşları (Nakit)', 'Stajyer Maaşı', 'Kredi Kartı Borç Ödemesi', 'Dükkan Kirası', 'Ev Kirası', 'Manav Ödemesi', 'Elektrik Faturası', 'Geçici Vergi Ödemesi', 'Yemek Kartları Ödemesi', 'İçim Süt Ödemesi', 'Nakit Diğer Ödemeler', 'Arıtma Değişim Ücreti', 'Su Faturası', 'Cam Temizlik Ödeme', 'Vantilatör Lamba Ödemesi', 'Filtre Bakım Ödemesi', 'İlaçlama Ödeme', 'Yazılım Bakım Ücreti', 'Telefon Faturası', 'İnternet Faturası', 'Havale Ücreti' ],
-                data: [ 4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZV20001.54, 24697.62, 12730.00, 8400.00, 5126.00, 4800.00, 2000.00, 1500.00, 1500.00, 798.00, 781.50, 420.00, 409.42 ]
-            },
-            foodCards: {
-                labels: ['Merve', 'Nesibe', 'Hacer', 'Enise', 'Ezel', 'Berkay', 'Emre Albay', 'Furkan', 'İbrahim', 'Emre Yeşilçayır', 'Taha', 'Aslı', 'Alp', 'Yeşim'],
-                data: [3030, 2042.54, 3030, 3000, 1900, 1590, 2176, 2170, 441, 1465, 1235, 370, 1820, 1792]
-            },
-            shipmentDetails: [
-                 { name: 'CALLEBAUT BEYAZ ÇİKOLATA (10 KG)', quantity: 60, unit: 'KG', price: 4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZV },
-                 { name: 'CALLEBAUT RUBY ÇİKOLATA (10 KG)', quantity: 10, unit: 'KG', price: 8433.50 }, { name: 'CALLEBAUT SÜTLÜ ÇİKOLATA (10 KG)', quantity: 300, unit: 'KG', price: 209070.00 },
-                 { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/1', quantity: 1, unit: 'PAKET', price: 3600.00 }, { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/2', quantity: 1, unit: 'PAKET', price: 2760.00 },
-                 { name: 'BOSTON BASKILI KRAFT SAPLI ÇANTA', quantity: 1, unit: 'KOLİ', price: 1500.00 }, { name: 'BASKILI KRAFT KESE KAĞIDI KG', quantity: 1, unit: 'KOLİ', price: 3240.00 },
-                 { name: 'BOSTON BASKILI PEÇETE', quantity: 2, unit: 'ADET', price: 2040.00 }, { name: 'BOSTON CRUST MIX WAFFLE KUTU', quantity: 1, unit: 'PAKET', price: 2100.00 },
-                 { name: 'BOSTON BASKILI MİNİ KAP', quantity: 2, unit: 'KOLİ', price: 4320.00 }, { name: 'BOSTON BASKILI TAM KAP', quantity: 1, unit: 'KOLİ', price: 1710.00 },
-                 { name: 'BOSTON BASKILI ŞEFFAF BARDAK 12 OZ', quantity: 1, unit: 'KOLİ', price: 3840.00 }, { name: 'TORKU TAM BUĞDAYLI BİSKÜVİ TOZU', quantity: 2, unit: 'KOLİ', price: 1575.60 },
-                 { name: 'CALLEBAUT KREP KIRIĞI (10 KG)', quantity: 20, unit: 'KG', price: 13332.00 }, { name: 'BOSTON BASKILI DEMLİK POŞET ÇAY', quantity: 1, unit: 'KOLİ', price: 1818.00 },
-                 { name: 'DVG BAR SOS KARAMEL (2KG)', quantity: 1, unit: 'ADET', price: 1187.76 }, { name: 'CALLEBAUT GOLD KARAMEL ÇİKOLATA (10KG)', quantity: 10, unit: 'KG', price: 9595.00 }
-            ],
-            onlineCommissions: [
-                 { name: 'Yemeksepeti', gross: 547510.00, net: 396173.05, color: '#FF6B6B' }, { name: 'Getir', gross: 162820.00, net: 104019.71, color: '#FFD166' },
-                 { name: 'Trendyol', gross: 142555.00, net: 96789.04, color: '#06D6A0' }
-            ],
-            financialStatus: { bankaGelirleri: 1334915.99, bankaGiderleri: 1258695.82, nakitGelir: 122175.00, nakitGider: 88845.00 }
-        };
-
-        const formatCurrency = (value) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(value);
-        const formatAmountWithSign = (amount) => {
-            const formatted = formatCurrency(Math.abs(amount));
-            return amount < 0 ? `-` + formatted : formatted;
-        };
-
-        const createOrUpdateChart = (ctxId, type, labels, data, colors, totalElementId) => {
-            const ctx = document.getElementById(ctxId).getContext('2d');
-            const totalLabel = document.getElementById(totalElementId);
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const reportContainer = document.getElementById('report-container');
             
-            if (charts[ctxId]) {
-                charts[ctxId].destroy();
-            }
+            const chartStates = {
+                grossIncomeChart: 'doughnut',
+                netIncomeChart: 'doughnut',
+                chocolateChart: 'doughnut',
+                expenseChart: 'doughnut',
+                foodCardChart: 'doughnut'
+            };
 
-            const isCircular = ['doughnut', 'pie', 'polarArea'].includes(type);
-            if (totalLabel) {
-                 const total = data.reduce((sum, val) => sum + val, 0);
-                 totalLabel.textContent = formatCurrency(total);
-                 totalLabel.style.display = isCircular ? 'block' : 'none';
-            }
-            
-            const options = {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                        labels: { padding: 15, font: { size: 12 }, color: '#E2E8F0' }
-                    },
-                    tooltip: { callbacks: { label: (context) => `${context.label}: ${formatCurrency(context.raw)}` } }
-                }
+            const icons = {
+                'Kredi Kartı': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-blue-500"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>`,
+                'Nakit': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-green-500"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+                'Yemeksepeti Online': `<svg class="w-6 h-6 mr-2" viewBox="0 0 512 512"><path fill="#ED5058" d="M351.9,4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZV"/></svg>`,
+                'Getir Online': `<svg class="w-6 h-6 mr-2" viewBox="0 0 24 24"><path fill="#5D3EBC" d="M12,2A10,10,0,1,0,22,12,10,10,0,0,0,12,2Z"/><path fill="#FFD440" d="M12.6,13.4l-1.8-3-1.8,3H6.5l3.6-5.5h3.3l1.3,2,2-3.2,2,3.2,1.3-2h2L17,17l-4.4-3.6Z"/></svg>`,
+                'Trendyol Online': `<svg class="w-6 h-6 mr-2" viewBox="0 0 100 100"><path fill="#f27a13" d="M88.7 72.1L69.3 61.4c-2-1.2-4.6-.1-6 1.7l-9.2 10.8c-.2 0-.5-.1-.7-.2l-17-9.9c-5.9-3.4-10.1-9.8-10.1-16.4l3.8-4.4c-2.1-1.8-3.9-4.3-4.3-6.5L35.1 22c-.3-1.9-1.7-3.4-3.4-3.4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZV"/></svg>`
             };
             
-            if (type === 'doughnut') options.cutout = '60%';
-            if (type === 'bar') {
-                if(options.plugins.legend) options.plugins.legend.display = false;
-                options.scales = {
-                    y: { beginAtZero: true, ticks: { color: '#94A3B8' } },
-                    x: { ticks: { color: '#94A3B8' } }
-                };
-            }
+            const chocolateColorMap = {
+                'Sütlü Çikolata': { bg: 'bg-amber-900/30', text: 'text-amber-400' },
+                'Bitter Çikolata': { bg: 'bg-gray-700/30', text: 'text-gray-300' },
+                'Beyaz Çikolata': { bg: 'bg-yellow-900/20', text: 'text-yellow-400' },
+                'Ruby Çikolata': { bg: 'bg-pink-900/30', text: 'text-pink-400' },
+                'Gold Çikolata': { bg: 'bg-yellow-800/30', text: 'text-yellow-300' },
+            };
 
-            charts[ctxId] = new Chart(ctx, {
-                type,
-                data: {
-                    labels,
-                    datasets: [{
-                        data,
-                        backgroundColor: colors,
-                        borderColor: '#1E293B',
-                        borderWidth: type === 'bar' ? 0 : 3
-                    }]
+            const sampleReportData = {
+                period: '01.08.2025 - 04.09.2025',
+                kpi: { brutGelir: 1704018.00, toplamGider: 1347540.82, netKar: 109550.17 },
+                grossIncome: { labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'], data: [728958, 547510, 162820, 142555, 122175] },
+                netIncome: { labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'], data: [729092.33, 396173.05, 104019.71, 96789.04, 122175] },
+                chocolate: {
+                    labels: ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'],
+                    costs: [
+                        { name: 'Sütlü Çikolata', kg: 360, pricePerKg: 690 }, { name: 'Bitter Çikolata', kg: 40, pricePerKg: 730 }, { name: 'Beyaz Çikolata', kg: 60, pricePerKg: 690 },
+                        { name: 'Ruby Çikolata', kg: 12.5, pricePerKg: 835 }, { name: 'Gold Çikolata', kg: 15, pricePerKg: 950 }
+                    ],
+                    colors: ['#A0522D', '#3B2F2F', '#F5F5DC', '#E91E63', '#FFD700']
                 },
-                options
-            });
-        };
-        
-        const createListWithIcons = (listId, data, colorClass, formatFunc, iconMap) => {
-            const listContainer = document.getElementById(listId);
-            listContainer.innerHTML = '';
-            data.forEach(item => {
-                const div = document.createElement('div');
-                const iconHTML = iconMap[item.label] || '';
-                div.className = `flex justify-between items-center p-3 rounded-lg ${colorClass}`;
-                div.innerHTML = `<div class="flex items-center"><span class="font-medium">${iconHTML}${item.label}</span></div><span class="font-bold">${formatFunc(item.value)}</span>`;
-                listContainer.appendChild(div);
-            });
-        };
-        
-        const renderReport = (data) => {
-            if (!data) return;
-            reportDataCache = data; // Cache the data
-
-            document.getElementById('report-period').textContent = `Dönem: ${data.period}`;
-            document.getElementById('brut-gelir').textContent = formatCurrency(data.kpi.brutGelir);
-            document.getElementById('toplam-gider').textContent = formatCurrency(data.kpi.toplamGider);
-            document.getElementById('net-kar').textContent = formatCurrency(data.kpi.netKar);
-            
-            const grossIncomeTotal = data.grossIncome.data.reduce((s, v) => s + v, 0);
-            document.getElementById('gross-income-subtitle').textContent = `Kasa raporuna göre toplam ${formatCurrency(grossIncomeTotal)}'lik brüt gelirin kaynaklara göre dökümü.`;
-            createListWithIcons('gross-income-list', data.grossIncome.labels.map((l, i) => ({ label: l, value: data.grossIncome.data[i] })).sort((a,b) => b.value - a.value), 'bg-green-900/20', formatCurrency, icons);
-            createOrUpdateChart('grossIncomeChart', chartStates.grossIncomeChart, data.grossIncome.labels, data.grossIncome.data, ['#118AB2', '#06D6A0', '#FFD166', '#EF4444', '#073B4C'], 'grossIncomeTotal');
-
-            document.getElementById('net-income-subtitle').textContent = `Bankaya yatan ve kasadaki net gelirin kaynaklara göre dökümü.`;
-            createListWithIcons('net-income-list', data.netIncome.labels.map((l, i) => ({ label: l, value: data.netIncome.data[i] })).sort((a,b) => b.value - a.value), 'bg-green-900/20', formatCurrency, icons);
-            createOrUpdateChart('netIncomeChart', chartStates.netIncomeChart, data.netIncome.labels, data.netIncome.data, ['#118AB2', '#06D6A0', '#FFD166', '#EF4444', '#073B4C'], 'netIncomeTotal');
-
-            const chocolateDetails = data.chocolate.costs.map((c, i) => ({...c, totalCost: c.kg * c.pricePerKg, color: data.chocolate.colors[i] })).sort((a, b) => b.totalCost - a.totalCost);
-            createOrUpdateChart('chocolateChart', chartStates.chocolateChart, chocolateDetails.map(c => c.name), chocolateDetails.map(c => c.totalCost), chocolateDetails.map(c => c.color), 'chocolateTotal');
-            
-            const chocolateList = document.getElementById('chocolate-list');
-            chocolateList.innerHTML = '';
-            chocolateDetails.forEach(c => {
-                 const div = document.createElement('div');
-                 const colorClasses = chocolateColorMap[c.name] || { bg: 'bg-slate-800', text: '' };
-                 div.className = `flex justify-between items-center p-3 rounded-lg ${colorClasses.bg}`;
-                 div.innerHTML = `<span class="font-medium">${c.name}</span><span class="font-bold ${colorClasses.text}">${c.kg} KG (${formatCurrency(c.totalCost)})</span>`;
-                 chocolateList.appendChild(div);
-            });
-            
-            const categorizedExpenses = {
-                'Genel Merkeze Ödeme': data.expenses.data[0], 'Personel Maaşları': data.expenses.data[1] + data.expenses.data[2] + data.expenses.data[3],
-                'Kredi Kartı Borcu': data.expenses.data[4], 'Kiralar': data.expenses.data[5] + data.expenses.data[6], 'Manav Ödemesi': data.expenses.data[7],
-                'Vergi & Faturalar': data.expenses.data[8] + data.expenses.data[9] + data.expenses.data[14] + data.expenses.data[20] + data.expenses.data[21],
-                'Diğer Giderler': [10, 11, 12, 13, 15, 16, 17, 18, 19, 22].reduce((s, i) => s + data.expenses.data[i], 0)
+                expenses: {
+                    labels: [ 'Genel Merkeze Ödeme', 'Personel Maaşları (Banka)', 'Personel Maaşları (Nakit)', 'Stajyer Maaşı', 'Kredi Kartı Borç Ödemesi', 'Dükkan Kirası', 'Ev Kirası', 'Manav Ödemesi', 'Elektrik Faturası', 'Geçici Vergi Ödemesi', 'Yemek Kartları Ödemesi', 'İçim Süt Ödemesi', 'Nakit Diğer Ödemeler', 'Arıtma Değişim Ücreti', 'Su Faturası', 'Cam Temizlik Ödeme', 'Vantilatör Lamba Ödemesi', 'Filtre Bakım Ödemesi', 'İlaçlama Ödeme', 'Yazılım Bakım Ücreti', 'Telefon Faturası', 'İnternet Faturası', 'Havale Ücreti' ],
+                    data: [ 4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZV20001.54, 24697.62, 12730.00, 8400.00, 5126.00, 4800.00, 2000.00, 1500.00, 1500.00, 798.00, 781.50, 420.00, 409.42 ]
+                },
+                foodCards: {
+                    labels: ['Merve', 'Nesibe', 'Hacer', 'Enise', 'Ezel', 'Berkay', 'Emre Albay', 'Furkan', 'İbrahim', 'Emre Yeşilçayır', 'Taha', 'Aslı', 'Alp', 'Yeşim'],
+                    data: [3030, 2042.54, 3030, 3000, 1900, 1590, 2176, 2170, 441, 1465, 1235, 370, 1820, 1792]
+                },
+                shipmentDetails: [
+                    { name: 'CALLEBAUT BEYAZ ÇİKOLATA (10 KG)', quantity: 60, unit: 'KG', price: 4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZV },
+                    { name: 'CALLEBAUT RUBY ÇİKOLATA (10 KG)', quantity: 10, unit: 'KG', price: 8433.50 }, { name: 'CALLEBAUT SÜTLÜ ÇİKOLATA (10 KG)', quantity: 300, unit: 'KG', price: 209070.00 },
+                    { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/1', quantity: 1, unit: 'PAKET', price: 3600.00 }, { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/2', quantity: 1, unit: 'PAKET', price: 2760.00 },
+                    { name: 'BOSTON BASKILI KRAFT SAPLI ÇANTA', quantity: 1, unit: 'KOLİ', price: 1500.00 }, { name: 'BASKILI KRAFT KESE KAĞIDI KG', quantity: 1, unit: 'KOLİ', price: 3240.00 },
+                    { name: 'BOSTON BASKILI PEÇETE', quantity: 2, unit: 'ADET', price: 2040.00 }, { name: 'BOSTON CRUST MIX WAFFLE KUTU', quantity: 1, unit: 'PAKET', price: 2100.00 },
+                    { name: 'BOSTON BASKILI MİNİ KAP', quantity: 2, unit: 'KOLİ', price: 4320.00 }, { name: 'BOSTON BASKILI TAM KAP', quantity: 1, unit: 'KOLİ', price: 1710.00 },
+                    { name: 'BOSTON BASKILI ŞEFFAF BARDAK 12 OZ', quantity: 1, unit: 'KOLİ', price: 3840.00 }, { name: 'TORKU TAM BUĞDAYLI BİSKÜVİ TOZU', quantity: 2, unit: 'KOLİ', price: 1575.60 },
+                    { name: 'CALLEBAUT KREP KIRIĞI (10 KG)', quantity: 20, unit: 'KG', price: 13332.00 }, { name: 'BOSTON BASKILI DEMLİK POŞET ÇAY', quantity: 1, unit: 'KOLİ', price: 1818.00 },
+                    { name: 'DVG BAR SOS KARAMEL (2KG)', quantity: 1, unit: 'ADET', price: 1187.76 }, { name: 'CALLEBAUT GOLD KARAMEL ÇİKOLATA (10KG)', quantity: 10, unit: 'KG', price: 9595.00 }
+                ],
+                onlineCommissions: [
+                    { name: 'Yemeksepeti', gross: 547510.00, net: 396173.05, color: '#FF6B6B' }, { name: 'Getir', gross: 162820.00, net: 104019.71, color: '#FFD166' },
+                    { name: 'Trendyol', gross: 142555.00, net: 96789.04, color: '#06D6A0' }
+                ],
+                financialStatus: { bankaGelirleri: 1334915.99, bankaGiderleri: 1258695.82, nakitGelir: 122175.00, nakitGider: 88845.00 }
             };
-            const sortedCategorizedExpenses = Object.entries(categorizedExpenses).sort(([, a], [, b]) => b - a);
-            createOrUpdateChart('expenseChart', chartStates.expenseChart, sortedCategorizedExpenses.map(([l]) => l), sortedCategorizedExpenses.map(([,v]) => v), ['#FF6B6B', '#073B4C', '#118AB2', '#F79256', '#7DCFB6', '#FBD1A2', '#BDB2FF'], 'expenseTotal');
 
-            const expenseList = document.getElementById('expense-list');
-            expenseList.innerHTML = '';
-            data.expenses.labels.map((l, i) => ({ label: l, value: data.expenses.data[i] })).sort((a,b) => b.value - a.value).forEach(e => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center p-3 bg-red-900/20 rounded-lg';
-                div.innerHTML = `<span>${e.label}</span><span class="font-bold text-red-400">${formatAmountWithSign(-e.value)}</span>`;
-                expenseList.appendChild(div);
-            });
-            
-            const foodCards = data.foodCards.labels.map((l, i) => ({ label: l, value: data.foodCards.data[i] })).sort((a,b) => b.value - a.value);
-            createOrUpdateChart('foodCardChart', chartStates.foodCardChart, foodCards.map(fc => fc.label), foodCards.map(fc => fc.value), ['#8E44AD', '#3498DB', '#1ABC9C', '#F1C40F', '#E67E22', '#E74C3C', '#95A5A6', '#34495E', '#2ECC71', '#D35400', '#C0392B', '#7F8C8D', '#16A085', '#2980B9'], 'foodCardTotal');
-            
-            const foodCardList = document.getElementById('food-card-list');
-            foodCardList.innerHTML = '';
-            foodCards.forEach(fc => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center p-3 rounded-lg bg-indigo-900/20';
-                div.innerHTML = `<span class="font-medium">${fc.label}</span><span class="font-bold">${formatCurrency(fc.value)}</span>`;
-                foodCardList.appendChild(div);
-            });
+            const formatCurrency = (value) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(value);
+            const formatAmountWithSign = (amount) => {
+                const formatted = formatCurrency(Math.abs(amount));
+                return amount < 0 ? `-` + formatted : formatted;
+            };
 
-            const shipmentList = document.getElementById('shipment-list');
-            shipmentList.innerHTML = '';
-            let totalShipmentCost = 0;
-            [...data.shipmentDetails].sort((a,b) => b.price - a.price).forEach(item => {
-                totalShipmentCost += item.price;
-                const div = document.createElement('div');
-                div.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-slate-700 rounded-lg';
-                div.innerHTML = `<div class="font-medium text-gray-200">${item.name} <span class="text-sm text-gray-4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZV">${formatCurrency(item.price)}</div>`;
-                shipmentList.appendChild(div);
-            });
-            document.getElementById('shipment-total').textContent = formatCurrency(totalShipmentCost);
-
-            const onlineCommissionList = document.getElementById('online-commission-list');
-            onlineCommissionList.innerHTML = '';
-            let totalCommission = 0;
-            data.onlineCommissions.forEach(p => {
-                const commission = p.gross - p.net; totalCommission += commission;
-                const pct = ((commission / p.gross) * 100).toFixed(1);
-                const div = document.createElement('div');
-                div.innerHTML = `<div><div class="flex justify-between font-semibold"><span>${p.name}</span><span class="text-red-4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZVfull h-4 mt-1"><div class="bg-[#FF6B6B] h-4 rounded-full" style="width: ${pct}%"></div></div><div class="flex justify-between text-sm text-gray-4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZV>`;
-                onlineCommissionList.appendChild(div);
-            });
-
-            document.getElementById('total-commission-header').textContent = `Toplam Komisyon Gideri: ${formatCurrency(totalCommission)}`;
-            document.getElementById('total-commission-text').textContent = `Online platformlardan elde edilen ${formatCurrency(data.onlineCommissions.reduce((s, p) => s + p.gross, 0))} brüt cironun bankaya yatan net karşılığı ${formatCurrency(data.onlineCommissions.reduce((s, p) => s + p.net, 0))}'dir.`;
-
-            const financialStatusList = document.getElementById('financial-status-list');
-            const bankNetFlow = data.financialStatus.bankaGelirleri - data.financialStatus.bankaGiderleri;
-            const cashNetFlow = data.financialStatus.nakitGelir - data.financialStatus.nakitGider;
-            financialStatusList.innerHTML = `
-                <div class="flex justify-between p-3 rounded-lg bg-slate-700"><span>Banka Gelirleri</span><span class="font-medium text-green-400">${formatCurrency(data.financialStatus.bankaGelirleri)}</span></div>
-                <div class="flex justify-between p-3 rounded-lg bg-slate-700"><span>Banka Giderleri</span><span class="font-medium text-red-400">${formatAmountWithSign(-data.financialStatus.bankaGiderleri)}</span></div>
-                <div class="flex justify-between p-3 rounded-lg bg-blue-900/30 font-bold"><span>Banka Net Akışı</span><span>${formatAmountWithSign(bankNetFlow)} ?</span></div>
-                <hr class="my-3 border-gray-700">
-                <div class="flex justify-between p-3 rounded-lg bg-slate-700"><span>Nakit Gelir</span><span class="font-medium text-green-400">${formatCurrency(data.financialStatus.nakitGelir)}</span></div>
-                <div class="flex justify-between p-3 rounded-lg bg-slate-700"><span>Nakit Gider</span><span class="font-medium text-red-400">${formatAmountWithSign(-data.financialStatus.nakitGider)}</span></div>
-                <div class="flex justify-between p-3 rounded-lg bg-blue-900/30 font-bold"><span>Kasa Net Akışı</span><span>${formatAmountWithSign(cashNetFlow)} ?</span></div>
-                <hr class="my-3 border-2 border-dashed border-gray-700">
-                <div class="flex justify-between p-4 rounded-lg bg-yellow-900/30 text-yellow-300 font-bold text-lg"><span>Toplam Varlık</span><span>${formatAmountWithSign(bankNetFlow + cashNetFlow)} ?</span></div>
-            `;
-
-            loadingSpinner.classList.add('hidden');
-            reportContainer.classList.remove('hidden');
-        };
-        
-        document.querySelectorAll('.chart-controls').forEach(controlContainer => {
-            controlContainer.addEventListener('click', (e) => {
-                if (e.target.matches('.chart-control-btn')) {
-                    const chartId = controlContainer.dataset.chartId;
-                    const newChartType = e.target.dataset.type;
-
-                    if (chartId && chartStates[chartId] !== newChartType) {
-                        chartStates[chartId] = newChartType;
-
-                        controlContainer.querySelectorAll('.chart-control-btn').forEach(btn => {
-                            btn.classList.remove('active');
-                        });
-                        e.target.classList.add('active');
-
-                        if (reportDataCache) {
-                            renderReport(reportDataCache);
-                        }
-                    }
+            const createOrUpdateChart = (ctxId, type, labels, data, colors, totalElementId) => {
+                const ctx = document.getElementById(ctxId).getContext('2d');
+                const totalLabel = document.getElementById(totalElementId);
+                
+                if (charts[ctxId]) {
+                    charts[ctxId].destroy();
                 }
-            });
-        });
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
-                    app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    auth = getAuth(app);
-                    setLogLevel('debug');
-
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                    } else {
-                        await signInAnonymously(auth);
+                const isCircular = ['doughnut', 'pie', 'polarArea'].includes(type);
+                if (totalLabel) {
+                    const total = data.reduce((sum, val) => sum + val, 0);
+                    totalLabel.textContent = formatCurrency(total);
+                    totalLabel.style.display = isCircular ? 'block' : 'none';
+                }
+                
+                const options = {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 15, font: { size: 12 }, color: '#E2E8F0' }
+                        },
+                        tooltip: { callbacks: { label: (context) => `${context.label}: ${formatCurrency(context.raw)}` } }
                     }
+                };
+                
+                if (type === 'doughnut') options.cutout = '60%';
+                if (type === 'bar') {
+                    if(options.plugins.legend) options.plugins.legend.display = false;
+                    options.scales = {
+                        y: { beginAtZero: true, ticks: { color: '#94A3B8' } },
+                        x: { ticks: { color: '#94A3B8' } }
+                    };
+                }
 
-                    onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
-                            onSnapshot(docRef, (docSnap) => {
-                                if (docSnap.exists() && docSnap.data()) {
-                                    console.log("Firestore'dan veri alındı.");
-                                    renderReport(docSnap.data());
-                                } else {
-                                    console.log("Belge bulunamadı. Örnek veri kullanılıyor ve Firestore'a yazılıyor.");
-                                    renderReport(sampleReportData);
-                                    setDoc(docRef, sampleReportData).catch(e => {
-                                        console.error("Arka planda Firestore'a yazma hatası:", e);
-                                    });
-                                }
-                            }, (error) => {
-                                console.error("onSnapshot hatası, fallback kullanılıyor:", error);
-                                renderReport(sampleReportData);
+                charts[ctxId] = new Chart(ctx, {
+                    type,
+                    data: {
+                        labels,
+                        datasets: [{
+                            data,
+                            backgroundColor: colors,
+                            borderColor: '#1E293B',
+                            borderWidth: type === 'bar' ? 0 : 3
+                        }]
+                    },
+                    options
+                });
+            };
+            
+            const createListWithIcons = (listId, data, colorClass, formatFunc, iconMap) => {
+                const listContainer = document.getElementById(listId);
+                listContainer.innerHTML = '';
+                data.forEach(item => {
+                    const div = document.createElement('div');
+                    const iconHTML = iconMap[item.label] || '';
+                    div.className = `flex justify-between items-center p-3 rounded-lg ${colorClass}`;
+                    div.innerHTML = `<div class="flex items-center"><span class="font-medium">${iconHTML}${item.label}</span></div><span class="font-bold">${formatFunc(item.value)}</span>`;
+                    listContainer.appendChild(div);
+                });
+            };
+            
+            const renderReport = (data) => {
+                if (!data) return;
+                reportDataCache = data; // Cache the data
+
+                document.getElementById('report-period').textContent = `Dönem: ${data.period}`;
+                document.getElementById('brut-gelir').textContent = formatCurrency(data.kpi.brutGelir);
+                document.getElementById('toplam-gider').textContent = formatCurrency(data.kpi.toplamGider);
+                document.getElementById('net-kar').textContent = formatCurrency(data.kpi.netKar);
+                
+                const grossIncomeTotal = data.grossIncome.data.reduce((s, v) => s + v, 0);
+                document.getElementById('gross-income-subtitle').textContent = `Kasa raporuna göre toplam ${formatCurrency(grossIncomeTotal)}'lik brüt gelirin kaynaklara göre dökümü.`;
+                createListWithIcons('gross-income-list', data.grossIncome.labels.map((l, i) => ({ label: l, value: data.grossIncome.data[i] })).sort((a,b) => b.value - a.value), 'bg-green-900/20', formatCurrency, icons);
+                createOrUpdateChart('grossIncomeChart', chartStates.grossIncomeChart, data.grossIncome.labels, data.grossIncome.data, ['#118AB2', '#06D6A0', '#FFD166', '#EF4444', '#073B4C'], 'grossIncomeTotal');
+
+                document.getElementById('net-income-subtitle').textContent = `Bankaya yatan ve kasadaki net gelirin kaynaklara göre dökümü.`;
+                createListWithIcons('net-income-list', data.netIncome.labels.map((l, i) => ({ label: l, value: data.netIncome.data[i] })).sort((a,b) => b.value - a.value), 'bg-green-900/20', formatCurrency, icons);
+                createOrUpdateChart('netIncomeChart', chartStates.netIncomeChart, data.netIncome.labels, data.netIncome.data, ['#118AB2', '#06D6A0', '#FFD166', '#EF4444', '#073B4C'], 'netIncomeTotal');
+
+                const chocolateDetails = data.chocolate.costs.map((c, i) => ({...c, totalCost: c.kg * c.pricePerKg, color: data.chocolate.colors[i] })).sort((a, b) => b.totalCost - a.totalCost);
+                createOrUpdateChart('chocolateChart', chartStates.chocolateChart, chocolateDetails.map(c => c.name), chocolateDetails.map(c => c.totalCost), chocolateDetails.map(c => c.color), 'chocolateTotal');
+                
+                const chocolateList = document.getElementById('chocolate-list');
+                chocolateList.innerHTML = '';
+                chocolateDetails.forEach(c => {
+                    const div = document.createElement('div');
+                    const colorClasses = chocolateColorMap[c.name] || { bg: 'bg-slate-800', text: '' };
+                    div.className = `flex justify-between items-center p-3 rounded-lg ${colorClasses.bg}`;
+                    div.innerHTML = `<span class="font-medium">${c.name}</span><span class="font-bold ${colorClasses.text}">${c.kg} KG (${formatCurrency(c.totalCost)})</span>`;
+                    chocolateList.appendChild(div);
+                });
+                
+                const categorizedExpenses = {
+                    'Genel Merkeze Ödeme': data.expenses.data[0], 'Personel Maaşları': data.expenses.data[1] + data.expenses.data[2] + data.expenses.data[3],
+                    'Kredi Kartı Borcu': data.expenses.data[4], 'Kiralar': data.expenses.data[5] + data.expenses.data[6], 'Manav Ödemesi': data.expenses.data[7],
+                    'Vergi & Faturalar': data.expenses.data[8] + data.expenses.data[9] + data.expenses.data[14] + data.expenses.data[20] + data.expenses.data[21],
+                    'Diğer Giderler': [10, 11, 12, 13, 15, 16, 17, 18, 19, 22].reduce((s, i) => s + data.expenses.data[i], 0)
+                };
+                const sortedCategorizedExpenses = Object.entries(categorizedExpenses).sort(([, a], [, b]) => b - a);
+                createOrUpdateChart('expenseChart', chartStates.expenseChart, sortedCategorizedExpenses.map(([l]) => l), sortedCategorizedExpenses.map(([,v]) => v), ['#FF6B6B', '#073B4C', '#118AB2', '#F79256', '#7DCFB6', '#FBD1A2', '#BDB2FF'], 'expenseTotal');
+
+                const expenseList = document.getElementById('expense-list');
+                expenseList.innerHTML = '';
+                data.expenses.labels.map((l, i) => ({ label: l, value: data.expenses.data[i] })).sort((a,b) => b.value - a.value).forEach(e => {
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between items-center p-3 bg-red-900/20 rounded-lg';
+                    div.innerHTML = `<span>${e.label}</span><span class="font-bold text-red-400">${formatAmountWithSign(-e.value)}</span>`;
+                    expenseList.appendChild(div);
+                });
+                
+                const foodCards = data.foodCards.labels.map((l, i) => ({ label: l, value: data.foodCards.data[i] })).sort((a,b) => b.value - a.value);
+                createOrUpdateChart('foodCardChart', chartStates.foodCardChart, foodCards.map(fc => fc.label), foodCards.map(fc => fc.value), ['#8E44AD', '#3498DB', '#1ABC9C', '#F1C40F', '#E67E22', '#E74C3C', '#95A5A6', '#34495E', '#2ECC71', '#D35400', '#C0392B', '#7F8C8D', '#16A085', '#2980B9'], 'foodCardTotal');
+                
+                const foodCardList = document.getElementById('food-card-list');
+                foodCardList.innerHTML = '';
+                foodCards.forEach(fc => {
+                    const div = document.createElement('div');
+                    div.className = 'flex justify-between items-center p-3 rounded-lg bg-indigo-900/20';
+                    div.innerHTML = `<span class="font-medium">${fc.label}</span><span class="font-bold">${formatCurrency(fc.value)}</span>`;
+                    foodCardList.appendChild(div);
+                });
+
+                const shipmentList = document.getElementById('shipment-list');
+                shipmentList.innerHTML = '';
+                let totalShipmentCost = 0;
+                [...data.shipmentDetails].sort((a,b) => b.price - a.price).forEach(item => {
+                    totalShipmentCost += item.price;
+                    const div = document.createElement('div');
+                    div.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center p-3 bg-slate-700 rounded-lg';
+                    div.innerHTML = `<div class="font-medium text-gray-200">${item.name} <span class="text-sm text-gray-4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZV">${formatCurrency(item.price)}</div>`;
+                    shipmentList.appendChild(div);
+                });
+                document.getElementById('shipment-total').textContent = formatCurrency(totalShipmentCost);
+
+                const onlineCommissionList = document.getElementById('online-commission-list');
+                onlineCommissionList.innerHTML = '';
+                let totalCommission = 0;
+                data.onlineCommissions.forEach(p => {
+                    const commission = p.gross - p.net; totalCommission += commission;
+                    const pct = ((commission / p.gross) * 100).toFixed(1);
+                    const div = document.createElement('div');
+                    div.innerHTML = `<div><div class="flex justify-between font-semibold"><span>${p.name}</span><span class="text-red-4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZVfull h-4 mt-1"><div class="bg-[#FF6B6B] h-4 rounded-full" style="width: ${pct}%"></div></div><div class="flex justify-between text-sm text-gray-4JUdGzvrMFDWrUUwY3toJATSeNwjn54LkCnKBPRzDuhzi5vSepHfUckJNxRL2gjkNrSqtCoRUrEDAgRwsQvVCjZbRyFTLRNyDmT1a1boZV>`;
+                    onlineCommissionList.appendChild(div);
+                });
+
+                document.getElementById('total-commission-header').textContent = `Toplam Komisyon Gideri: ${formatCurrency(totalCommission)}`;
+                document.getElementById('total-commission-text').textContent = `Online platformlardan elde edilen ${formatCurrency(data.onlineCommissions.reduce((s, p) => s + p.gross, 0))} brüt cironun bankaya yatan net karşılığı ${formatCurrency(data.onlineCommissions.reduce((s, p) => s + p.net, 0))}'dir.`;
+
+                const financialStatusList = document.getElementById('financial-status-list');
+                const bankNetFlow = data.financialStatus.bankaGelirleri - data.financialStatus.bankaGiderleri;
+                const cashNetFlow = data.financialStatus.nakitGelir - data.financialStatus.nakitGider;
+                financialStatusList.innerHTML = `
+                    <div class="flex justify-between p-3 rounded-lg bg-slate-700"><span>Banka Gelirleri</span><span class="font-medium text-green-400">${formatCurrency(data.financialStatus.bankaGelirleri)}</span></div>
+                    <div class="flex justify-between p-3 rounded-lg bg-slate-700"><span>Banka Giderleri</span><span class="font-medium text-red-400">${formatAmountWithSign(-data.financialStatus.bankaGiderleri)}</span></div>
+                    <div class="flex justify-between p-3 rounded-lg bg-blue-900/30 font-bold"><span>Banka Net Akışı</span><span>${formatAmountWithSign(bankNetFlow)} ?</span></div>
+                    <hr class="my-3 border-gray-700">
+                    <div class="flex justify-between p-3 rounded-lg bg-slate-700"><span>Nakit Gelir</span><span class="font-medium text-green-400">${formatCurrency(data.financialStatus.nakitGelir)}</span></div>
+                    <div class="flex justify-between p-3 rounded-lg bg-slate-700"><span>Nakit Gider</span><span class="font-medium text-red-400">${formatAmountWithSign(-data.financialStatus.nakitGider)}</span></div>
+                    <div class="flex justify-between p-3 rounded-lg bg-blue-900/30 font-bold"><span>Kasa Net Akışı</span><span>${formatAmountWithSign(cashNetFlow)} ?</span></div>
+                    <hr class="my-3 border-2 border-dashed border-gray-700">
+                    <div class="flex justify-between p-4 rounded-lg bg-yellow-900/30 text-yellow-300 font-bold text-lg"><span>Toplam Varlık</span><span>${formatAmountWithSign(bankNetFlow + cashNetFlow)} ?</span></div>
+                `;
+
+                loadingSpinner.classList.add('hidden');
+                reportContainer.classList.remove('hidden');
+            };
+            
+            document.querySelectorAll('.chart-controls').forEach(controlContainer => {
+                controlContainer.addEventListener('click', (e) => {
+                    if (e.target.matches('.chart-control-btn')) {
+                        const chartId = controlContainer.dataset.chartId;
+                        const newChartType = e.target.dataset.type;
+
+                        if (chartId && chartStates[chartId] !== newChartType) {
+                            chartStates[chartId] = newChartType;
+
+                            controlContainer.querySelectorAll('.chart-control-btn').forEach(btn => {
+                                btn.classList.remove('active');
                             });
-                        } else {
-                             console.log("Kullanıcı kimliği doğrulanmadı, fallback kullanılıyor.");
-                             renderReport(sampleReportData);
-                        }
-                    });
-                } else {
-                    console.log("Firebase config bulunamadı, örnek veri kullanılıyor.");
-                    renderReport(sampleReportData); 
-                }
-            } catch (error) {
-                console.error("Firebase başlatma hatası:", error);
-                renderReport(sampleReportData);
-            }
+                            e.target.classList.add('active');
 
-            document.getElementById('updateDataBtn').addEventListener('click', () => {
-                const btn = document.getElementById('updateDataBtn');
-                if(db && userId) {
-                     const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
-                     btn.textContent = 'Güncelleniyor...';
-                     setDoc(docRef, sampleReportData)
-                        .then(() => {
-                            console.log("Örnek veri başarıyla güncellendi.");
-                            btn.textContent = 'Başarıyla Güncellendi!';
-                            setTimeout(() => { btn.textContent = 'Örnek Veriyi Güncelle'; }, 2000);
-                        })
-                        .catch(e => {
-                            console.error("Veri güncellenirken hata oluştu: ", e);
-                            btn.textContent = 'Hata Oluştu!';
-                            setTimeout(() => { btn.textContent = 'Örnek Veriyi Güncelle'; }, 2000);
-                        });
-                } else {
-                    console.log("Veritabanı bağlantısı yok. Güncelleme yapılamıyor.");
-                }
+                            if (reportDataCache) {
+                                renderReport(reportDataCache);
+                            }
+                        }
+                    }
+                });
             });
+
+            // Sayfa yüklendiğinde raporu doğrudan örnek verilerle oluştur.
+            renderReport(sampleReportData); 
         });
     </script>
 </body>
