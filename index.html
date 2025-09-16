@@ -260,7 +260,16 @@
 
         // Firebase ve Uygulama Ayarları 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        
+        let firebaseConfig = {};
+        try {
+            if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+                firebaseConfig = JSON.parse(__firebase_config);
+            }
+        } catch (e) {
+            console.error("Firebase config parsing error:", e);
+        }
+
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
         let app;
@@ -273,7 +282,6 @@
         const loadingSpinner = document.getElementById('loading-spinner');
         const reportContainer = document.getElementById('report-container');
         
-        // --- NEW: Chart State Management ---
         const chartStates = {
             grossIncomeChart: 'doughnut',
             netIncomeChart: 'doughnut',
@@ -282,7 +290,6 @@
             foodCardChart: 'doughnut'
         };
 
-        // --- SVG and Brand Icons ---
         const icons = {
             'Kredi Kartı': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-blue-500"><rect width="20" height="14" x="2" y="5" rx="2"/><line x1="2" x2="22" y1="10" y2="10"/></svg>`,
             'Nakit': `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-3 text-green-500"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
@@ -513,7 +520,6 @@
             reportContainer.classList.remove('hidden');
         };
         
-        // --- FIXED: Chart Control Logic ---
         document.querySelectorAll('.chart-controls').forEach(controlContainer => {
             controlContainer.addEventListener('click', (e) => {
                 if (e.target.matches('.chart-control-btn')) {
@@ -536,8 +542,7 @@
             });
         });
 
-        // --- FIXED: Initialization logic runs immediately ---
-        (async () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             try {
                 if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
                     app = initializeApp(firebaseConfig);
@@ -561,9 +566,7 @@
                                     renderReport(docSnap.data());
                                 } else {
                                     console.log("Belge bulunamadı. Örnek veri kullanılıyor ve Firestore'a yazılıyor.");
-                                    // Render immediately with sample data to unblock UI
                                     renderReport(sampleReportData);
-                                    // Then, write to Firestore in the background.
                                     setDoc(docRef, sampleReportData).catch(e => {
                                         console.error("Arka planda Firestore'a yazma hatası:", e);
                                     });
@@ -606,7 +609,7 @@
                     console.log("Veritabanı bağlantısı yok. Güncelleme yapılamıyor.");
                 }
             });
-        })();
+        });
     </script>
 </body>
 </html>
