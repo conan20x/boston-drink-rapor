@@ -556,16 +556,25 @@
                             userId = user.uid;
                             const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
                             onSnapshot(docRef, (docSnap) => {
-                                if (docSnap.exists()) {
+                                if (docSnap.exists() && docSnap.data()) {
+                                    console.log("Firestore'dan veri alındı.");
                                     renderReport(docSnap.data());
                                 } else {
-                                    console.log("Belge bulunamadı, örnek veri yazılıyor.");
-                                    setDoc(docRef, sampleReportData);
+                                    console.log("Belge bulunamadı. Örnek veri kullanılıyor ve Firestore'a yazılıyor.");
+                                    // Render immediately with sample data to unblock UI
+                                    renderReport(sampleReportData);
+                                    // Then, write to Firestore in the background.
+                                    setDoc(docRef, sampleReportData).catch(e => {
+                                        console.error("Arka planda Firestore'a yazma hatası:", e);
+                                    });
                                 }
                             }, (error) => {
-                                console.error("onSnapshot hatası:", error);
+                                console.error("onSnapshot hatası, fallback kullanılıyor:", error);
                                 renderReport(sampleReportData);
                             });
+                        } else {
+                             console.log("Kullanıcı kimliği doğrulanmadı, fallback kullanılıyor.");
+                             renderReport(sampleReportData);
                         }
                     });
                 } else {
@@ -578,15 +587,21 @@
             }
 
             document.getElementById('updateDataBtn').addEventListener('click', () => {
+                const btn = document.getElementById('updateDataBtn');
                 if(db && userId) {
                      const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
+                     btn.textContent = 'Güncelleniyor...';
                      setDoc(docRef, sampleReportData)
                         .then(() => {
-                            // Replaced alert with a more modern notification if possible
-                            // For now, console log is safer
                             console.log("Örnek veri başarıyla güncellendi.");
+                            btn.textContent = 'Başarıyla Güncellendi!';
+                            setTimeout(() => { btn.textContent = 'Örnek Veriyi Güncelle'; }, 2000);
                         })
-                        .catch(e => console.error("Veri güncellenirken hata oluştu: ", e));
+                        .catch(e => {
+                            console.error("Veri güncellenirken hata oluştu: ", e);
+                            btn.textContent = 'Hata Oluştu!';
+                            setTimeout(() => { btn.textContent = 'Örnek Veriyi Güncelle'; }, 2000);
+                        });
                 } else {
                     console.log("Veritabanı bağlantısı yok. Güncelleme yapılamıyor.");
                 }
@@ -595,3 +610,4 @@
     </script>
 </body>
 </html>
+
