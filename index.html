@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boston Drink & Dessert Cadde Şube Ağustos 2025 Raporu</title>
+    <title>Boston Drink & Dessert Cadde Şube Finansal Raporu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -154,6 +154,56 @@
             font-size: 2.6rem;
             letter-spacing: -0.04em;
         }
+
+        .month-switcher {
+            display: inline-flex;
+            padding: 0.35rem;
+            border-radius: 9999px;
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.45), 0 12px 35px -20px rgba(14, 165, 233, 0.45);
+            gap: 0.35rem;
+        }
+
+        .month-button {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.55rem 1.35rem;
+            border-radius: 9999px;
+            border: none;
+            background: transparent;
+            color: rgba(226, 232, 240, 0.85);
+            transition: all 0.25s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .month-button::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(59, 130, 246, 0.35));
+            opacity: 0;
+            transition: opacity 0.25s ease;
+        }
+
+        .month-button span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .month-button[data-active="true"],
+        .month-button:hover {
+            color: #0F172A;
+        }
+
+        .month-button[data-active="true"]::after,
+        .month-button:hover::after {
+            opacity: 1;
+        }
     </style>
 </head>
 
@@ -164,6 +214,9 @@
     </div>
 
     <div class="page-wrapper px-4 sm:px-8 md:px-10 lg:px-12 py-10 hidden" id="report-container">
+        <div class="flex justify-center lg:justify-end mb-10">
+            <div id="month-switcher" class="month-switcher"></div>
+        </div>
         <header class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 mb-12">
             <div class="flex items-center gap-4">
                 <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-cyan-400 via-emerald-400 to-blue-500 flex items-center justify-center shadow-2xl shadow-cyan-500/30">
@@ -171,7 +224,7 @@
                 </div>
                 <div>
                     <p class="uppercase tracking-[0.4em] text-xs text-sky-200/80">Finansal Özet</p>
-                    <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold gradient-text leading-tight">Boston Drink & Dessert | Cadde Şube Ağustos 2025 Raporu</h1>
+                    <h1 id="report-title" class="text-3xl sm:text-4xl lg:text-5xl font-bold gradient-text leading-tight">Boston Drink & Dessert | Cadde Şube Raporu</h1>
                 </div>
             </div>
             <div class="glass-card flex flex-col sm:flex-row items-start sm:items-center gap-4 py-4 px-6">
@@ -375,7 +428,7 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase ve Uygulama Ayarları
+        // Firebase ve Uygulama Ayarları 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
@@ -393,88 +446,246 @@
 
         // Örnek Rapor Verileri (Bu veriler veritabanına kaydedilecek)
         const sampleReportData = {
-            period: '01.08.2025 - 04.09.2025',
-            kpi: {
-                brutGelir: 1704018.00,
-                toplamGider: 1347540.82,
-                netKar: 109550.17
-            },
-            grossIncome: {
-                labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
-                data: [728958, 547510, 162820, 142555, 122175]
-            },
-            netIncome: {
-                labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
-                data: [729092.33, 396173.05, 104019.71, 96789.04, 122175]
-            },
-            chocolate: {
-                labels: ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'],
-                costs: [
-                    { name: 'Sütlü Çikolata', kg: 360, pricePerKg: 690 },
-                    { name: 'Bitter Çikolata', kg: 40, pricePerKg: 730 },
-                    { name: 'Beyaz Çikolata', kg: 60, pricePerKg: 690 },
-                    { name: 'Ruby Çikolata', kg: 12.5, pricePerKg: 835 },
-                    { name: 'Gold Çikolata', kg: 15, pricePerKg: 950 }
-                ],
-                colors: ['#A0522D', '#2F2F2F', '#F5F5DC', '#E91E63', '#FFD700']
-            },
-            expenses: {
-                labels: [
-                    'Genel Merkeze Ödeme', 'Personel Maaşları (Banka)', 'Personel Maaşları (Nakit)', 'Stajyer Maaşı',
-                    'Kredi Kartı Borç Ödemesi', 'Dükkan Kirası', 'Ev Kirası', 'Manav Ödemesi', 'Elektrik Faturası',
-                    'Geçici Vergi Ödemesi', 'Yemek Kartları Ödemesi', 'İçim Süt Ödemesi', 'Nakit Diğer Ödemeler',
-                    'Arıtma Değişim Ücreti', 'Su Faturası', 'Cam Temizlik Ödeme', 'Vantilatör Lamba Ödemesi',
-                    'Filtre Bakım Ödemesi', 'İlaçlama Ödeme', 'Yazılım Bakım Ücreti', 'Telefon Faturası',
-                    'İnternet Faturası', 'Havale Ücreti'
-                ],
-                data: [
-                    426283.57, 116000.00, 76115.00, 30050.00, 175177.17, 92000.00, 25000.00, 100280.00, 71310.00,
-                    65946.00, 20001.54, 24697.62, 12730.00, 8400.00, 5126.00, 4800.00, 2000.00, 1500.00,
-                    1500.00, 798.00, 781.50, 420.00, 409.42
-                ]
-            },
-            foodCards: {
-                labels: ['Merve', 'Nesibe', 'Hacer', 'Enise', 'Ezel', 'Berkay', 'Emre Albay', 'Furkan', 'İbrahim', 'Emre Yeşilçayır', 'Taha', 'Aslı', 'Alp', 'Yeşim'],
-                data: [3030, 2042.54, 3030, 3000, 1900, 1590, 2176, 2170, 441, 1465, 1235, 370, 1820, 1792]
-            },
-            shipmentDetails: [
-                { name: 'CALLEBAUT BEYAZ ÇİKOLATA (10 KG)', quantity: 60, unit: 'KG', price: 41814.00 },
-                { name: 'CALLEBAUT BITTER ÇİKOLATA (10 KG)', quantity: 40, unit: 'KG', price: 29492.00 },
-                { name: 'CALLEBAUT RUBY ÇİKOLATA (10 KG)', quantity: 10, unit: 'KG', price: 8433.50 },
-                { name: 'CALLEBAUT SÜTLÜ ÇİKOLATA (10 KG)', quantity: 300, unit: 'KG', price: 209070.00 },
-                { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/1', quantity: 1, unit: 'PAKET', price: 3600.00 },
-                { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/2', quantity: 1, unit: 'PAKET', price: 2760.00 },
-                { name: 'BOSTON BASKILI KRAFT SAPLI ÇANTA', quantity: 1, unit: 'KOLİ', price: 1500.00 },
-                { name: 'BASKILI KRAFT KESE KAĞIDI KG', quantity: 1, unit: 'KOLİ', price: 3240.00 },
-                { name: 'BOSTON BASKILI PEÇETE', quantity: 2, unit: 'ADET', price: 2040.00 },
-                { name: 'BOSTON CRUST MIX WAFFLE KUTU', quantity: 1, unit: 'PAKET', price: 2100.00 },
-                { name: 'BOSTON BASKILI MİNİ KAP', quantity: 2, unit: 'KOLİ', price: 4320.00 },
-                { name: 'BOSTON BASKILI TAM KAP', quantity: 1, unit: 'KOLİ', price: 1710.00 },
-                { name: 'BOSTON BASKILI ŞEFFAF BARDAK 12 OZ', quantity: 1, unit: 'KOLİ', price: 3840.00 },
-                { name: 'TORKU TAM BUĞDAYLI BİSKÜVİ TOZU', quantity: 2, unit: 'KOLİ', price: 1575.60 },
-                { name: 'CALLEBAUT KREP KIRIĞI (10 KG)', quantity: 20, unit: 'KG', price: 13332.00 },
-                { name: 'BOSTON BASKILI DEMLİK POŞET ÇAY', quantity: 1, unit: 'KOLİ', price: 1818.00 },
-                { name: 'DVG BAR SOS KARAMEL (2KG)', quantity: 1, unit: 'ADET', price: 1187.76 },
-                { name: 'CALLEBAUT GOLD KARAMEL ÇİKOLATA (10KG)', quantity: 10, unit: 'KG', price: 9595.00 }
-            ],
-            onlineCommissions: [
-                { name: 'Yemeksepeti', gross: 547510.00, net: 396173.05, color: '#FF6B6B' },
-                { name: 'Getir', gross: 162820.00, net: 104019.71, color: '#FFD166' },
-                { name: 'Trendyol', gross: 142555.00, net: 96789.04, color: '#06D6A0' }
-            ],
-            financialStatus: {
-                bankaGelirleri: 1334915.99,
-                bankaGiderleri: 1258695.82,
-                nakitGelir: 122175.00,
-                nakitGider: 88845.00
+            activeMonth: 'agustos2025',
+            reports: {
+                agustos2025: {
+                    name: 'Ağustos 2025',
+                    period: '01.08.2025 - 04.09.2025',
+                    kpi: {
+                        brutGelir: 1704018.0,
+                        toplamGider: 1347540.82,
+                        netKar: 109550.17
+                    },
+                    grossIncome: {
+                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
+                        data: [728958, 547510, 162820, 142555, 122175]
+                    },
+                    netIncome: {
+                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
+                        data: [729092.33, 396173.05, 104019.71, 96789.04, 122175]
+                    },
+                    chocolate: {
+                        labels: ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'],
+                        costs: [
+                            { name: 'Sütlü Çikolata', kg: 360, pricePerKg: 690 },
+                            { name: 'Bitter Çikolata', kg: 40, pricePerKg: 730 },
+                            { name: 'Beyaz Çikolata', kg: 60, pricePerKg: 690 },
+                            { name: 'Ruby Çikolata', kg: 12.5, pricePerKg: 835 },
+                            { name: 'Gold Çikolata', kg: 15, pricePerKg: 950 }
+                        ],
+                        colors: ['#A0522D', '#2F2F2F', '#F5F5DC', '#E91E63', '#FFD700']
+                    },
+                    expenses: {
+                        items: [
+                            { label: 'Genel Merkeze Ödeme', value: 426283.57 },
+                            { label: 'Personel Maaşları (Banka)', value: 116000.0 },
+                            { label: 'Personel Maaşları (Nakit)', value: 76115.0 },
+                            { label: 'Stajyer Maaşı', value: 30050.0 },
+                            { label: 'Kredi Kartı Borç Ödemesi', value: 175177.17 },
+                            { label: 'Dükkan Kirası', value: 92000.0 },
+                            { label: 'Ev Kirası', value: 25000.0 },
+                            { label: 'Manav Ödemesi', value: 100280.0 },
+                            { label: 'Elektrik Faturası', value: 71310.0 },
+                            { label: 'Geçici Vergi Ödemesi', value: 65946.0 },
+                            { label: 'Yemek Kartları Ödemesi', value: 20001.54 },
+                            { label: 'İçim Süt Ödemesi', value: 24697.62 },
+                            { label: 'Nakit Diğer Ödemeler', value: 12730.0 },
+                            { label: 'Arıtma Değişim Ücreti', value: 8400.0 },
+                            { label: 'Su Faturası', value: 5126.0 },
+                            { label: 'Cam Temizlik Ödeme', value: 4800.0 },
+                            { label: 'Vantilatör Lamba Ödemesi', value: 2000.0 },
+                            { label: 'Filtre Bakım Ödemesi', value: 1500.0 },
+                            { label: 'İlaçlama Ödeme', value: 1500.0 },
+                            { label: 'Yazılım Bakım Ücreti', value: 798.0 },
+                            { label: 'Telefon Faturası', value: 781.5 },
+                            { label: 'İnternet Faturası', value: 420.0 },
+                            { label: 'Havale Ücreti', value: 409.42 }
+                        ],
+                        categories: [
+                            { label: 'Genel Merkeze Ödeme', value: 426283.57 },
+                            { label: 'Personel Maaşları', value: 222165.0 },
+                            { label: 'Kredi Kartı Borcu', value: 175177.17 },
+                            { label: 'Kiralar', value: 117000.0 },
+                            { label: 'Manav Ödemesi', value: 100280.0 },
+                            { label: 'Vergi & Faturalar', value: 143583.5 },
+                            { label: 'Diğer Giderler', value: 76836.58 }
+                        ]
+                    },
+                    foodCards: {
+                        labels: ['Merve', 'Nesibe', 'Hacer', 'Enise', 'Ezel', 'Berkay', 'Emre Albay', 'Furkan', 'İbrahim', 'Emre Yeşilçayır', 'Taha', 'Aslı', 'Alp', 'Yeşim'],
+                        data: [3030, 2042.54, 3030, 3000, 1900, 1590, 2176, 2170, 441, 1465, 1235, 370, 1820, 1792]
+                    },
+                    shipmentDetails: [
+                        { name: 'CALLEBAUT BEYAZ ÇİKOLATA (10 KG)', quantity: 60, unit: 'KG', price: 41814.0 },
+                        { name: 'CALLEBAUT BITTER ÇİKOLATA (10 KG)', quantity: 40, unit: 'KG', price: 29492.0 },
+                        { name: 'CALLEBAUT RUBY ÇİKOLATA (10 KG)', quantity: 10, unit: 'KG', price: 8433.5 },
+                        { name: 'CALLEBAUT SÜTLÜ ÇİKOLATA (10 KG)', quantity: 300, unit: 'KG', price: 209070.0 },
+                        { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/1', quantity: 1, unit: 'PAKET', price: 3600.0 },
+                        { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/2', quantity: 1, unit: 'PAKET', price: 2760.0 },
+                        { name: 'BOSTON BASKILI KRAFT SAPLI ÇANTA', quantity: 1, unit: 'KOLİ', price: 1500.0 },
+                        { name: 'BASKILI KRAFT KESE KAĞIDI KG', quantity: 1, unit: 'KOLİ', price: 3240.0 },
+                        { name: 'BOSTON BASKILI PEÇETE', quantity: 2, unit: 'ADET', price: 2040.0 },
+                        { name: 'BOSTON CRUST MIX WAFFLE KUTU', quantity: 1, unit: 'PAKET', price: 2100.0 },
+                        { name: 'BOSTON BASKILI MİNİ KAP', quantity: 2, unit: 'KOLİ', price: 4320.0 },
+                        { name: 'BOSTON BASKILI TAM KAP', quantity: 1, unit: 'KOLİ', price: 1710.0 },
+                        { name: 'BOSTON BASKILI ŞEFFAF BARDAK 12 OZ', quantity: 1, unit: 'KOLİ', price: 3840.0 },
+                        { name: 'TORKU TAM BUĞDAYLI BİSKÜVİ TOZU', quantity: 2, unit: 'KOLİ', price: 1575.6 },
+                        { name: 'CALLEBAUT KREP KIRIĞI (10 KG)', quantity: 20, unit: 'KG', price: 13332.0 },
+                        { name: 'BOSTON BASKILI DEMLİK POŞET ÇAY', quantity: 1, unit: 'KOLİ', price: 1818.0 },
+                        { name: 'DVG BAR SOS KARAMEL (2KG)', quantity: 1, unit: 'ADET', price: 1187.76 },
+                        { name: 'CALLEBAUT GOLD KARAMEL ÇİKOLATA (10KG)', quantity: 10, unit: 'KG', price: 9595.0 }
+                    ],
+                    onlineCommissions: [
+                        { name: 'Yemeksepeti', gross: 547510.0, net: 396173.05, color: '#FF6B6B' },
+                        { name: 'Getir', gross: 162820.0, net: 104019.71, color: '#FFD166' },
+                        { name: 'Trendyol', gross: 142555.0, net: 96789.04, color: '#06D6A0' }
+                    ],
+                    financialStatus: {
+                        bankaGelirleri: 1334915.99,
+                        bankaGiderleri: 1258695.82,
+                        nakitGelir: 122175.0,
+                        nakitGider: 88845.0
+                    }
+                },
+                eylul2025: {
+                    name: 'Eylül 2025',
+                    period: '01.09.2025 - 30.09.2025',
+                    kpi: {
+                        brutGelir: 1607227.75,
+                        toplamGider: 1079994.16,
+                        netKar: 58299.91
+                    },
+                    grossIncome: {
+                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
+                        data: [720312.75, 507500.0, 168150.0, 123735.0, 87530.0]
+                    },
+                    netIncome: {
+                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
+                        data: [618956.77, 252192.39, 89088.14, 66436.15, 87530.0]
+                    },
+                    chocolate: {
+                        labels: ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'],
+                        costs: [
+                            { name: 'Sütlü Çikolata', kg: 360, pricePerKg: 690 },
+                            { name: 'Bitter Çikolata', kg: 40, pricePerKg: 730 },
+                            { name: 'Beyaz Çikolata', kg: 60, pricePerKg: 690 },
+                            { name: 'Ruby Çikolata', kg: 12.5, pricePerKg: 835 },
+                            { name: 'Gold Çikolata', kg: 15, pricePerKg: 950 }
+                        ],
+                        colors: ['#A0522D', '#2F2F2F', '#F5F5DC', '#E91E63', '#FFD700']
+                    },
+                    expenses: {
+                        items: [
+                            { label: 'Genel Merkeze Ödeme', value: 442918.24 },
+                            { label: 'Personel Maaşları (Banka)', value: 163680.0 },
+                            { label: 'İçim Gıda Ödemesi', value: 17131.25 },
+                            { label: 'Elektronik Arıza Giderleri', value: 5635.8 },
+                            { label: 'Kredi Kartı Borç Ödemesi', value: 52578.39 },
+                            { label: 'Reklam & Pazarlama', value: 25009.59 },
+                            { label: 'Cam Temizlik Ödemesi', value: 4800.0 },
+                            { label: 'Yemek Kartları Ödemesi', value: 24759.0 },
+                            { label: 'İlaçlama Ödemesi', value: 1500.0 },
+                            { label: 'POS Bakım Ücretleri', value: 798.0 },
+                            { label: 'Tamirat Giderleri', value: 9000.0 },
+                            { label: 'Market & Manav Ödemeleri', value: 53827.79 },
+                            { label: 'Enerji & Elektrik Giderleri', value: 58920.0 },
+                            { label: 'İnternet Gideri', value: 778.5 },
+                            { label: 'Su & Belediye Giderleri', value: 5067.0 },
+                            { label: 'Ev Kirası', value: 25000.0 },
+                            { label: 'Dükkan Kirası', value: 92000.0 },
+                            { label: 'Ambalaj & Sarf Malzemeleri', value: 2070.9 },
+                            { label: 'Stajyer Maaşları', value: 28515.0 },
+                            { label: 'Telefon Gideri', value: 521.5 },
+                            { label: 'Personel Maaşları (Nakit)', value: 48015.0 },
+                            { label: 'Nakit Diğer Giderler', value: 17190.0 },
+                            { label: 'Banka İşlem Ücretleri', value: 278.2 }
+                        ],
+                        categories: [
+                            { label: 'Genel Merkez Ödemeleri', value: 442918.24 },
+                            { label: 'Personel Giderleri', value: 240210.0 },
+                            { label: 'Kira Giderleri', value: 117000.0 },
+                            { label: 'Tedarik & Stok', value: 73029.94 },
+                            { label: 'Enerji & Altyapı', value: 65287.0 },
+                            { label: 'Pazarlama & Satış', value: 50566.59 },
+                            { label: 'Finans & Banka', value: 52856.59 },
+                            { label: 'Diğer Operasyonel Giderler', value: 38125.8 }
+                        ]
+                    },
+                    foodCards: {
+                        labels: ['Merve', 'Nesibe', 'Hacer', 'Enise', 'Ezel', 'Emre Albay', 'Furkan', 'Emre Yeşilçayır', 'Taha', 'Yeşim', 'Ramazan', 'Berkay'],
+                        data: [2822, 2182, 3000, 3000, 2073, 1900, 2535, 680, 640, 1960, 2080, 1132]
+                    },
+                    shipmentDetails: [
+                        { name: 'CALLEBAUT BEYAZ ÇİKOLATA (10 KG)', quantity: 60, unit: 'KG', price: 41814.0 },
+                        { name: 'CALLEBAUT SÜTLÜ ÇİKOLATA (10 KG)', quantity: 340, unit: 'KG', price: 236946.0 },
+                        { name: 'CALLEBAUT BITTER ÇİKOLATA (10 KG)', quantity: 40, unit: 'KG', price: 29492.0 },
+                        { name: 'CALLEBAUT RUBY ÇİKOLATA (10 KG)', quantity: 20, unit: 'KG', price: 16867.0 },
+                        { name: 'PİRİNÇ PATLAĞI SÜTLÜ (1,75KG)', quantity: 1, unit: 'KOLİ', price: 2828.0 },
+                        { name: 'TORKU TAM BUĞDAYLI BİSKÜVİ TOZU', quantity: 1, unit: 'KOLİ', price: 787.8 },
+                        { name: 'BOSTON CRUST HİNDİSTAN CEVİZLİ BAR(32GR)', quantity: 100, unit: 'ADET', price: 2525.0 },
+                        { name: 'BOSTON CRUST ANTEP FISTIKLI BAR(30GR)', quantity: 100, unit: 'ADET', price: 6060.0 },
+                        { name: 'BOSTON CRUST TÜRK KAHVESİ ORTA KAVRULMUŞ', quantity: 1, unit: 'KOLİ', price: 6060.0 },
+                        { name: 'BOSTON CRUST FİLTRE KAHVE', quantity: 1, unit: 'KOLİ', price: 6666.0 },
+                        { name: 'BOSTON BASKILI DEMLİK POŞET ÇAY', quantity: 1, unit: 'KOLİ', price: 1818.0 },
+                        { name: 'DVG PASSION FRUIT PÜRE (1000GR)', quantity: 1, unit: 'ADET', price: 993.84 },
+                        { name: 'Dİ AGOSTO ÇİLEK PÜRE(1000GR)', quantity: 3, unit: 'ADET', price: 848.4 },
+                        { name: 'Dİ AGOSTO ANANAS PÜRE(1000GR)', quantity: 1, unit: 'ADET', price: 282.8 },
+                        { name: 'Dİ AGOSTO KARPUZ PÜRE(1000GR)', quantity: 2, unit: 'ADET', price: 565.6 },
+                        { name: 'Dİ AGOSTO ORMAN MEYVELERI PÜRE(1000GR)', quantity: 2, unit: 'ADET', price: 727.2 },
+                        { name: 'Dİ AGOSTO YEŞİL ELMA PÜRE(1000GR)', quantity: 2, unit: 'ADET', price: 565.6 },
+                        { name: 'Dİ AGOSTO KAVUN PÜRE(1000GR)', quantity: 2, unit: 'ADET', price: 565.6 },
+                        { name: 'DVG MENTA CUBANO ŞURUP (750ML)', quantity: 4, unit: 'ADET', price: 2407.84 },
+                        { name: 'DVG MEXİCAN LIME ŞURUP (375ML)', quantity: 2, unit: 'ADET', price: 1344.0 },
+                        { name: 'DVG STRAWBERRY ŞURUP (750ML)', quantity: 2, unit: 'ADET', price: 1203.92 },
+                        { name: 'DVG COCONUT ŞURUP (750ML)', quantity: 1, unit: 'ADET', price: 601.96 },
+                        { name: 'Dİ AGOSTO YUZU BAZI (2,5KG)', quantity: 1, unit: 'ADET', price: 959.5 },
+                        { name: 'DVG BAR SOS ÇİKOLATA (2KG)', quantity: 3, unit: 'ADET', price: 3563.28 },
+                        { name: 'DVG BAR SOS BEYAZ ÇİKOLATA (2KG)', quantity: 2, unit: 'ADET', price: 2375.52 },
+                        { name: 'DVG BAR SOS KARAMEL (2KG)', quantity: 2, unit: 'ADET', price: 2375.52 },
+                        { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/1', quantity: 2, unit: 'PAKET', price: 7200.0 },
+                        { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/2', quantity: 1, unit: 'PAKET', price: 2760.0 },
+                        { name: 'BOSTON BASKILI KRAFT SAPLI ÇANTA', quantity: 2, unit: 'KOLİ', price: 3000.0 },
+                        { name: 'BASKILI KRAFT KESE KAĞIDI KG', quantity: 1, unit: 'KOLİ', price: 3408.0 },
+                        { name: 'BOSTON BASKILI PEÇETE', quantity: 2, unit: 'ADET', price: 2124.0 },
+                        { name: 'BOSTON BASKILI STICK ŞEKER', quantity: 1, unit: 'KOLİ', price: 1262.5 },
+                        { name: 'BOSTON CRUST MIX WAFFLE KUTU', quantity: 2, unit: 'PAKET', price: 4200.0 },
+                        { name: 'BOSTON CRUST FONDUE KUTU', quantity: 1, unit: 'PAKET', price: 1680.0 },
+                        { name: 'BOSTON BASKILI TAM KAP', quantity: 2, unit: 'KOLİ', price: 3600.0 },
+                        { name: 'BOSTON BASKILI ŞEFFAF BARDAK 12 OZ', quantity: 1, unit: 'KOLİ', price: 4104.0 },
+                        { name: '750 CC SIZDIRMAZ GIDA KABI', quantity: 2, unit: 'KOLİ', price: 2304.0 },
+                        { name: '80 CC SOS KABI KAP + KAPAK', quantity: 1, unit: 'KOLİ', price: 1920.0 },
+                        { name: 'TEK KULLANIMLIK MASA TEMİZLEME HAVLUSU', quantity: 3, unit: 'KOLİ', price: 2700.0 },
+                        { name: 'KÜLLÜK', quantity: 10, unit: 'ADET', price: 804.0 },
+                        { name: 'DVG SOS POMPASI', quantity: 1, unit: 'ADET', price: 192.0 },
+                        { name: 'DVG ŞURUP POMPASI', quantity: 1, unit: 'ADET', price: 192.0 },
+                        { name: 'ANTEP FISTIĞI (5KG)', quantity: 1, unit: 'PAKET', price: 7070.0 },
+                        { name: 'BOSTON BASKILI ISLAK MENDİL', quantity: 1, unit: 'KOLİ', price: 2160.0 }
+                    ],
+                    onlineCommissions: [
+                        { name: 'Yemeksepeti', gross: 507500.0, net: 252192.39, color: '#FF6B6B' },
+                        { name: 'Getir', gross: 168150.0, net: 89088.14, color: '#FFD166' },
+                        { name: 'Trendyol', gross: 123735.0, net: 66436.15, color: '#06D6A0' }
+                    ],
+                    financialStatus: {
+                        bankaGelirleri: 1050764.07,
+                        bankaGiderleri: 1014789.16,
+                        nakitGelir: 87530.0,
+                        nakitGider: 65205.0
+                    }
+                }
             }
         };
 
         Chart.defaults.color = '#E2E8F0';
         Chart.defaults.font.family = 'Inter, sans-serif';
 
+        const monthSwitcher = document.getElementById('month-switcher');
+        const monthSwitcherWrapper = monthSwitcher ? monthSwitcher.parentElement : null;
+        let availableReports = {};
+        let currentMonthKey = null;
+
         // Veri Formatlama ve Grafik Fonksiyonları
-        const formatCurrency = (value) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(value);
+        const formatCurrency = (value) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(value || 0);
         const formatAmountWithSign = (amount) => {
             const formatted = formatCurrency(Math.abs(amount));
             return amount < 0 ? `-` + formatted : formatted;
@@ -617,9 +828,10 @@
             setActiveChartButton(chartId, type);
         };
         const createInteractiveChart = (ctxId, labels, data, colors, totalElementId, defaultType = 'doughnut') => {
+            const palette = colors && colors.length ? colors : ['#38BDF8', '#818CF8', '#F97316', '#F472B6', '#34D399', '#FACC15', '#A855F7', '#22D3EE'];
             const existingState = chartStates[ctxId];
             const targetType = existingState?.currentType || defaultType;
-            chartStates[ctxId] = { labels, data, colors, totalElementId, currentType: targetType };
+            chartStates[ctxId] = { labels, data, colors: palette.slice(0, labels.length), totalElementId, currentType: targetType };
             renderChart(ctxId, targetType);
         };
         const updateChartType = (chartId, type) => {
@@ -638,34 +850,115 @@
             });
         };
 
+        const getMonthLabel = (key) => {
+            const report = availableReports[key];
+            return report?.name || key;
+        };
+        const setActiveMonthButton = () => {
+            if (!monthSwitcher) return;
+            monthSwitcher.querySelectorAll('.month-button').forEach(button => {
+                button.dataset.active = button.dataset.monthKey === currentMonthKey ? 'true' : 'false';
+            });
+        };
+        const buildMonthSwitcher = () => {
+            if (!monthSwitcher) return;
+            monthSwitcher.innerHTML = '';
+            const monthKeys = Object.keys(availableReports);
+            if (monthSwitcherWrapper) {
+                if (monthKeys.length <= 1) {
+                    monthSwitcherWrapper.classList.add('hidden');
+                } else {
+                    monthSwitcherWrapper.classList.remove('hidden');
+                }
+            }
+            monthKeys.forEach(key => {
+                const button = document.createElement('button');
+                button.className = 'month-button';
+                button.dataset.monthKey = key;
+                button.innerHTML = `<span>${getMonthLabel(key)}</span>`;
+                button.addEventListener('click', () => renderMonth(key));
+                monthSwitcher.appendChild(button);
+            });
+            setActiveMonthButton();
+        };
+        const renderMonth = (monthKey) => {
+            if (!availableReports[monthKey]) return;
+            currentMonthKey = monthKey;
+            setActiveMonthButton();
+            renderReport(availableReports[monthKey]);
+        };
+        const normalizeReportPayload = (rawData) => {
+            if (!rawData) return null;
+            if (rawData.reports) {
+                Object.entries(rawData.reports).forEach(([key, report]) => {
+                    if (!report.name) {
+                        rawData.reports[key].name = key;
+                    }
+                });
+                return rawData;
+            }
+            const fallbackKey = rawData?.meta?.key || 'agustos2025';
+            const fallbackName = rawData?.name || 'Ağustos 2025';
+            return {
+                activeMonth: fallbackKey,
+                reports: {
+                    [fallbackKey]: {
+                        name: fallbackName,
+                        ...rawData
+                    }
+                }
+            };
+        };
+        const initializeReports = (payload) => {
+            if (!payload?.reports) {
+                console.error('Geçerli rapor verisi bulunamadı.');
+                loadingSpinner.classList.add('hidden');
+                return;
+            }
+            availableReports = payload.reports;
+            buildMonthSwitcher();
+            const monthKeys = Object.keys(availableReports);
+            if (!monthKeys.length) {
+                console.error('Rapor bulunamadı.');
+                loadingSpinner.classList.add('hidden');
+                return;
+            }
+            const defaultKey = (payload.activeMonth && availableReports[payload.activeMonth]) ? payload.activeMonth : monthKeys[0];
+            renderMonth(defaultKey);
+        };
         const renderReport = (reportData) => {
             if (!reportData) {
-                console.error("Rapor verisi bulunamadı.");
+                console.error('Rapor verisi bulunamadı.');
                 return;
             }
 
+            const monthName = reportData.name || getMonthLabel(currentMonthKey) || 'Finansal';
+            const reportTitle = document.getElementById('report-title');
+            if (reportTitle) {
+                reportTitle.textContent = `Boston Drink & Dessert | Cadde Şube ${monthName} Raporu`;
+            }
+            document.title = `Boston Drink & Dessert Cadde Şube ${monthName} Raporu`;
             document.getElementById('report-period').textContent = `Dönem: ${reportData.period}`;
             document.getElementById('brut-gelir').textContent = formatCurrency(reportData.kpi.brutGelir);
             document.getElementById('toplam-gider').textContent = formatCurrency(reportData.kpi.toplamGider);
             document.getElementById('net-kar').textContent = formatCurrency(reportData.kpi.netKar);
 
-            // Brut Gelir Listesi ve Grafiği
             document.getElementById('gross-income-subtitle').textContent = `Kasa raporuna göre toplam ${formatCurrency(reportData.grossIncome.data.reduce((sum, val) => sum + val, 0))}'lik brüt gelirin kaynaklara göre dökümü.`;
-            createList('gross-income-list', reportData.grossIncome.labels.map((label, i) => ({
-                label: label,
+            const sortedGrossIncome = reportData.grossIncome.labels.map((label, i) => ({
+                label,
                 value: reportData.grossIncome.data[i]
-            })).sort((a, b) => b.value - a.value), 'border-emerald-400/20 bg-emerald-500/10', formatCurrency, 'text-emerald-200');
+            })).sort((a, b) => b.value - a.value);
+            createList('gross-income-list', sortedGrossIncome, 'border-emerald-400/20 bg-emerald-500/10', formatCurrency, 'text-emerald-200');
             createInteractiveChart('grossIncomeChart', reportData.grossIncome.labels, reportData.grossIncome.data, ['#38BDF8', '#22D3EE', '#F97316', '#F472B6', '#34D399'], 'grossIncomeTotal');
 
-            // Net Gelir Listesi ve Grafiği
             document.getElementById('net-income-subtitle').textContent = `Bankaya yatan ve kasadaki net gelirin kaynaklara göre dökümü.`;
-            createList('net-income-list', reportData.netIncome.labels.map((label, i) => ({
-                label: label,
+            const sortedNetIncome = reportData.netIncome.labels.map((label, i) => ({
+                label,
                 value: reportData.netIncome.data[i]
-            })).sort((a, b) => b.value - a.value), 'border-sky-400/20 bg-sky-500/10', formatCurrency, 'text-sky-200');
+            })).sort((a, b) => b.value - a.value);
+            createList('net-income-list', sortedNetIncome, 'border-sky-400/20 bg-sky-500/10', formatCurrency, 'text-sky-200');
             createInteractiveChart('netIncomeChart', reportData.netIncome.labels, reportData.netIncome.data, ['#60A5FA', '#38BDF8', '#F97316', '#F472B6', '#34D399'], 'netIncomeTotal');
 
-            // Çikolata Gider Listesi ve Grafiği (Büyükten Küçüğe Sıralı)
             const chocolateDetails = reportData.chocolate.costs.map((c, i) => ({
                 ...c,
                 totalCost: c.kg * c.pricePerKg,
@@ -688,40 +981,19 @@
                 chocolateList.appendChild(div);
             });
 
-            // Giderler Listesi ve Grafiği (Büyükten Küçüğe Sıralı)
-            const categorizedExpenses = {
-                'Genel Merkeze Ödeme': reportData.expenses.data[0],
-                'Personel Maaşları': reportData.expenses.data[1] + reportData.expenses.data[2] + reportData.expenses.data[3],
-                'Kredi Kartı Borcu': reportData.expenses.data[4],
-                'Kiralar': reportData.expenses.data[5] + reportData.expenses.data[6],
-                'Manav Ödemesi': reportData.expenses.data[7],
-                'Vergi & Faturalar': reportData.expenses.data[8] + reportData.expenses.data[9] + reportData.expenses.data[14] + reportData.expenses.data[20] + reportData.expenses.data[21],
-                'Diğer Giderler': [10, 11, 12, 13, 15, 16, 17, 18, 19, 22].reduce((sum, i) => sum + reportData.expenses.data[i], 0)
-            };
+            const expenseItems = (reportData.expenses?.items || []).map(item => ({ ...item }));
+            const sortedExpenses = expenseItems.sort((a, b) => b.value - a.value);
+            createList('expense-list', sortedExpenses, 'border-rose-500/30 bg-rose-500/10', (value) => formatAmountWithSign(-value), 'text-rose-200');
 
-            const sortedCategorizedExpenses = Object.entries(categorizedExpenses).sort(([, a], [, b]) => b - a);
-            const sortedCategorizedLabels = sortedCategorizedExpenses.map(([label]) => label);
-            const sortedCategorizedData = sortedCategorizedExpenses.map(([, value]) => value);
-            const expenseColors = ['#FB7185', '#38BDF8', '#818CF8', '#F97316', '#2DD4BF', '#FACC15', '#A855F7'];
-            createInteractiveChart('expenseChart', sortedCategorizedLabels, sortedCategorizedData, expenseColors, 'expenseTotal');
+            const expenseCategories = (reportData.expenses?.categories || []).map(item => ({ ...item }));
+            const sortedCategorizedExpenses = expenseCategories.sort((a, b) => b.value - a.value);
+            const expenseLabels = sortedCategorizedExpenses.map(item => item.label);
+            const expenseData = sortedCategorizedExpenses.map(item => item.value);
+            const expenseColors = ['#FB7185', '#38BDF8', '#818CF8', '#F97316', '#2DD4BF', '#FACC15', '#A855F7', '#14B8A6'];
+            createInteractiveChart('expenseChart', expenseLabels, expenseData, expenseColors, 'expenseTotal');
 
-            const expenseList = document.getElementById('expense-list');
-            expenseList.innerHTML = '';
-            const combinedExpenses = reportData.expenses.labels.map((label, i) => ({
-                label: label,
-                value: reportData.expenses.data[i]
-            })).sort((a, b) => b.value - a.value);
-
-            combinedExpenses.forEach(expense => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center gap-4 p-3 rounded-xl border border-rose-500/30 bg-rose-500/10';
-                div.innerHTML = `<span class="text-slate-200">${expense.label}</span><span class="font-semibold text-rose-200">${formatAmountWithSign(-expense.value)}</span>`;
-                expenseList.appendChild(div);
-            });
-
-            // YEMEK KARTLARI (Büyükten Küçüğe Sıralı)
             const combinedFoodCards = reportData.foodCards.labels.map((label, i) => ({
-                label: label,
+                label,
                 value: reportData.foodCards.data[i]
             })).sort((a, b) => b.value - a.value);
 
@@ -731,7 +1003,6 @@
             createInteractiveChart('foodCardChart', sortedFoodCardLabels, sortedFoodCardData, foodCardColors, 'foodCardTotal');
             createList('food-card-list', combinedFoodCards, 'border-indigo-400/30 bg-indigo-500/10', formatCurrency, 'text-indigo-200');
 
-            // SEVKİYAT LİSTESİ (Büyükten Küçüğe Sıralı)
             const shipmentListContainer = document.getElementById('shipment-list');
             shipmentListContainer.innerHTML = '';
             let totalShipmentCost = 0;
@@ -749,14 +1020,13 @@
             });
             document.getElementById('shipment-total').textContent = formatCurrency(totalShipmentCost);
 
-            // Nakit Akışı ve Komisyon Analizi
             const onlineCommissionList = document.getElementById('online-commission-list');
             onlineCommissionList.innerHTML = '';
             let totalCommission = 0;
             reportData.onlineCommissions.forEach(platform => {
                 const commission = platform.gross - platform.net;
                 totalCommission += commission;
-                const commissionPercentage = ((commission / platform.gross) * 100).toFixed(1);
+                const commissionPercentage = platform.gross > 0 ? ((commission / platform.gross) * 100).toFixed(1) : '0.0';
 
                 const div = document.createElement('div');
                 div.className = 'space-y-2 p-4 rounded-xl border border-slate-700/60 bg-slate-900/60 shadow-inner shadow-sky-500/10';
@@ -821,14 +1091,12 @@
                             userId = user.uid;
                             console.log("Firebase'e başarılı bir şekilde giriş yapıldı. UID:", userId);
 
-                            // Veritabanından veriyi dinle
                             const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
                             onSnapshot(docRef, (docSnap) => {
                                 if (docSnap.exists()) {
-                                    renderReport(docSnap.data());
+                                    initializeReports(normalizeReportPayload(docSnap.data()));
                                 } else {
                                     console.log("Rapor verisi bulunamadı. Örnek veriyi kaydediyor...");
-                                    // Eğer rapor yoksa, örnek veriyi kaydet
                                     setDoc(docRef, sampleReportData)
                                         .then(() => console.log("Örnek veri başarıyla kaydedildi."))
                                         .catch(error => console.error("Veri kaydetme hatası:", error));
@@ -841,16 +1109,15 @@
 
                         } else {
                             console.log("Kullanıcı oturumu açılmadı. Yerel örnek veri kullanılıyor.");
-                            renderReport(sampleReportData);
+                            initializeReports(sampleReportData);
                         }
                     });
 
                 } else {
                     console.error("Firebase yapılandırması eksik. Yerel örnek veri kullanılıyor.");
-                    renderReport(sampleReportData);
+                    initializeReports(sampleReportData);
                 }
 
-                // Veri güncelleme butonu işlevi
                 document.getElementById('updateDataBtn').addEventListener('click', async () => {
                     if (!db) {
                         alert("Veritabanı bağlantısı henüz kurulmadı.");
