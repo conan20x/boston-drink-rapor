@@ -91,6 +91,51 @@
             box-shadow: 0 25px 65px -20px rgba(16, 185, 129, 0.65);
         }
 
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .kpi-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 2.75rem;
+            height: 2.75rem;
+            border-radius: 0.9rem;
+            box-shadow: 0 20px 35px -18px rgba(14, 165, 233, 0.5);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .kpi-card:hover .kpi-icon {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 25px 45px -22px rgba(45, 212, 191, 0.55);
+        }
+
+        .kpi-icon svg {
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        .kpi-icon--income {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.4), rgba(45, 212, 191, 0.55));
+        }
+
+        .kpi-icon--expense {
+            background: linear-gradient(135deg, rgba(248, 113, 113, 0.4), rgba(251, 191, 36, 0.45));
+        }
+
+        .kpi-icon--positive {
+            background: linear-gradient(135deg, rgba(186, 230, 253, 0.4), rgba(59, 130, 246, 0.55));
+        }
+
+        .kpi-icon--negative {
+            background: linear-gradient(135deg, rgba(252, 165, 165, 0.35), rgba(248, 113, 113, 0.5));
+        }
+
         .section-title {
             letter-spacing: 0.08em;
             text-transform: uppercase;
@@ -246,15 +291,39 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="kpi-card">
-                    <p class="text-xs uppercase tracking-[0.3em] text-emerald-200/80">Brüt Gelir (Kasa)</p>
-                    <p class="kpi-value font-bold text-emerald-200 mt-4" id="brut-gelir">Yükleniyor...</p>
+                    <div class="kpi-header">
+                        <p class="text-xs uppercase tracking-[0.3em] text-emerald-200/80">Net Gelir (Banka + Nakit)</p>
+                        <span class="kpi-icon kpi-icon--income" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 19V5" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M6.75 10.25L12 5L17.25 10.25" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </div>
+                    <p class="kpi-value font-bold text-emerald-200 mt-4" id="net-gelir">Yükleniyor...</p>
                 </div>
                 <div class="kpi-card">
-                    <p class="text-xs uppercase tracking-[0.3em] text-rose-200/80">Toplam Gider (Banka + Nakit)</p>
+                    <div class="kpi-header">
+                        <p class="text-xs uppercase tracking-[0.3em] text-rose-200/80">Toplam Gider (Banka + Nakit)</p>
+                        <span class="kpi-icon kpi-icon--expense" aria-hidden="true">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 5V19" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M17.25 13.75L12 19L6.75 13.75" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </div>
                     <p class="kpi-value font-bold text-rose-200 mt-4" id="toplam-gider">Yükleniyor...</p>
                 </div>
                 <div class="kpi-card">
-                    <p class="text-xs uppercase tracking-[0.3em] text-amber-200/80">Net Dönem Kârı (Nakit Akışı)</p>
+                    <div class="kpi-header">
+                        <p class="text-xs uppercase tracking-[0.3em] text-amber-200/80">Net Dönem Kârı (Nakit Akışı)</p>
+                        <span id="net-kar-icon" class="kpi-icon kpi-icon--positive" role="img" aria-label="Kârda">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M5 15.5L9.5 11L13 14.5L19 8.5" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                                <path d="M19 12V8H15" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </span>
+                    </div>
                     <p class="kpi-value font-bold text-amber-200 mt-4" id="net-kar">Yükleniyor...</p>
                 </div>
             </div>
@@ -302,26 +371,6 @@
             </section>
         </div>
 
-        <section id="chocolate-analysis" class="glass-card mb-14">
-            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
-                <div>
-                    <p class="section-title text-slate-300">Hammadde & Stoklar</p>
-                    <h2 class="text-2xl font-semibold text-white">Çikolata Kullanım ve Gider Analizi</h2>
-                    <p class="text-sm text-slate-400">Kullanılan çikolataların miktar (KG) ve toplam maliyet (₺) dökümü.</p>
-                </div>
-                <div class="chart-type-group" data-chart-toggle="chocolateChart">
-                    <button class="chart-type-button" data-chart-target="chocolateChart" data-chart-type="doughnut">Halka</button>
-                    <button class="chart-type-button" data-chart-target="chocolateChart" data-chart-type="bar">Çubuk</button>
-                    <button class="chart-type-button" data-chart-target="chocolateChart" data-chart-type="polarArea">Kutupsal</button>
-                </div>
-            </div>
-            <div class="chart-container mb-6">
-                <canvas id="chocolateChart"></canvas>
-                <div class="total-label" id="chocolateTotal"></div>
-            </div>
-            <div id="chocolate-list" class="space-y-3"></div>
-        </section>
-
         <section id="expenses" class="glass-card mb-14">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                 <div>
@@ -340,6 +389,26 @@
                 <div class="total-label" id="expenseTotal"></div>
             </div>
             <div id="expense-list" class="space-y-3 max-h-64 overflow-y-auto pr-2"></div>
+        </section>
+
+        <section id="chocolate-analysis" class="glass-card mb-14">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+                <div>
+                    <p class="section-title text-slate-300">Hammadde & Stoklar</p>
+                    <h2 class="text-2xl font-semibold text-white">Çikolata Kullanım ve Gider Analizi</h2>
+                    <p class="text-sm text-slate-400">Kullanılan çikolataların miktar (KG) ve toplam maliyet (₺) dökümü.</p>
+                </div>
+                <div class="chart-type-group" data-chart-toggle="chocolateChart">
+                    <button class="chart-type-button" data-chart-target="chocolateChart" data-chart-type="doughnut">Halka</button>
+                    <button class="chart-type-button" data-chart-target="chocolateChart" data-chart-type="bar">Çubuk</button>
+                    <button class="chart-type-button" data-chart-target="chocolateChart" data-chart-type="polarArea">Kutupsal</button>
+                </div>
+            </div>
+            <div class="chart-container mb-6">
+                <canvas id="chocolateChart"></canvas>
+                <div class="total-label" id="chocolateTotal"></div>
+            </div>
+            <div id="chocolate-list" class="space-y-3"></div>
         </section>
 
         <!-- YENİ BÖLÜM: YEMEK KARTLARI -->
@@ -440,6 +509,8 @@
         let charts = {};
         const chartStates = {};
         const radialChartTypes = ['doughnut', 'polarArea', 'pie'];
+        const grossIncomeColors = ['#2563EB', '#F97316', '#22C55E', '#A855F7', '#FACC15'];
+        const netIncomeColors = ['#2563EB', '#F97316', '#22C55E', '#A855F7', '#FACC15', '#EC4899', '#14B8A6'];
 
         const loadingSpinner = document.getElementById('loading-spinner');
         const reportContainer = document.getElementById('report-container');
@@ -454,7 +525,7 @@
                     kpi: {
                         brutGelir: 1704018.0,
                         toplamGider: 1347540.82,
-                        netKar: 109550.17
+                        netKar: 186923.31
                     },
                     grossIncome: {
                         labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
@@ -541,8 +612,8 @@
                         { name: 'Trendyol', gross: 142555.0, net: 96789.04, color: '#06D6A0' }
                     ],
                     financialStatus: {
-                        bankaGelirleri: 1334915.99,
-                        bankaGiderleri: 1258695.82,
+                        bankaGelirleri: 1326074.13,
+                        bankaGiderleri: 1172480.82,
                         nakitGelir: 122175.0,
                         nakitGider: 88845.0
                     }
@@ -551,17 +622,17 @@
                     name: 'Eylül 2025',
                     period: '01.09.2025 - 30.09.2025',
                     kpi: {
-                        brutGelir: 1607227.75,
-                        toplamGider: 1079994.16,
-                        netKar: 58299.91
+                        brutGelir: 1663411.75,
+                        toplamGider: 1290307.73,
+                        netKar: -59285.27
                     },
                     grossIncome: {
                         labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
-                        data: [720312.75, 507500.0, 168150.0, 123735.0, 87530.0]
+                        data: [750231.75, 520550.0, 175060.0, 126140.0, 91430.0]
                     },
                     netIncome: {
-                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
-                        data: [618956.77, 252192.39, 89088.14, 66436.15, 87530.0]
+                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Devlet Katkısı', 'Nakit'],
+                        data: [650660.46, 321868.74, 95685.25, 66436.15, 8841.86, 87530.0]
                     },
                     chocolate: {
                         labels: ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'],
@@ -580,7 +651,7 @@
                             { label: 'Personel Maaşları (Banka)', value: 163680.0 },
                             { label: 'İçim Gıda Ödemesi', value: 17131.25 },
                             { label: 'Elektronik Arıza Giderleri', value: 5635.8 },
-                            { label: 'Kredi Kartı Borç Ödemesi', value: 52578.39 },
+                            { label: 'Kredi Kartı Borç Ödemesi', value: 262891.96 },
                             { label: 'Reklam & Pazarlama', value: 25009.59 },
                             { label: 'Cam Temizlik Ödemesi', value: 4800.0 },
                             { label: 'Yemek Kartları Ödemesi', value: 24759.0 },
@@ -607,7 +678,7 @@
                             { label: 'Tedarik & Stok', value: 73029.94 },
                             { label: 'Enerji & Altyapı', value: 65287.0 },
                             { label: 'Pazarlama & Satış', value: 50566.59 },
-                            { label: 'Finans & Banka', value: 52856.59 },
+                            { label: 'Finans & Banka', value: 263170.16 },
                             { label: 'Diğer Operasyonel Giderler', value: 38125.8 }
                         ]
                     },
@@ -662,13 +733,13 @@
                         { name: 'BOSTON BASKILI ISLAK MENDİL', quantity: 1, unit: 'KOLİ', price: 2160.0 }
                     ],
                     onlineCommissions: [
-                        { name: 'Yemeksepeti', gross: 507500.0, net: 252192.39, color: '#FF6B6B' },
-                        { name: 'Getir', gross: 168150.0, net: 89088.14, color: '#FFD166' },
+                        { name: 'Yemeksepeti', gross: 507500.0, net: 321868.74, color: '#FF6B6B' },
+                        { name: 'Getir', gross: 168150.0, net: 95685.25, color: '#FFD166' },
                         { name: 'Trendyol', gross: 123735.0, net: 66436.15, color: '#06D6A0' }
                     ],
                     financialStatus: {
-                        bankaGelirleri: 1050764.07,
-                        bankaGiderleri: 1014789.16,
+                        bankaGelirleri: 1143492.46,
+                        bankaGiderleri: 1225102.73,
                         nakitGelir: 87530.0,
                         nakitGider: 65205.0
                     }
@@ -701,6 +772,36 @@
             const g = (bigint >> 8) & 255;
             const b = bigint & 255;
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        };
+        const ensureColorArray = (colors = [], length = 0) => {
+            if (!length) {
+                return colors || [];
+            }
+            const basePalette = colors?.length ? [...colors] : ['#38BDF8', '#818CF8', '#F97316', '#F472B6', '#34D399', '#FACC15', '#A855F7', '#22D3EE'];
+            if (basePalette.length >= length) {
+                return basePalette.slice(0, length);
+            }
+            const extended = [...basePalette];
+            let index = 0;
+            while (extended.length < length) {
+                extended.push(basePalette[index % basePalette.length]);
+                index += 1;
+            }
+            return extended;
+        };
+        const profitIconTemplates = {
+            positive: `
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 15.5L9.5 11L13 14.5L19 8.5" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M19 12V8H15" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            `,
+            negative: `
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 8.5L9.5 13L13 9.5L19 15.5" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M19 12V16H15" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            `
         };
         const getChartOptions = (type) => {
             const baseOptions = {
@@ -828,10 +929,10 @@
             setActiveChartButton(chartId, type);
         };
         const createInteractiveChart = (ctxId, labels, data, colors, totalElementId, defaultType = 'doughnut') => {
-            const palette = colors && colors.length ? colors : ['#38BDF8', '#818CF8', '#F97316', '#F472B6', '#34D399', '#FACC15', '#A855F7', '#22D3EE'];
+            const palette = ensureColorArray(colors && colors.length ? colors : undefined, labels.length);
             const existingState = chartStates[ctxId];
             const targetType = existingState?.currentType || defaultType;
-            chartStates[ctxId] = { labels, data, colors: palette.slice(0, labels.length), totalElementId, currentType: targetType };
+            chartStates[ctxId] = { labels, data, colors: palette, totalElementId, currentType: targetType };
             renderChart(ctxId, targetType);
         };
         const updateChartType = (chartId, type) => {
@@ -939,25 +1040,46 @@
             }
             document.title = `Boston Drink & Dessert Cadde Şube ${monthName} Raporu`;
             document.getElementById('report-period').textContent = `Dönem: ${reportData.period}`;
-            document.getElementById('brut-gelir').textContent = formatCurrency(reportData.kpi.brutGelir);
-            document.getElementById('toplam-gider').textContent = formatCurrency(reportData.kpi.toplamGider);
-            document.getElementById('net-kar').textContent = formatCurrency(reportData.kpi.netKar);
 
-            document.getElementById('gross-income-subtitle').textContent = `Kasa raporuna göre toplam ${formatCurrency(reportData.grossIncome.data.reduce((sum, val) => sum + val, 0))}'lik brüt gelirin kaynaklara göre dökümü.`;
-            const sortedGrossIncome = reportData.grossIncome.labels.map((label, i) => ({
+            const grossIncomeLabels = Array.isArray(reportData.grossIncome?.labels) ? reportData.grossIncome.labels : [];
+            const grossIncomeValues = Array.isArray(reportData.grossIncome?.data) ? reportData.grossIncome.data : [];
+            const netIncomeLabels = Array.isArray(reportData.netIncome?.labels) ? reportData.netIncome.labels : [];
+            const netIncomeValues = Array.isArray(reportData.netIncome?.data) ? reportData.netIncome.data : [];
+            const expenseItems = (reportData.expenses?.items || []).map(item => ({ ...item }));
+
+            const totalGrossIncome = grossIncomeValues.reduce((sum, val) => sum + (val || 0), 0);
+            const totalNetIncome = netIncomeValues.reduce((sum, val) => sum + (val || 0), 0);
+            const totalExpenses = expenseItems.reduce((sum, item) => sum + (item.value || 0), 0);
+            const computedNetProfit = totalNetIncome - totalExpenses;
+
+            document.getElementById('net-gelir').textContent = formatCurrency(totalNetIncome);
+            document.getElementById('toplam-gider').textContent = formatCurrency(totalExpenses);
+            document.getElementById('net-kar').textContent = formatCurrency(computedNetProfit);
+
+            const netProfitIcon = document.getElementById('net-kar-icon');
+            if (netProfitIcon) {
+                const isPositive = computedNetProfit >= 0;
+                netProfitIcon.classList.toggle('kpi-icon--positive', isPositive);
+                netProfitIcon.classList.toggle('kpi-icon--negative', !isPositive);
+                netProfitIcon.setAttribute('aria-label', isPositive ? 'Kârda' : 'Zararda');
+                netProfitIcon.innerHTML = isPositive ? profitIconTemplates.positive : profitIconTemplates.negative;
+            }
+
+            document.getElementById('gross-income-subtitle').textContent = `Kasa raporuna göre toplam ${formatCurrency(totalGrossIncome)}'lik brüt gelirin kaynaklara göre dökümü.`;
+            const sortedGrossIncome = grossIncomeLabels.map((label, i) => ({
                 label,
-                value: reportData.grossIncome.data[i]
+                value: grossIncomeValues[i]
             })).sort((a, b) => b.value - a.value);
             createList('gross-income-list', sortedGrossIncome, 'border-emerald-400/20 bg-emerald-500/10', formatCurrency, 'text-emerald-200');
-            createInteractiveChart('grossIncomeChart', reportData.grossIncome.labels, reportData.grossIncome.data, ['#38BDF8', '#22D3EE', '#F97316', '#F472B6', '#34D399'], 'grossIncomeTotal');
+            createInteractiveChart('grossIncomeChart', grossIncomeLabels, grossIncomeValues, grossIncomeColors, 'grossIncomeTotal');
 
             document.getElementById('net-income-subtitle').textContent = `Bankaya yatan ve kasadaki net gelirin kaynaklara göre dökümü.`;
-            const sortedNetIncome = reportData.netIncome.labels.map((label, i) => ({
+            const sortedNetIncome = netIncomeLabels.map((label, i) => ({
                 label,
-                value: reportData.netIncome.data[i]
+                value: netIncomeValues[i]
             })).sort((a, b) => b.value - a.value);
             createList('net-income-list', sortedNetIncome, 'border-sky-400/20 bg-sky-500/10', formatCurrency, 'text-sky-200');
-            createInteractiveChart('netIncomeChart', reportData.netIncome.labels, reportData.netIncome.data, ['#60A5FA', '#38BDF8', '#F97316', '#F472B6', '#34D399'], 'netIncomeTotal');
+            createInteractiveChart('netIncomeChart', netIncomeLabels, netIncomeValues, netIncomeColors, 'netIncomeTotal');
 
             const chocolateDetails = reportData.chocolate.costs.map((c, i) => ({
                 ...c,
@@ -981,8 +1103,7 @@
                 chocolateList.appendChild(div);
             });
 
-            const expenseItems = (reportData.expenses?.items || []).map(item => ({ ...item }));
-            const sortedExpenses = expenseItems.sort((a, b) => b.value - a.value);
+            const sortedExpenses = [...expenseItems].sort((a, b) => b.value - a.value);
             createList('expense-list', sortedExpenses, 'border-rose-500/30 bg-rose-500/10', (value) => formatAmountWithSign(-value), 'text-rose-200');
 
             const expenseCategories = (reportData.expenses?.categories || []).map(item => ({ ...item }));
@@ -1043,19 +1164,26 @@
             document.getElementById('total-commission-header').textContent = `Toplam Komisyon Gideri: ${formatCurrency(totalCommission)}`;
             document.getElementById('total-commission-text').textContent = `Online platformlardan elde edilen ${formatCurrency(reportData.onlineCommissions.reduce((sum, p) => sum + p.gross, 0))} brüt cironun bankaya yatan net karşılığı ${formatCurrency(reportData.onlineCommissions.reduce((sum, p) => sum + p.net, 0))}'dir. Aradaki fark, platformların hizmet bedeli ve komisyonlarıdır.`;
 
-            const financialStatusList = document.getElementById('financial-status-list');
-            financialStatusList.innerHTML = '';
-            const bankNetFlow = reportData.financialStatus.bankaGelirleri - reportData.financialStatus.bankaGiderleri;
-            const cashNetFlow = reportData.financialStatus.nakitGelir - reportData.financialStatus.nakitGider;
+            const cashIncome = netIncomeLabels.reduce((sum, label, index) => {
+                return label?.toLowerCase().includes('nakit') ? sum + (netIncomeValues[index] || 0) : sum;
+            }, 0);
+            const bankIncome = totalNetIncome - cashIncome;
+            const cashExpense = expenseItems.reduce((sum, item) => {
+                return item.label?.toLowerCase().includes('nakit') ? sum + (item.value || 0) : sum;
+            }, 0);
+            const bankExpense = totalExpenses - cashExpense;
+            const bankNetFlow = bankIncome - bankExpense;
+            const cashNetFlow = cashIncome - cashExpense;
             const totalAssets = bankNetFlow + cashNetFlow;
 
+            const financialStatusList = document.getElementById('financial-status-list');
             financialStatusList.innerHTML = `
-                <div class="flex justify-between items-center p-4 rounded-xl border border-slate-700/60 bg-slate-900/60"><span class="text-slate-300">Toplam Banka Gelirleri</span><span class="font-semibold text-emerald-200">${formatCurrency(reportData.financialStatus.bankaGelirleri)}</span></div>
-                <div class="flex justify-between items-center p-4 rounded-xl border border-slate-700/60 bg-slate-900/60"><span class="text-slate-300">Toplam Banka Giderleri</span><span class="font-semibold text-rose-300">${formatAmountWithSign(-reportData.financialStatus.bankaGiderleri)}</span></div>
+                <div class="flex justify-between items-center p-4 rounded-xl border border-slate-700/60 bg-slate-900/60"><span class="text-slate-300">Toplam Banka Gelirleri</span><span class="font-semibold text-emerald-200">${formatCurrency(bankIncome)}</span></div>
+                <div class="flex justify-between items-center p-4 rounded-xl border border-slate-700/60 bg-slate-900/60"><span class="text-slate-300">Toplam Banka Giderleri</span><span class="font-semibold text-rose-300">${formatAmountWithSign(-bankExpense)}</span></div>
                 <div class="flex justify-between items-center p-4 rounded-xl border border-sky-500/30 bg-sky-500/10 font-semibold text-slate-100"><span>Banka Net Akışı</span><span>${formatAmountWithSign(bankNetFlow)}</span></div>
                 <hr class="my-3 border-slate-700/60">
-                <div class="flex justify-between items-center p-4 rounded-xl border border-slate-700/60 bg-slate-900/60"><span class="text-slate-300">Nakit Gelir (Kasa)</span><span class="font-semibold text-emerald-200">${formatCurrency(reportData.financialStatus.nakitGelir)}</span></div>
-                <div class="flex justify-between items-center p-4 rounded-xl border border-slate-700/60 bg-slate-900/60"><span class="text-slate-300">Nakit Gider (Kasa)</span><span class="font-semibold text-rose-300">${formatAmountWithSign(-reportData.financialStatus.nakitGider)}</span></div>
+                <div class="flex justify-between items-center p-4 rounded-xl border border-slate-700/60 bg-slate-900/60"><span class="text-slate-300">Nakit Gelir (Kasa)</span><span class="font-semibold text-emerald-200">${formatCurrency(cashIncome)}</span></div>
+                <div class="flex justify-between items-center p-4 rounded-xl border border-slate-700/60 bg-slate-900/60"><span class="text-slate-300">Nakit Gider (Kasa)</span><span class="font-semibold text-rose-300">${formatAmountWithSign(-cashExpense)}</span></div>
                 <div class="flex justify-between items-center p-4 rounded-xl border border-sky-500/30 bg-sky-500/10 font-semibold text-slate-100"><span>Kasa Net Akışı</span><span>${formatAmountWithSign(cashNetFlow)}</span></div>
                 <hr class="my-3 border-dashed border-slate-600/60">
                 <div class="flex justify-between items-center p-5 rounded-2xl bg-gradient-to-r from-amber-400/20 via-emerald-400/20 to-sky-400/20 text-lg font-semibold text-slate-100 border border-amber-200/30"><span>Toplam Nakit + Banka Varlığı</span><span>${formatAmountWithSign(totalAssets)}</span></div>
@@ -1120,7 +1248,7 @@
 
                 document.getElementById('updateDataBtn').addEventListener('click', async () => {
                     if (!db) {
-                        alert("Veritabanı bağlantısı henüz kurulmadı.");
+                        alert("Bu kısmı sadece Umut Pınarbaşı kullanabilir");
                         return;
                     }
                     const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
