@@ -1310,7 +1310,15 @@
                     const chocolateUsage = report.chocolate.costs.reduce((sum, item) => sum + item.kg, 0);
                     const chocolateCost = report.chocolate.costs.reduce((sum, item) => sum + (item.kg * item.pricePerKg), 0);
 
+                    // Gider kategorilerini ve brüt geliri de ekleyelim
+                    const grossIncome = (report.grossIncome?.data || []).reduce((a,b) => a + b, 0);
+                    const cogs = (report.expenses.categories.find(c => c.label.includes('Genel Merkeze'))?.value || 0) + (report.expenses.categories.find(c => c.label.includes('Manav'))?.value || 0) + (report.expenses.categories.find(c => c.label.includes('Tedarik'))?.value || 0) ;
+                    const labor = report.expenses.categories.find(c => c.label.includes('Personel'))?.value || 0;
+                    const rent = report.expenses.categories.find(c => c.label.includes('Kira'))?.value || 0;
+
+
                     return `
+- Toplam Brüt Gelir: ${formatCurrency(grossIncome)}
 - Toplam Net Gelir: ${formatCurrency(netIncome)}
 - Toplam Gider: ${formatCurrency(totalExpenses)}
 - Net Dönem Kârı/Zararı: ${formatCurrency(netProfit)}
@@ -1318,6 +1326,10 @@
 ${report.netIncome.labels.map((label, i) => `  - ${label}: ${formatCurrency(report.netIncome.data[i])}`).join('\n')}
 - Gider Kategorileri:
 ${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCurrency(item.value)}`).join('\n')}
+- Ana Gider Oranları için Ham Veriler:
+  - Gıda/Sarf Malzemesi Maliyeti (COGS): ${formatCurrency(cogs)}
+  - Personel Maliyeti: ${formatCurrency(labor)}
+  - Kira Maliyeti: ${formatCurrency(rent)}
 - Toplam Çikolata Kullanımı: ${chocolateUsage.toFixed(1)} KG
 - Toplam Çikolata Maliyeti: ${formatCurrency(chocolateCost)}
 `;
@@ -1344,6 +1356,15 @@ ${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCur
                     - Genel gelir ve giderlerdeki önemli artış/azalışlar.
                     - Çikolata kullanım miktarları ve maliyetlerindeki değişimler.
                     - Verilerde göze çarpan, dikkat çeken veya mantıksız görünen durumlar var mı? (Örn: Bir ayda gelirin düşmesine rağmen X giderinin artması gibi).
+
+                    ### 3. Endüstri Standartları ile Karşılaştırma (Seçili Ay: ${currentReport.name})
+                    Aşağıdaki genel kafe/restoran sektörü standartlarını kullanarak **${currentReport.name}** ayının verilerini karşılaştır ve yorumla. Hesaplamaları Toplam Brüt Gelir'e göre yap.
+                    - **Gıda ve Sarf Malzemesi Maliyeti (COGS) Standardı: %25 - %35**
+                    - **İşçilik Giderleri (Maaşlar) Standardı: %25 - %35**
+                    - **Kira Gideri Standardı: %5 - %10**
+                    - **Net Kâr Marjı Standardı: %3 - %10**
+
+                    Bu standartlara göre işletmenin durumunu analiz et. Örneğin: "İşletmenin personel gider oranı %X, bu oran sektör standardı olan %25-%35 aralığının içindedir/üzerindedir/altındadır. Bu durumun olası nedenleri..." gibi net karşılaştırmalar yap.
                 `;
 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
@@ -1466,5 +1487,4 @@ ${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCur
 </body>
 
 </html>
-
 
