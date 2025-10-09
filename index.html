@@ -7,6 +7,7 @@
     <title>Boston Drink & Dessert Cadde Şube Finansal Raporu</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script> <!-- AI Response Formatter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -249,6 +250,63 @@
         .month-button:hover::after {
             opacity: 1;
         }
+
+        /* YENİ EKLENEN STİLLER */
+        .ai-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.6rem 1.25rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            color: #0F172A;
+            background: linear-gradient(135deg, #A5B4FC, #818CF8);
+            border: 1px solid rgba(199, 210, 254, 0.5);
+            box-shadow: 0 10px 30px -12px rgba(129, 140, 248, 0.6);
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        .ai-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px -12px rgba(129, 140, 248, 0.7);
+        }
+        .ai-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .ai-button .spinner {
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid transparent;
+            border-top-color: #0F172A;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        #ai-analysis-content h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+            color: #C7D2FE;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(129, 140, 248, 0.2);
+        }
+        #ai-analysis-content ul {
+            list-style-position: inside;
+            list-style-type: ' ✓ ';
+            padding-left: 0.5rem;
+            color: #E2E8F0;
+        }
+        #ai-analysis-content li {
+            margin-bottom: 0.5rem;
+            padding-left: 0.5rem;
+        }
+        #ai-analysis-content p {
+            line-height: 1.6;
+        }
     </style>
 </head>
 
@@ -286,8 +344,15 @@
 
         <section id="overview" class="mb-14">
             <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
-                <h2 class="section-title text-slate-300">Genel Bakış</h2>
-                <span class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-slate-400 bg-slate-900/60 border border-slate-700/60 rounded-full px-4 py-1">Anlık Güncellenen Panoramik Özet</span>
+                <div class="flex items-center gap-6">
+                    <h2 class="section-title text-slate-300">Genel Bakış</h2>
+                    <span class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-slate-400 bg-slate-900/60 border border-slate-700/60 rounded-full px-4 py-1">Anlık Güncellenen Panoramik Özet</span>
+                </div>
+                 <!-- YENİ BUTON BURADA -->
+                <button id="runAiAnalysisBtn" class="ai-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles"><path d="m12 3-1.9 4.8-4.8 1.9 4.8 1.9L12 21l1.9-4.8 4.8-1.9-4.8-1.9L12 3z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                    <span>Yapay Zeka Analizi</span>
+                </button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="kpi-card">
@@ -327,6 +392,24 @@
                     <p class="kpi-value font-bold text-amber-200 mt-4" id="net-kar">Yükleniyor...</p>
                 </div>
             </div>
+        </section>
+
+        <!-- YENİ EKLENEN YAPAY ZEKA ANALİZ BÖLÜMÜ -->
+        <section id="ai-analysis-section" class="glass-card mb-14 hidden">
+             <div class="flex items-center gap-4 mb-4">
+                <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 4.8-4.8 1.9 4.8 1.9L12 21l1.9-4.8 4.8-1.9-4.8-1.9L12 3z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                </div>
+                <div>
+                     <p class="section-title text-indigo-200">Gemini AI</p>
+                    <h2 class="text-2xl font-semibold text-white">Yapay Zeka Finansal Analizi</h2>
+                </div>
+            </div>
+            <div id="ai-analysis-loader" class="text-center py-8 hidden">
+                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-400"></div>
+                <p class="mt-4 text-slate-300">Finansal veriler analiz ediliyor, lütfen bekleyin...</p>
+            </div>
+            <div id="ai-analysis-content" class="text-slate-300 leading-relaxed"></div>
         </section>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-14">
@@ -488,7 +571,7 @@
 
         <footer class="text-center text-xs text-slate-400/80 mt-16 pb-10">
             <p>Bu rapor, güvenli veri kaynaklarına dayanarak oluşturulmuştur ve finansal danışmanlık yerine geçmez.</p>
-            <p>Rapor Tarihi: 6 Eylül 2025</p>
+            <p>Rapor Tarihi: 10 Ekim 2025</p>
         </footer>
     </div>
 
@@ -496,7 +579,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, onSnapshot, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
+        
         // Firebase ve Uygulama Ayarları 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
@@ -1032,6 +1115,9 @@
                 console.error('Rapor verisi bulunamadı.');
                 return;
             }
+             // Her ay değiştiğinde AI analizini gizle
+            document.getElementById('ai-analysis-section').classList.add('hidden');
+            document.getElementById('ai-analysis-content').innerHTML = '';
 
             const monthName = reportData.name || getMonthLabel(currentMonthKey) || 'Finansal';
             const reportTitle = document.getElementById('report-title');
@@ -1193,6 +1279,112 @@
             reportContainer.classList.remove('hidden');
         };
 
+         // --- YENİ EKLENEN YAPAY ZEKA FONKSİYONLARI ---
+        const GEMINI_API_KEY = "AIzaSyBhFNahLBWvzoM70OPW3HqAwIhpScubVNQ";
+        
+        async function runAiAnalysis() {
+            const aiSection = document.getElementById('ai-analysis-section');
+            const aiLoader = document.getElementById('ai-analysis-loader');
+            const aiContent = document.getElementById('ai-analysis-content');
+            const aiButton = document.getElementById('runAiAnalysisBtn');
+
+            aiSection.classList.remove('hidden');
+            aiLoader.classList.remove('hidden');
+            aiContent.innerHTML = '';
+            aiButton.disabled = true;
+            aiButton.querySelector('span').textContent = 'Analiz Ediliyor...';
+
+            try {
+                const reportAug = availableReports['agustos2025'];
+                const reportSep = availableReports['eylul2025'];
+                const currentReport = availableReports[currentMonthKey];
+
+                if (!reportAug || !reportSep) {
+                    throw new Error("Analiz için Ağustos ve Eylül rapor verileri bulunamadı.");
+                }
+
+                const formatReportDataForPrompt = (report) => {
+                    const netIncome = (report.netIncome?.data || []).reduce((a, b) => a + b, 0);
+                    const totalExpenses = (report.expenses?.items || []).reduce((a, b) => a + b.value, 0);
+                    const netProfit = netIncome - totalExpenses;
+                    const chocolateUsage = report.chocolate.costs.reduce((sum, item) => sum + item.kg, 0);
+                    const chocolateCost = report.chocolate.costs.reduce((sum, item) => sum + (item.kg * item.pricePerKg), 0);
+
+                    return `
+- Toplam Net Gelir: ${formatCurrency(netIncome)}
+- Toplam Gider: ${formatCurrency(totalExpenses)}
+- Net Dönem Kârı/Zararı: ${formatCurrency(netProfit)}
+- Gelir Kaynakları (Net):
+${report.netIncome.labels.map((label, i) => `  - ${label}: ${formatCurrency(report.netIncome.data[i])}`).join('\n')}
+- Gider Kategorileri:
+${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCurrency(item.value)}`).join('\n')}
+- Toplam Çikolata Kullanımı: ${chocolateUsage.toFixed(1)} KG
+- Toplam Çikolata Maliyeti: ${formatCurrency(chocolateCost)}
+`;
+                };
+                
+                let prompt = `
+                    Sen bir kafe ve restoran endüstrisinde uzmanlaşmış bir finansal analistsin.
+                    Aşağıdaki finansal verileri "Boston Drink & Dessert" adlı kafe için analiz et. İki dönemin verileri aşağıdadır: Ağustos 2025 ve Eylül 2025.
+
+                    **Ağustos 2025 Verileri:**
+                    ${formatReportDataForPrompt(reportAug)}
+
+                    **Eylül 2025 Verileri:**
+                    ${formatReportDataForPrompt(reportSep)}
+
+                    **Analiz İsteği:**
+                    Bu verilere dayanarak, Türkçe dilinde ve Markdown formatında, işletme sahibinin kolayca anlayabileceği profesyonel bir dille kısa ve öz bir finansal analiz hazırla. Analiz SADECE şu başlıkları içermelidir:
+
+                    ### 1. Yüzdesel Analiz (Seçili Ay: ${currentReport.name})
+                    Şu an görüntülenen **${currentReport.name}** ayı için, en büyük 3 gelir ve en büyük 3 gider kategorisinin toplam içindeki yüzdelik paylarını belirt. Örneğin: "Giderlerin %X'i Genel Merkez Ödemeleri'ne aittir".
+
+                    ### 2. İki Aylık Karşılaştırma ve Anormallikler
+                    Ağustos ve Eylül aylarını birbiriyle karşılaştır. Özellikle şu noktalara odaklan:
+                    - Genel gelir ve giderlerdeki önemli artış/azalışlar.
+                    - Çikolata kullanım miktarları ve maliyetlerindeki değişimler.
+                    - Verilerde göze çarpan, dikkat çeken veya mantıksız görünen durumlar var mı? (Örn: Bir ayda gelirin düşmesine rağmen X giderinin artması gibi).
+                `;
+
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
+                
+                const payload = {
+                    contents: [{
+                        parts: [{
+                            text: prompt
+                        }]
+                    }]
+                };
+
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload),
+                });
+
+                if (!response.ok) {
+                    const errorBody = await response.json();
+                    throw new Error(`API Error: ${response.status} ${response.statusText} - ${JSON.stringify(errorBody)}`);
+                }
+                
+                const data = await response.json();
+                const text = data.candidates[0].content.parts[0].text;
+
+                aiContent.innerHTML = marked.parse(text);
+
+            } catch (error) {
+                console.error("AI analysis error:", error);
+                aiContent.innerHTML = `<p class="text-center text-red-400 font-semibold">An error occurred during the analysis. Please ensure your API key is valid and check your internet connection. <br><small>${error.message}</small></p>`;
+            } finally {
+                aiLoader.classList.add('hidden');
+                aiButton.disabled = false;
+                aiButton.querySelector('span').textContent = 'Yapay Zeka Analizi';
+            }
+        }
+
+
         // Veritabanı ve kimlik doğrulama işlemleri
         document.addEventListener('DOMContentLoaded', async () => {
             document.querySelectorAll('.chart-type-button').forEach(button => {
@@ -1200,6 +1392,9 @@
                     updateChartType(button.dataset.chartTarget, button.dataset.chartType);
                 });
             });
+
+            // YENİ BUTON İÇİN EVENT LISTENER
+            document.getElementById('runAiAnalysisBtn').addEventListener('click', runAiAnalysis);
 
             try {
                 if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
@@ -1217,53 +1412,53 @@
                     onAuthStateChanged(auth, (user) => {
                         if (user) {
                             userId = user.uid;
-                            console.log("Firebase'e başarılı bir şekilde giriş yapıldı. UID:", userId);
+                            console.log("Successfully logged into Firebase. UID:", userId);
 
                             const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
                             onSnapshot(docRef, (docSnap) => {
                                 if (docSnap.exists()) {
                                     initializeReports(normalizeReportPayload(docSnap.data()));
                                 } else {
-                                    console.log("Rapor verisi bulunamadı. Örnek veriyi kaydediyor...");
+                                    console.log("Report data not found. Saving sample data...");
                                     setDoc(docRef, sampleReportData)
-                                        .then(() => console.log("Örnek veri başarıyla kaydedildi."))
-                                        .catch(error => console.error("Veri kaydetme hatası:", error));
+                                        .then(() => console.log("Sample data saved successfully."))
+                                        .catch(error => console.error("Error saving data:", error));
                                 }
                             }, (error) => {
-                                console.error("Veritabanı dinleme hatası:", error);
+                                console.error("Database listening error:", error);
                                 loadingSpinner.classList.add('hidden');
-                                document.getElementById('report-container').innerHTML = '<p class="text-center text-red-500 text-xl font-bold mt-10">Rapor yüklenirken bir hata oluştu. Lütfen konsolu kontrol edin.</p>';
+                                document.getElementById('report-container').innerHTML = '<p class="text-center text-red-500 text-xl font-bold mt-10">An error occurred while loading the report. Please check the console.</p>';
                             });
 
                         } else {
-                            console.log("Kullanıcı oturumu açılmadı. Yerel örnek veri kullanılıyor.");
+                            console.log("User is not signed in. Using local sample data.");
                             initializeReports(sampleReportData);
                         }
                     });
 
                 } else {
-                    console.error("Firebase yapılandırması eksik. Yerel örnek veri kullanılıyor.");
+                    console.error("Firebase configuration is missing. Using local sample data.");
                     initializeReports(sampleReportData);
                 }
 
                 document.getElementById('updateDataBtn').addEventListener('click', async () => {
                     if (!db) {
-                        alert("Bu kısmı sadece Umut Pınarbaşı kullanabilir");
+                        alert("Only authorized users can perform this action.");
                         return;
                     }
                     const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
                     try {
                         await setDoc(docRef, sampleReportData);
-                        console.log("Veri güncelleme isteği gönderildi.");
+                        console.log("Data update request sent.");
                     } catch (e) {
-                        console.error("Veri güncelleme hatası:", e);
+                        console.error("Error updating data:", e);
                     }
                 });
 
             } catch (error) {
-                console.error("Uygulama başlatılırken hata:", error);
+                console.error("Error during application initialization:", error);
                 loadingSpinner.classList.add('hidden');
-                document.getElementById('report-container').innerHTML = '<p class="text-center text-red-500 text-xl font-bold mt-10">Uygulama başlatılırken bir hata oluştu. Lütfen konsolu kontrol edin.</p>';
+                document.getElementById('report-container').innerHTML = '<p class="text-center text-red-500 text-xl font-bold mt-10">An error occurred during application startup. Please check the console.</p>';
             }
         });
 
@@ -1271,4 +1466,5 @@
 </body>
 
 </html>
+
 
