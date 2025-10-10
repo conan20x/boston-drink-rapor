@@ -348,10 +348,10 @@
                     <h2 class="section-title text-slate-300">Genel Bakış</h2>
                     <span class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-slate-400 bg-slate-900/60 border border-slate-700/60 rounded-full px-4 py-1">Anlık Güncellenen Panoramik Özet</span>
                 </div>
-                 <!-- YENİ BUTON BURADA -->
+                 <!-- DEĞİŞTİRİLEN BUTON -->
                 <button id="runAiAnalysisBtn" class="ai-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles"><path d="m12 3-1.9 4.8-4.8 1.9 4.8 1.9L12 21l1.9-4.8 4.8-1.9-4.8-1.9L12 3z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-                    <span>Yapay Zeka Analizi</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                    <span>Kapsamlı AI Raporu</span>
                 </button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -1297,7 +1297,6 @@
             try {
                 const reportAug = availableReports['agustos2025'];
                 const reportSep = availableReports['eylul2025'];
-                const currentReport = availableReports[currentMonthKey];
 
                 if (!reportAug || !reportSep) {
                     throw new Error("Analiz için Ağustos ve Eylül rapor verileri bulunamadı.");
@@ -1309,13 +1308,10 @@
                     const netProfit = netIncome - totalExpenses;
                     const chocolateUsage = report.chocolate.costs.reduce((sum, item) => sum + item.kg, 0);
                     const chocolateCost = report.chocolate.costs.reduce((sum, item) => sum + (item.kg * item.pricePerKg), 0);
-
-                    // Gider kategorilerini ve brüt geliri de ekleyelim
                     const grossIncome = (report.grossIncome?.data || []).reduce((a,b) => a + b, 0);
                     const cogs = (report.expenses.categories.find(c => c.label.includes('Genel Merkeze'))?.value || 0) + (report.expenses.categories.find(c => c.label.includes('Manav'))?.value || 0) + (report.expenses.categories.find(c => c.label.includes('Tedarik'))?.value || 0) ;
                     const labor = report.expenses.categories.find(c => c.label.includes('Personel'))?.value || 0;
                     const rent = report.expenses.categories.find(c => c.label.includes('Kira'))?.value || 0;
-
 
                     return `
 - Toplam Brüt Gelir: ${formatCurrency(grossIncome)}
@@ -1346,25 +1342,27 @@ ${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCur
                     ${formatReportDataForPrompt(reportSep)}
 
                     **Analiz İsteği:**
-                    Bu verilere dayanarak, Türkçe dilinde ve Markdown formatında, işletme sahibinin kolayca anlayabileceği profesyonel bir dille kısa ve öz bir finansal analiz hazırla. Analiz SADECE şu başlıkları içermelidir:
+                    Bu verilere dayanarak, Türkçe dilinde ve Markdown formatında, işletme sahibinin kolayca anlayabileceği profesyonel bir dille kapsamlı bir finansal analiz hazırla. Analiz SADECE şu başlıkları ve sırayı takip etmelidir:
 
-                    ### 1. Yüzdesel Analiz (Seçili Ay: ${currentReport.name})
-                    Şu an görüntülenen **${currentReport.name}** ayı için, en büyük 3 gelir ve en büyük 3 gider kategorisinin toplam içindeki yüzdelik paylarını belirt. Örneğin: "Giderlerin %X'i Genel Merkez Ödemeleri'ne aittir".
+                    ### Ağustos 2025 Detaylı Analizi
+                    Bu bölümde SADECE Ağustos ayını analiz et.
+                    - **Yüzdesel Dağılım:** En büyük 3 gelir ve en büyük 3 gider kategorisinin toplam içindeki yüzdelik paylarını belirt.
+                    - **Endüstri Standartları ile Karşılaştırma:** Aşağıdaki standartları kullanarak Ağustos ayının verilerini yorumla. Hesaplamaları Toplam Brüt Gelir'e göre yap:
+                        - Gıda ve Sarf Malzemesi (COGS) Standardı: %25-%35
+                        - İşçilik Giderleri Standardı: %25-%35
+                        - Kira Gideri Standardı: %5-%10
+                        - Net Kâr Marjı Standardı: %3-%10
+                    
+                    ### Eylül 2025 Detaylı Analizi
+                    Bu bölümde SADECE Eylül ayını analiz et.
+                    - **Yüzdesel Dağılım:** En büyük 3 gelir ve en büyük 3 gider kategorisinin toplam içindeki yüzdelik paylarını belirt.
+                    - **Endüstri Standartları ile Karşılaştırma:** Yukarıdaki aynı standartları kullanarak Eylül ayının verilerini yorumla.
 
-                    ### 2. İki Aylık Karşılaştırma ve Anormallikler
-                    Ağustos ve Eylül aylarını birbiriyle karşılaştır. Özellikle şu noktalara odaklan:
-                    - Genel gelir ve giderlerdeki önemli artış/azalışlar.
-                    - Çikolata kullanım miktarları ve maliyetlerindeki değişimler.
-                    - Verilerde göze çarpan, dikkat çeken veya mantıksız görünen durumlar var mı? (Örn: Bir ayda gelirin düşmesine rağmen X giderinin artması gibi).
-
-                    ### 3. Endüstri Standartları ile Karşılaştırma (Seçili Ay: ${currentReport.name})
-                    Aşağıdaki genel kafe/restoran sektörü standartlarını kullanarak **${currentReport.name}** ayının verilerini karşılaştır ve yorumla. Hesaplamaları Toplam Brüt Gelir'e göre yap.
-                    - **Gıda ve Sarf Malzemesi Maliyeti (COGS) Standardı: %25 - %35**
-                    - **İşçilik Giderleri (Maaşlar) Standardı: %25 - %35**
-                    - **Kira Gideri Standardı: %5 - %10**
-                    - **Net Kâr Marjı Standardı: %3 - %10**
-
-                    Bu standartlara göre işletmenin durumunu analiz et. Örneğin: "İşletmenin personel gider oranı %X, bu oran sektör standardı olan %25-%35 aralığının içindedir/üzerindedir/altındadır. Bu durumun olası nedenleri..." gibi net karşılaştırmalar yap.
+                    ### Genel Karşılaştırma ve Stratejik Özet
+                    İki ayı birbiriyle karşılaştırarak genel bir özet sun.
+                    - **Trend Analizi:** Genel gelir, gider ve kârlılıkta aydan aya nasıl bir değişim olduğunu belirt.
+                    - **Anormallikler:** Verilerde göze çarpan, dikkat çeken veya mantıksız görünen durumlar var mı? (Örn: Bir ayda gelirin düşmesine rağmen X giderinin artması gibi).
+                    - **Nihai Yorum:** İşletmenin iki aylık finansal gidişatı hakkında genel bir sonuç cümlesi kur.
                 `;
 
                 const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
@@ -1401,7 +1399,7 @@ ${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCur
             } finally {
                 aiLoader.classList.add('hidden');
                 aiButton.disabled = false;
-                aiButton.querySelector('span').textContent = 'Yapay Zeka Analizi';
+                aiButton.querySelector('span').textContent = 'Kapsamlı AI Raporu';
             }
         }
 
