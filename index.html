@@ -285,41 +285,66 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+        
+        /* GÜNCELLENEN AI İÇERİK STİLLERİ */
         #ai-analysis-content h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-            color: #C7D2FE;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid rgba(129, 140, 248, 0.2);
+            font-size: 1.25rem; /* Biraz daha büyük */
+            font-weight: 700; /* Daha kalın */
+            margin-top: 1.75rem; /* Daha fazla üst boşluk */
+            margin-bottom: 1rem; /* Daha fazla alt boşluk */
+            color: #C7D2FE; /* İndigo rengi */
+            padding-bottom: 0.75rem; /* Alt çizgi için boşluk */
+            border-bottom: 2px solid rgba(129, 140, 248, 0.3); /* Daha belirgin alt çizgi */
         }
         #ai-analysis-content ul {
             list-style-position: inside;
-            list-style-type: ' ✓ ';
+            list-style-type: ' ✓ '; /* Güzel tik işareti */
             padding-left: 0.5rem;
-            color: #E2E8F0;
+            color: #E2E8F0; /* Açık gri */
+            margin-top: 1rem; /* Listeden önce boşluk */
         }
         #ai-analysis-content li {
-            margin-bottom: 0.5rem;
-            padding-left: 0.5rem;
+            margin-bottom: 0.75rem; /* Liste elemanları arası boşluk */
+            background: rgba(129, 140, 248, 0.05); /* Çok hafif vurgu arkaplanı */
+            border-left: 3px solid #818CF8; /* Vurgu için sol kenarlık */
+            padding: 0.75rem 0.75rem 0.75rem 1.25rem; /* İç boşluklar */
+            border-radius: 0 0.5rem 0.5rem 0; /* Köşe yuvarlatma */
+            line-height: 1.6;
         }
         #ai-analysis-content p {
-            line-height: 1.6;
+            line-height: 1.7; /* Daha okunaklı satır yüksekliği */
+            color: #CBD5F5; /* Paragraflar için daha açık renk */
+            margin-bottom: 1rem; /* Paragraflar arası boşluk */
+        }
+        /* KALIN METİNLERİ VURGULAMAK İÇİN YENİ KURAL */
+        #ai-analysis-content strong {
+            color: #F8FAFC; /* Parlak beyaz */
+            font-weight: 700;
+        }
+        /* Başlıklardan hemen sonra gelen paragraflar (giriş metinleri) */
+        #ai-analysis-content h3 + p {
+             color: #E2E8F0;
+             font-size: 1.05rem; /* Giriş metni için biraz daha büyük font */
         }
     </style>
 </head>
 
 <body class="antialiased">
+    <!-- Yükleme Ekranı -->
     <div id="loading-spinner" class="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-50">
         <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
         <div class="absolute text-xl font-semibold text-gray-700">Rapor Yükleniyor...</div>
     </div>
 
+    <!-- Ana Rapor İçeriği -->
     <div class="page-wrapper px-4 sm:px-8 md:px-10 lg:px-12 py-10 hidden" id="report-container">
+        
+        <!-- Ay Değiştirici -->
         <div class="flex justify-center lg:justify-end mb-10">
             <div id="month-switcher" class="month-switcher"></div>
         </div>
+        
+        <!-- Başlık Bölümü -->
         <header class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8 mb-12">
             <div class="flex items-center gap-4">
                 <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-cyan-400 via-emerald-400 to-blue-500 flex items-center justify-center shadow-2xl shadow-cyan-500/30">
@@ -342,19 +367,41 @@
             </div>
         </header>
 
+        <!-- YENİ KONUM: YAPAY ZEKA ANALİZ BÖLÜMÜ -->
+        <section id="ai-analysis-section" class="glass-card mb-14 hidden">
+             <div class="flex items-center gap-4 mb-4">
+                 <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 4.8-4.8 1.9 4.8 1.9L12 21l1.9-4.8 4.8-1.9-4.8-1.9L12 3z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
+                 </div>
+                 <div>
+                      <!-- DEĞİŞİKLİK: Gemini AI -> Umut AI -->
+                      <p class="section-title text-indigo-200">UMUT AI</p>
+                     <h2 class="text-2xl font-semibold text-white">Yapay Zeka Finansal Analizi</h2>
+                 </div>
+             </div>
+             <div id="ai-analysis-loader" class="text-center py-8 hidden">
+                 <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-400"></div>
+                 <p class="mt-4 text-slate-300">Finansal veriler analiz ediliyor, lütfen bekleyin...</p>
+             </div>
+             <div id="ai-analysis-content" class="text-slate-300 leading-relaxed"></div>
+        </section>
+
+        <!-- KPI Kartları Bölümü -->
         <section id="overview" class="mb-14">
             <div class="flex items-center justify-between flex-wrap gap-4 mb-6">
                 <div class="flex items-center gap-6">
                     <h2 class="section-title text-slate-300">Genel Bakış</h2>
                     <span class="inline-flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-slate-400 bg-slate-900/60 border border-slate-700/60 rounded-full px-4 py-1">Anlık Güncellenen Panoramik Özet</span>
                 </div>
-                 <!-- DEĞİŞTİRİLEN BUTON -->
+                <!-- DEĞİŞTİRİLEN BUTON -->
                 <button id="runAiAnalysisBtn" class="ai-button">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
-                    <span>Kapsamlı AI Raporu</span>
+                    <!-- GÜNCELLENEN METİN -->
+                    <span>Kapsamlı Yapay Zeka Analizi</span>
                 </button>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Net Gelir Kartı -->
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <p class="text-xs uppercase tracking-[0.3em] text-emerald-200/80">Net Gelir (Banka + Nakit)</p>
@@ -367,6 +414,7 @@
                     </div>
                     <p class="kpi-value font-bold text-emerald-200 mt-4" id="net-gelir">Yükleniyor...</p>
                 </div>
+                <!-- Toplam Gider Kartı -->
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <p class="text-xs uppercase tracking-[0.3em] text-rose-200/80">Toplam Gider (Banka + Nakit)</p>
@@ -379,6 +427,7 @@
                     </div>
                     <p class="kpi-value font-bold text-rose-200 mt-4" id="toplam-gider">Yükleniyor...</p>
                 </div>
+                <!-- Net Kâr Kartı -->
                 <div class="kpi-card">
                     <div class="kpi-header">
                         <p class="text-xs uppercase tracking-[0.3em] text-amber-200/80">Net Dönem Kârı (Nakit Akışı)</p>
@@ -394,25 +443,9 @@
             </div>
         </section>
 
-        <!-- YENİ EKLENEN YAPAY ZEKA ANALİZ BÖLÜMÜ -->
-        <section id="ai-analysis-section" class="glass-card mb-14 hidden">
-             <div class="flex items-center gap-4 mb-4">
-                <div class="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                   <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0F172A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.9 4.8-4.8 1.9 4.8 1.9L12 21l1.9-4.8 4.8-1.9-4.8-1.9L12 3z"/><path d="M5 3v4"/><path d="M19 17v4"/><path d="M3 5h4"/><path d="M17 19h4"/></svg>
-                </div>
-                <div>
-                     <p class="section-title text-indigo-200">Gemini AI</p>
-                    <h2 class="text-2xl font-semibold text-white">Yapay Zeka Finansal Analizi</h2>
-                </div>
-            </div>
-            <div id="ai-analysis-loader" class="text-center py-8 hidden">
-                <div class="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-400"></div>
-                <p class="mt-4 text-slate-300">Finansal veriler analiz ediliyor, lütfen bekleyin...</p>
-            </div>
-            <div id="ai-analysis-content" class="text-slate-300 leading-relaxed"></div>
-        </section>
-
+        <!-- Grafik Bölümleri -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-14">
+            <!-- Brüt Gelir Grafiği -->
             <section id="gross-income" class="glass-card">
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div>
@@ -433,6 +466,7 @@
                 <div id="gross-income-list" class="space-y-3"></div>
             </section>
 
+            <!-- Net Gelir Grafiği -->
             <section id="net-income" class="glass-card">
                 <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                     <div>
@@ -454,6 +488,7 @@
             </section>
         </div>
 
+        <!-- Giderler Grafiği -->
         <section id="expenses" class="glass-card mb-14">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                 <div>
@@ -474,6 +509,7 @@
             <div id="expense-list" class="space-y-3 max-h-64 overflow-y-auto pr-2"></div>
         </section>
 
+        <!-- Çikolata Analizi -->
         <section id="chocolate-analysis" class="glass-card mb-14">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                 <div>
@@ -494,7 +530,7 @@
             <div id="chocolate-list" class="space-y-3"></div>
         </section>
 
-        <!-- YENİ BÖLÜM: YEMEK KARTLARI -->
+        <!-- Yemek Kartları Analizi -->
         <section id="food-cards" class="glass-card mb-14">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
                 <div>
@@ -519,7 +555,7 @@
             </div>
         </section>
 
-        <!-- YENİ BÖLÜM: SEVKİYAT DETAYLARI -->
+        <!-- Sevkiyat Detayları -->
         <section id="shipment" class="glass-card mb-14">
             <div class="flex flex-col gap-3 mb-6">
                 <p class="section-title text-slate-300">Tedarik Zinciri</p>
@@ -535,7 +571,7 @@
             </div>
         </section>
 
-
+        <!-- Nakit Akışı Bölümü -->
         <section id="cashflow" class="glass-card mb-14">
             <div class="flex flex-col gap-3 mb-6">
                 <p class="section-title text-slate-300">Likidite Nabzı</p>
@@ -558,6 +594,7 @@
             </div>
         </section>
 
+        <!-- Yönetici Paneli -->
         <section id="admin-panel" class="glass-card mt-12 mb-12">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div>
@@ -569,12 +606,14 @@
             </div>
         </section>
 
+        <!-- Alt Bilgi -->
         <footer class="text-center text-xs text-slate-400/80 mt-16 pb-10">
             <p>Bu rapor, güvenli veri kaynaklarına dayanarak oluşturulmuştur ve finansal danışmanlık yerine geçmez.</p>
             <p>Rapor Tarihi: 10 Ekim 2025</p>
         </footer>
     </div>
 
+    <!-- JavaScript Modülü -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -600,7 +639,7 @@
 
         // Örnek Rapor Verileri (Bu veriler veritabanına kaydedilecek)
         const sampleReportData = {
-            activeMonth: 'agustos2025',
+            activeMonth: 'ekim2025', // DEĞİŞİKLİK: Aktif ay Ekim olarak ayarlandı
             reports: {
                 agustos2025: {
                     name: 'Ağustos 2025',
@@ -825,6 +864,108 @@
                         bankaGiderleri: 1225102.73,
                         nakitGelir: 87530.0,
                         nakitGider: 65205.0
+                    }
+                },
+                // YENİ: Ekim 2025 verileri eklendi
+                ekim2025: {
+                    name: 'Ekim 2025',
+                    period: '01.10.2025 - 31.10.2025',
+                    kpi: {
+                        brutGelir: 2147684.99,
+                        toplamGider: 1240060.26,
+                        netKar: 411929.95
+                    },
+                    grossIncome: {
+                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
+                        data: [1003526.49, 527550.00, 191015.50, 318950.00, 106643.00]
+                    },
+                    netIncome: {
+                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Devlet Katkısı', 'Nakit'],
+                        data: [918042.82, 329567.52, 106611.77, 182283.24, 8841.86, 106643.00]
+                    },
+                    chocolate: {
+                        labels: ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'],
+                        costs: [
+                            { name: 'Sütlü Çikolata', kg: 10, pricePerKg: 690 },
+                            { name: 'Bitter Çikolata', kg: 10, pricePerKg: 730 },
+                            { name: 'Beyaz Çikolata', kg: 10, pricePerKg: 690 },
+                            { name: 'Ruby Çikolata', kg: 10, pricePerKg: 835 },
+                            { name: 'Gold Çikolata', kg: 10, pricePerKg: 950 }
+                        ],
+                        colors: ['#A0522D', '#2F2F2F', '#F5F5DC', '#E91E63', '#FFD700']
+                    },
+                    expenses: {
+                        items: [
+                            { label: 'Genel Merkeze Ödeme', value: 406052.24 },
+                            { label: 'Personel Maaşları (Banka)', value: 157545.00 },
+                            { label: 'Personel Maaşları (Nakit)', value: 119910.00 },
+                            { label: 'Kredi Kartı Borç Ödemesi', value: 119720.94 }, // 218155.94 idi
+                            { label: 'Dükkan Kirası', value: 92000.00 },
+                            { label: 'Ev Kirası', value: 25000.00 },
+                            { label: 'Ev Aidatı', value: 8750.00 },
+                            { label: 'Tedarikçi Ödemeleri (Metro, İçim)', value: 65504.58 },
+                            { label: 'Manav Ödemesi', value: 98435.00 }, // YENİ EKLENDİ
+                            { label: 'Faturalar (Elk, Su, Net, Tel)', value: 54071.20 },
+                            { label: 'SGK/Vergi Ödemeleri', value: 28150.00 },
+                            { label: 'Muhasebe Ücreti', value: 10000.00 },
+                            { label: 'Bakım/Hizmet (Arıtma, Cam, İlaçlama, POS)', value: 33098.00 },
+                            { label: 'Nakit Diğer Ödemeler', value: 18590.00 },
+                            { label: 'Yemek Kartı (Metropol)', value: 1528.00 },
+                            { label: 'Banka Masrafları (Havale, DBS)', value: 1705.30 }
+                        ],
+                        categories: [
+                            { label: 'Genel Merkez Ödemeleri', value: 406052.24 },
+                            { label: 'Personel Giderleri', value: 277455.00 },
+                            { label: 'Finans & Banka', value: 121426.24 }, // 219861.24 idi
+                            { label: 'Kira Giderleri', value: 125750.00 },
+                            { label: 'Tedarik & Stok', value: 163939.58 }, // 65504.58 idi
+                            { label: 'Enerji & Altyapı', value: 54071.20 },
+                            { label: 'Vergi & Danışmanlık', value: 38150.00 },
+                            { label: 'Bakım & Hizmetler', value: 33098.00 },
+                            { label: 'Diğer Operasyonel Giderler', value: 20118.00 }
+                        ]
+                    },
+                    foodCards: {
+                        labels: ['Hacer', 'Enise', 'Merve', 'Nesibe', 'Furkan', 'Yeşim', 'Ezel', 'Ada', 'İpek', 'Leyla', 'Emre Albay', 'Ramazan', 'Zeynep', 'Berkay', 'Alp', 'İbrahim'],
+                        data: [3000, 3000, 2919, 2464, 2131, 1950, 1728, 1543, 1344, 1223, 1306, 1255, 1050, 224, 162, 135]
+                    },
+                    shipmentDetails: [
+                        { name: 'CALLEBAUT SÜTLÜ ÇİKOLATA (10 KG)', quantity: 360, unit: 'KG', price: 250884.00 },
+                        { name: 'CALLEBAUT BEYAZ ÇİKOLATA (10 KG)', quantity: 60, unit: 'KG', price: 41814.00 },
+                        { name: 'CALLEBAUT BITTER ÇİKOLATA (10 KG)', quantity: 40, unit: 'KG', price: 29492.00 },
+                        { name: 'CALLEBAUT GOLD KARAMEL ÇİKOLATA (10KG)', quantity: 20, unit: 'KG', price: 19190.00 },
+                        { name: 'CALLEBAUT KREP KIRIĞI (10 KG)', quantity: 20, unit: 'KG', price: 13332.00 },
+                        { name: 'CALLEBAUT RUBY ÇİKOLATA (10 KG)', quantity: 10, unit: 'KG', price: 8433.50 },
+                        { name: 'BOSTON BASKILI ŞEFFAF BARDAK 12 OZ', quantity: 2, unit: 'KOLİ', price: 8208.00 },
+                        { name: 'ANTEP FISTIĞI (5KG)', quantity: 1, unit: 'PAKET', price: 7070.00 },
+                        { name: 'BOSTON CRUST FİLTRE KAHVE', quantity: 1, unit: 'KOLİ', price: 6666.00 },
+                        { name: 'BOSTON CRUST ESPRESSO ÇEKİRDEK KAHVE', quantity: 1, unit: 'KOLİ', price: 6565.00 },
+                        { name: 'BOSTON CRUST TÜRK KAHVESİ ORTA KAVRULMUŞ', quantity: 1, unit: 'KOLİ', price: 6060.00 },
+                        { name: 'BOSTON BASKILI DEMLİK POŞET ÇAY', quantity: 3, unit: 'KOLİ', price: 5454.00 },
+                        { name: '80 CC SOS KABI KAP + KAPAK', quantity: 2, unit: 'KOLİ', price: 3840.00 },
+                        { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/1', quantity: 1, unit: 'PAKET', price: 3600.00 },
+                        { name: 'PAKET CUP IN ONE KAP+KAPAK', quantity: 1, unit: 'KOLİ', price: 3600.00 },
+                        { name: 'BASKILI KRAFT KESE KAĞIDI KG', quantity: 1, unit: 'KOLİ', price: 3408.00 },
+                        { name: 'PİRİNÇ PATLAĞI SÜTLÜ (1,75KG)', quantity: 1, unit: 'KOLİ', price: 2828.00 },
+                        { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/2', quantity: 1, unit: 'PAKET', price: 2760.00 },
+                        { name: 'TORKU TAM BUĞDAYLI BİSKÜVİ TOZU', quantity: 3, unit: 'KOLİ', price: 2363.40 },
+                        { name: 'BOSTON CRUST FONDUE KUTU', quantity: 1, unit: 'PAKET', price: 1680.00 },
+                        { name: 'BOSTON BASKILI KRAFT SAPLI ÇANTA', quantity: 1, unit: 'KOLİ', price: 1500.00 },
+                        { name: 'TEK KULLANIMLIK MASA TEMİZLEME HAVLUSU', quantity: 1, unit: 'KOLİ', price: 900.00 },
+                        { name: 'SIMONELLI SALEP (1000GR)', quantity: 2, unit: 'ADET', price: 595.90 },
+                        { name: '750 CC SIZDIRMAZ GIDA KABI', quantity: 2, unit: 'PAKET', price: 384.00 },
+                        { name: 'ÇAY KAŞIĞI', quantity: 3, unit: 'PAKET', price: 302.40 }
+                    ],
+                    onlineCommissions: [
+                        { name: 'Yemeksepeti', gross: 527550.0, net: 329567.52, color: '#FF6B6B' },
+                        { name: 'Getir', gross: 191015.50, net: 106611.77, color: '#FFD166' },
+                        { name: 'Trendyol', gross: 318950.0, net: 182283.24, color: '#06D6A0' }
+                    ],
+                    financialStatus: {
+                        bankaGelirleri: 1545347.21,
+                        bankaGiderleri: 1101560.26,
+                        nakitGelir: 106643.00,
+                        nakitGider: 138500.00
                     }
                 }
             }
@@ -1279,8 +1420,9 @@
             reportContainer.classList.remove('hidden');
         };
 
-         // --- YENİ EKLENEN YAPAY ZEKA FONKSİYONLARI ---
-        const GEMINI_API_KEY = "AIzaSyBhFNahLBWvzoM70OPW3HqAwIhpScubVNQ";
+         // --- GÜNCELLENEN YAPAY ZEKA FONKSİYONLARI ---
+         // API anahtarı, güvenlik ve kurallar gereği boş bırakılmalıdır.
+        const GEMINI_API_KEY = ""; 
         
         async function runAiAnalysis() {
             const aiSection = document.getElementById('ai-analysis-section');
@@ -1293,13 +1435,17 @@
             aiContent.innerHTML = '';
             aiButton.disabled = true;
             aiButton.querySelector('span').textContent = 'Analiz Ediliyor...';
+            
+            // Analiz bölümüne kaydır (Mobil cihazlar için)
+            aiSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
             try {
                 const reportAug = availableReports['agustos2025'];
                 const reportSep = availableReports['eylul2025'];
+                const reportOct = availableReports['ekim2025']; // YENİ: Ekim verisi eklendi
 
-                if (!reportAug || !reportSep) {
-                    throw new Error("Analiz için Ağustos ve Eylül rapor verileri bulunamadı.");
+                if (!reportAug || !reportSep || !reportOct) { // YENİ: Ekim kontrolü eklendi
+                    throw new Error("Analiz için Ağustos, Eylül ve Ekim rapor verileri bulunamadı.");
                 }
 
                 const formatReportDataForPrompt = (report) => {
@@ -1309,7 +1455,8 @@
                     const chocolateUsage = report.chocolate.costs.reduce((sum, item) => sum + item.kg, 0);
                     const chocolateCost = report.chocolate.costs.reduce((sum, item) => sum + (item.kg * item.pricePerKg), 0);
                     const grossIncome = (report.grossIncome?.data || []).reduce((a,b) => a + b, 0);
-                    const cogs = (report.expenses.categories.find(c => c.label.includes('Genel Merkeze'))?.value || 0) + (report.expenses.categories.find(c => c.label.includes('Manav'))?.value || 0) + (report.expenses.categories.find(c => c.label.includes('Tedarik'))?.value || 0) ;
+                    // DÜZELTME: 'Genel Merkeze' -> 'Genel Merkez' olarak değiştirildi
+                    const cogs = (report.expenses.categories.find(c => c.label.includes('Genel Merkez'))?.value || 0) + (report.expenses.categories.find(c => c.label.includes('Manav'))?.value || 0) + (report.expenses.categories.find(c => c.label.includes('Tedarik'))?.value || 0) ;
                     const labor = report.expenses.categories.find(c => c.label.includes('Personel'))?.value || 0;
                     const rent = report.expenses.categories.find(c => c.label.includes('Kira'))?.value || 0;
 
@@ -1333,7 +1480,7 @@ ${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCur
                 
                 let prompt = `
                     Sen bir kafe ve restoran endüstrisinde uzmanlaşmış bir finansal analistsin.
-                    Aşağıdaki finansal verileri "Boston Drink & Dessert" adlı kafe için analiz et. İki dönemin verileri aşağıdadır: Ağustos 2025 ve Eylül 2025.
+                    Aşağıdaki finansal verileri "Boston Drink & Dessert" adlı kafe için analiz et. Üç dönemin verileri aşağıdadır: Ağustos 2025, Eylül 2025 ve Ekim 2025.
 
                     **Ağustos 2025 Verileri:**
                     ${formatReportDataForPrompt(reportAug)}
@@ -1341,31 +1488,36 @@ ${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCur
                     **Eylül 2025 Verileri:**
                     ${formatReportDataForPrompt(reportSep)}
 
-                    **Analiz İsteği:**
-                    Bu verilere dayanarak, Türkçe dilinde ve Markdown formatında, işletme sahibinin kolayca anlayabileceği profesyonel bir dille kapsamlı bir finansal analiz hazırla. Analiz SADECE şu başlıkları ve sırayı takip etmelidir:
+                    **Ekim 2025 Verileri:**
+                    ${formatReportDataForPrompt(reportOct)}
 
-                    ### Ağustos 2025 Detaylı Analizi
-                    Bu bölümde SADECE Ağustos ayını analiz et.
+                    Bu verilere dayanarak, Türkçe dilinde ve Markdown formatında, işletme sahibinin kolayca anlayabileceği profesyonel bir dille kapsamlı bir finansal analiz hazırla.
+                    
+                    **ÖNEMLİ FORMATLAMA KURALLARI:**
+                    1.  Analizi SADECE şu başlıkları (\`### Başlık\`) ve sırayı takip ederek yap: \`### Ekim 2025 Detaylı Analizi\` ve \`### Üç Aylık Karşılaştırma ve Stratejik Özet\`.
+                    2.  **KESİNLİKLE HTML veya metin-tablo (örn: Kategori | Ağustos | Eylül) KULLANMA.**
+                    3.  Tüm karşılaştırmaları ve analizleri, her madde için (\`- Madde 1\`) formatını kullanarak **Markdown listeleri** halinde sun. Bu, görsel düzen için kritiktir.
+
+                    **İçerik İsteği:**
+
+                    ### Ekim 2025 Detaylı Analizi
+                    (Bu bölümü liste maddeleri kullanarak hazırla)
                     - **Yüzdesel Dağılım:** En büyük 3 gelir ve en büyük 3 gider kategorisinin toplam içindeki yüzdelik paylarını belirt.
-                    - **Endüstri Standartları ile Karşılaştırma:** Aşağıdaki standartları kullanarak Ağustos ayının verilerini yorumla. Hesaplamaları Toplam Brüt Gelir'e göre yap:
+                    - **Endüstri Standartları ile Karşılaştırma:** Aşağıdaki standartları kullanarak Ekim ayının verilerini yorumla. Hesaplamaları Toplam Brüt Gelir'e (Ekim: ${formatCurrency(reportOct.grossIncome.data.reduce((a,b) => a + b, 0))}) göre yap:
                         - Gıda ve Sarf Malzemesi (COGS) Standardı: %25-%35
                         - İşçilik Giderleri Standardı: %25-%35
                         - Kira Gideri Standardı: %5-%10
                         - Net Kâr Marjı Standardı: %3-%10
                     
-                    ### Eylül 2025 Detaylı Analizi
-                    Bu bölümde SADECE Eylül ayını analiz et.
-                    - **Yüzdesel Dağılım:** En büyük 3 gelir ve en büyük 3 gider kategorisinin toplam içindeki yüzdelik paylarını belirt.
-                    - **Endüstri Standartları ile Karşılaştırma:** Yukarıdaki aynı standartları kullanarak Eylül ayının verilerini yorumla.
-
-                    ### Genel Karşılaştırma ve Stratejik Özet
-                    İki ayı birbiriyle karşılaştırarak genel bir özet sun.
-                    - **Trend Analizi:** Genel gelir, gider ve kârlılıkta aydan aya nasıl bir değişim olduğunu belirt.
-                    - **Anormallikler:** Verilerde göze çarpan, dikkat çeken veya mantıksız görünen durumlar var mı? (Örn: Bir ayda gelirin düşmesine rağmen X giderinin artması gibi).
-                    - **Nihai Yorum:** İşletmenin iki aylık finansal gidişatı hakkında genel bir sonuç cümlesi kur.
+                    ### Üç Aylık Karşılaştırma ve Stratejik Özet
+                    (Bu bölümü de **tablo yerine** liste maddeleri kullanarak hazırla)
+                    - **Kârlılık Trendi (Liste Olarak):** Her ay için bir madde oluştur (örn: \`- **Ağustos 2025:** Brüt Gelir: X ₺, Gider: Y ₺, Net Kâr/Zarar: Z ₺\`). Ağustos kârı, Eylül zararı ve Ekim kârını vurgula.
+                    - **Gider Kategorisi Karşılaştırması (Liste Olarak):** Ana gider kategorilerindeki (Genel Merkez, Personel, Finans/Banka, Kiralar) 3 aylık değişimi her kategori için bir madde olarak analiz et.
+                    - **Nihai Yorum:** İşletmenin üç aylık finansal gidişatı ve özellikle Ekim ayındaki güçlü toparlanma hakkında genel bir sonuç cümlesi kur.
                 `;
 
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${GEMINI_API_KEY}`;
+                // GÜNCELLENEN MODEL ADI
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`;
                 
                 const payload = {
                     contents: [{
@@ -1375,31 +1527,62 @@ ${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCur
                     }]
                 };
 
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(payload),
-                });
+                // YENİ: Exponential Backoff ile Yeniden Deneme Mantığı
+                let response;
+                let data;
+                const maxRetries = 5;
+                let initialDelay = 1000; // 1 saniye
 
-                if (!response.ok) {
-                    const errorBody = await response.json();
-                    throw new Error(`API Error: ${response.status} ${response.statusText} - ${JSON.stringify(errorBody)}`);
+                for (let attempt = 0; attempt < maxRetries; attempt++) {
+                    try {
+                        response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify(payload),
+                        });
+
+                        if (response.ok) {
+                            data = await response.json();
+                            break; // Başarılı, döngüden çık
+                        }
+
+                        // Yanıt 'ok' değilse (örn. 429, 5xx)
+                        if (attempt === maxRetries - 1) {
+                            // Son deneme de başarısız oldu
+                            const errorBody = await response.json();
+                            throw new Error(`API Hatası: ${response.status} ${response.statusText} - ${JSON.stringify(errorBody)}`);
+                        }
+                        
+                        // Yeniden denemeden önce bekle
+                        await new Promise(resolve => setTimeout(resolve, initialDelay));
+                        initialDelay *= 2; // Üstel gecikme
+
+                    } catch (error) {
+                        // Ağ hatası veya fetch başarısız oldu
+                        if (attempt === maxRetries - 1) {
+                            throw new Error(`Ağ Hatası (${maxRetries} deneme sonunda): ${error.message}`);
+                        }
+                        await new Promise(resolve => setTimeout(resolve, initialDelay));
+                        initialDelay *= 2;
+                    }
                 }
                 
-                const data = await response.json();
+                if (!data || !data.candidates) {
+                    throw new Error("AI analizi yeniden denemelerden sonra başarısız oldu veya geçersiz veri alındı.");
+                }
+                
                 const text = data.candidates[0].content.parts[0].text;
-
                 aiContent.innerHTML = marked.parse(text);
 
             } catch (error) {
                 console.error("AI analysis error:", error);
-                aiContent.innerHTML = `<p class="text-center text-red-400 font-semibold">An error occurred during the analysis. Please ensure your API key is valid and check your internet connection. <br><small>${error.message}</small></p>`;
+                aiContent.innerHTML = `<p class="text-center text-red-400 font-semibold">Analiz sırasında bir hata oluştu. Lütfen internet bağlantınızı kontrol edin. <br><small>${error.message}</small></p>`;
             } finally {
                 aiLoader.classList.add('hidden');
                 aiButton.disabled = false;
-                aiButton.querySelector('span').textContent = 'Kapsamlı AI Raporu';
+                aiButton.querySelector('span').textContent = 'Kapsamlı Yapay Zeka Analizi';
             }
         }
 
@@ -1462,13 +1645,34 @@ ${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCur
 
                 document.getElementById('updateDataBtn').addEventListener('click', async () => {
                     if (!db) {
-                        alert("Only authorized users can perform this action.");
+                        // Basit bir custom modal/mesaj kutusu
+                        const adminPanel = document.getElementById('admin-panel');
+                        let msg = adminPanel.querySelector('.admin-message');
+                        if (!msg) {
+                            msg = document.createElement('p');
+                            msg.className = 'admin-message text-red-400 text-sm text-right mt-2';
+                            adminPanel.appendChild(msg);
+                        }
+                        msg.textContent = 'Veri güncelleme yetkiniz bulunmamaktadır.';
+                        setTimeout(() => msg.textContent = '', 3000);
                         return;
                     }
                     const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
                     try {
                         await setDoc(docRef, sampleReportData);
                         console.log("Data update request sent.");
+                        
+                        const adminPanel = document.getElementById('admin-panel');
+                        let msg = adminPanel.querySelector('.admin-message');
+                         if (!msg) {
+                            msg = document.createElement('p');
+                            msg.className = 'admin-message text-green-400 text-sm text-right mt-2';
+                            adminPanel.appendChild(msg);
+                        }
+                        msg.className = 'admin-message text-green-400 text-sm text-right mt-2';
+                        msg.textContent = 'Örnek veriler başarıyla güncellendi!';
+                        setTimeout(() => msg.textContent = '', 3000);
+
                     } catch (e) {
                         console.error("Error updating data:", e);
                     }
@@ -1485,4 +1689,8 @@ ${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCur
 </body>
 
 </html>
+
+
+
+
 
