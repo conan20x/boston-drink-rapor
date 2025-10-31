@@ -326,6 +326,43 @@
              color: #E2E8F0;
              font-size: 1.05rem; /* Giriş metni için biraz daha büyük font */
         }
+        
+        /* YENİ: AI tarafından oluşturulan tablolar için stiller */
+        #ai-analysis-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 10px 30px -15px rgba(15, 23, 42, 0.7);
+            border-radius: 0.75rem;
+            overflow: hidden; /* Köşe yuvarlatmaları için */
+            border: 1px solid rgba(148, 163, 184, 0.25);
+        }
+        #ai-analysis-content th,
+        #ai-analysis-content td {
+            padding: 0.85rem 1.15rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+        }
+        #ai-analysis-content th {
+            background: rgba(129, 140, 248, 0.1); /* Başlık arkaplanı */
+            color: #C7D2FE; /* Başlık rengi */
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        #ai-analysis-content td {
+            color: #CBD5F5; /* Veri rengi */
+            background: rgba(15, 23, 42, 0.8);
+        }
+        #ai-analysis-content tr:last-child td {
+            border-bottom: none; /* Son satırın alt çizgisi olmasın */
+        }
+        #ai-analysis-content tr:nth-child(even) td {
+             background: rgba(148, 163, 184, 0.03); /* Çizgili görünüm */
+        }
+
     </style>
 </head>
 
@@ -1422,7 +1459,7 @@
 
          // --- GÜNCELLENEN YAPAY ZEKA FONKSİYONLARI ---
          // API anahtarı, güvenlik ve kurallar gereği boş bırakılmalıdır.
-        const GEMINI_API_KEY = ""; 
+        const GEMINI_API_KEY = "AIzaSyBhFNahLBWvzoM70OPW3HqAwIhpScubVNQ"; 
         
         async function runAiAnalysis() {
             const aiSection = document.getElementById('ai-analysis-section');
@@ -1689,6 +1726,7 @@ ${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCur
 </body>
 
 </html>
+
 
 
 
