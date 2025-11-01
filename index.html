@@ -799,10 +799,12 @@
         // Veriyi "public" alandan okuyacak şekilde güncellendi
         const getReportDocRef = () => {
             if (!appId) {
-                console.error("Uygulama Kimliği (appId) bulunamadı.");
-                return null;
+                console.error("Uygulama Kimliği (appId) bulunamadı. 'default-app-id' kullanılıyor.");
+                // 'default-app-id' ile devam et, bu sayede admin paneli en azından veri yazmayı dener
             }
-            return doc(db, 'artifacts', appId, 'public', 'reportData');
+            // appId tanımsız olsa bile, hata ayıklama için 'default-app-id' kullan
+            const effectiveAppId = appId || 'default-app-id';
+            return doc(db, 'artifacts', effectiveAppId, 'public', 'reportData');
         }
 
         // --- Veri Kümesi (Sample Data) ---
@@ -1584,6 +1586,12 @@
             e.preventDefault();
             const email = emailInput.value;
             
+            // auth/argument-error hatasını önlemek için ek kontrol
+            if (!email || email.trim() === '') {
+                setAuthMessage("error", "Lütfen geçerli bir e-posta adresi girin.");
+                return;
+            }
+
             setAuthLoading(true, "Doğrulanıyor...");
 
             try {
@@ -1596,10 +1604,15 @@
 
                 // 2. Adım: E-posta bağlantısını gönder
                 setAuthLoading(true, "Bağlantı gönderiliyor...");
+                
+                // --- DÜZELTME: auth/argument-error için ---
+                // Canvas'ın 'blob:' URL'si yerine sizin GitHub URL'nizi manuel olarak giriyoruz.
                 const actionCodeSettings = {
-                    url: window.location.href, // Kullanıcı bu URL'e geri dönecek
+                    // url: window.location.href, // <-- Hata veren eski kod (blob: URL veriyordu)
+                    url: 'https://conan20x.github.io/boston-drink-rapor/', // <-- DÜZELTME: Sizin GitHub sayfanız
                     handleCodeInApp: false
                 };
+                // --- DÜZELTME SONU ---
 
                 await sendSignInLinkToEmail(auth, email, actionCodeSettings);
                 
@@ -1609,7 +1622,14 @@
 
             } catch (error) {
                 console.error("Yetki kontrolü veya e-posta gönderme hatası:", error);
-                setAuthMessage("error", error.message);
+                // Hata mesajını daha anlaşılır hale getir
+                if (error.code === 'auth/invalid-continue-uri') {
+                     setAuthMessage("error", "Güvenlik hatası: Bu alan adı (domain) Firebase'de yetkilendirilmemiş. Lütfen konsoldaki talimatları izleyin.");
+                } else if (error.code === 'auth/argument-error') {
+                    setAuthMessage("error", "Lütfen geçerli bir e-posta adresi formatı girin.");
+                } else {
+                    setAuthMessage("error", error.message);
+                }
             } finally {
                 setAuthLoading(false);
             }
@@ -1666,7 +1686,8 @@
          * Sayfa yüklendiğinde e-posta bağlantısını kontrol eder ve girişi tamamlar.
          */
         const handleSignInRedirect = async () => {
-            if (isSignInWithEmailLink(auth, window.location.href)) {
+            // Sadece GitHub sayfasındayken bu işlemi yap (Canvas'ta 'blob:' URL hatası vermemesi için)
+            if (isSignInWithEmailLink(auth, window.location.href) && window.location.host.includes('github.io')) {
                 let email = window.localStorage.getItem('emailForSignIn');
                 if (!email) {
                     // E-posta kayıp, kullanıcıdan iste
@@ -1705,6 +1726,7 @@
                 // setLogLevel('debug');
 
                 // 1. Adım: Sayfa URL'sinin bir giriş bağlantısı olup olmadığını kontrol et
+                // Bu fonksiyon artık sadece github.io üzerinde çalışacak şekilde güncellendi
                 handleSignInRedirect();
 
                 // 2. Adım: Kullanıcının oturum durumunu dinle
