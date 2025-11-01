@@ -764,7 +764,7 @@
 
         // --- HATA AYIKLAMA: HANGİ PROJEYE BAĞLANIYORUZ? ---
         console.log("BAĞLANILAN PROJE KİMLİĞİ:", firebaseConfig.projectId || "Proje Kimliği Bulunamadı!");
-        console.log("LÜTFEN BU ALAN ADINI EKLEYİN (Authentication > Settings > Authorized domains):", window.location.host);
+        // console.log("LÜTFEN BU ALAN ADINI EKLEYİN (Authentication > Settings > Authorized domains):", window.location.host); // Artık gerek yok, github.io'yu manuel ekledik.
         // --- HATA AYIKLAMA SONU ---
 
         let app;
@@ -1624,7 +1624,7 @@
                 console.error("Yetki kontrolü veya e-posta gönderme hatası:", error);
                 // Hata mesajını daha anlaşılır hale getir
                 if (error.code === 'auth/invalid-continue-uri') {
-                     setAuthMessage("error", "Güvenlik hatası: Bu alan adı (domain) Firebase'de yetkilendirilmemiş. Lütfen konsoldaki talimatları izleyin.");
+                     setAuthMessage("error", "Güvenlik hatası: Alan adınız (conan20x.github.io) Firebase'de yetkilendirilmemiş. Lütfen 'Authentication > Settings > Authorized domains' bölümüne ekleyin.");
                 } else if (error.code === 'auth/argument-error') {
                     setAuthMessage("error", "Lütfen geçerli bir e-posta adresi formatı girin.");
                 } else {
@@ -1686,7 +1686,7 @@
          * Sayfa yüklendiğinde e-posta bağlantısını kontrol eder ve girişi tamamlar.
          */
         const handleSignInRedirect = async () => {
-            // Sadece GitHub sayfasındayken bu işlemi yap (Canvas'ta 'blob:' URL hatası vermemesi için)
+            // Sadece GitHub sayfasındayken bu işlemi yap
             if (isSignInWithEmailLink(auth, window.location.href) && window.location.host.includes('github.io')) {
                 let email = window.localStorage.getItem('emailForSignIn');
                 if (!email) {
