@@ -504,7 +504,7 @@
                 </div>
                 <!-- DEĞİŞTİRİLEN BUTON -->
                 <button id="runAiAnalysisBtn" class="ai-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
                     <!-- GÜNCELLENEN METİN -->
                     <span>Kapsamlı Yapay Zeka Analizi</span>
                 </button>
@@ -1585,8 +1585,8 @@
             e.preventDefault();
             const email = emailInput.value;
             
-            // auth/argument-error hatasını önlemek için ek kontrol
-            if (!email || !email.includes('@')) {
+            // auth/argument-error hatasını önlemek için katı e-posta formatı kontrolü
+            if (!email || !email.includes('@') || email.length < 5) {
                  setAuthMessage("error", "Lütfen geçerli bir e-posta adresi formatı girin.");
                  return;
             }
@@ -1606,8 +1606,7 @@
                 setAuthLoading(true, "Bağlantı gönderiliyor...");
                 
                 // --- DÜZELTME: auth/argument-error için ---
-                // Canvas'ın 'blob:' URL'si yerine sizin GitHub URL'nizi manuel olarak giriyoruz.
-                // Bu link, sizin GitHub sitenize geri dönecek.
+                // Geri dönüş URL'sini sizin GitHub sayfanıza sabitliyoruz.
                 const actionCodeSettings = {
                     url: 'https://conan20x.github.io/boston-drink-rapor/', // <-- KULLANILACAK ADRES
                     handleCodeInApp: false
@@ -1684,17 +1683,16 @@
          * Sayfa yüklendiğinde e-posta bağlantısını kontrol eder ve girişi tamamlar.
          */
         const handleSignInRedirect = async () => {
-            // Sadece GitHub sayfasındayken veya geçerli bir URL'deyken bu işlemi yap
+            // Sadece GitHub sayfasındayken bu işlemi yap
             if (isSignInWithEmailLink(auth, window.location.href)) {
                 let email = window.localStorage.getItem('emailForSignIn');
                 
-                // Önizleme penceresinde çalışmak için burayı es geçiyoruz (çünkü window.prompt tarayıcıda çalışmaz)
-                // Gerçek sitede (github.io) çalışacaktır.
+                // Önizleme penceresinde window.prompt çalışmayacağı için gerçek sitede test edilmeli.
 
                 if (!email) {
-                    // E-posta kayıp, kullanıcıdan iste (Gerçek sitede çalışır)
-                    // Canvas'ta hata vereceği için bu kısmı atlıyoruz, sadece gerçek sitede test edin.
-                    console.log("UYARI: E-posta local storage'da bulunamadı. Lütfen gerçek sitenizde (github.io) deneyin.");
+                    console.log("UYARI: E-posta local storage'da bulunamadı. Gerçek sitede (github.io) deniyorsanız, e-posta sorulacaktır.");
+                    // Gerçek sitede (github.io) deniyorsa, burada window.prompt ile e-posta sorulur.
+                    // Canvas ortamında burayı atlıyoruz.
                     return; 
                 }
 
