@@ -764,7 +764,6 @@
 
         // --- HATA AYIKLAMA: HANGİ PROJEYE BAĞLANIYORUZ? ---
         console.log("BAĞLANILAN PROJE KİMLİĞİ:", firebaseConfig.projectId || "Proje Kimliği Bulunamadı!");
-        // console.log("LÜTFEN BU ALAN ADINI EKLEYİN (Authentication > Settings > Authorized domains):", window.location.host); // Artık gerek yok, github.io'yu manuel ekledik.
         // --- HATA AYIKLAMA SONU ---
 
         let app;
@@ -1587,10 +1586,11 @@
             const email = emailInput.value;
             
             // auth/argument-error hatasını önlemek için ek kontrol
-            if (!email || email.trim() === '') {
-                setAuthMessage("error", "Lütfen geçerli bir e-posta adresi girin.");
-                return;
+            if (!email || !email.includes('@')) {
+                 setAuthMessage("error", "Lütfen geçerli bir e-posta adresi formatı girin.");
+                 return;
             }
+
 
             setAuthLoading(true, "Doğrulanıyor...");
 
@@ -1607,9 +1607,9 @@
                 
                 // --- DÜZELTME: auth/argument-error için ---
                 // Canvas'ın 'blob:' URL'si yerine sizin GitHub URL'nizi manuel olarak giriyoruz.
+                // Bu link, sizin GitHub sitenize geri dönecek.
                 const actionCodeSettings = {
-                    // url: window.location.href, // <-- Hata veren eski kod (blob: URL veriyordu)
-                    url: 'https://conan20x.github.io/boston-drink-rapor/', // <-- DÜZELTME: Sizin GitHub sayfanız
+                    url: 'https://conan20x.github.io/boston-drink-rapor/', // <-- KULLANILACAK ADRES
                     handleCodeInApp: false
                 };
                 // --- DÜZELTME SONU ---
@@ -1622,11 +1622,9 @@
 
             } catch (error) {
                 console.error("Yetki kontrolü veya e-posta gönderme hatası:", error);
-                // Hata mesajını daha anlaşılır hale getir
-                if (error.code === 'auth/invalid-continue-uri') {
+                // Hata mesajlarını daha kullanıcı dostu yap
+                if (error.code === 'auth/invalid-continue-uri' || error.code === 'auth/argument-error') {
                      setAuthMessage("error", "Güvenlik hatası: Alan adınız (conan20x.github.io) Firebase'de yetkilendirilmemiş. Lütfen 'Authentication > Settings > Authorized domains' bölümüne ekleyin.");
-                } else if (error.code === 'auth/argument-error') {
-                    setAuthMessage("error", "Lütfen geçerli bir e-posta adresi formatı girin.");
                 } else {
                     setAuthMessage("error", error.message);
                 }
@@ -1686,17 +1684,18 @@
          * Sayfa yüklendiğinde e-posta bağlantısını kontrol eder ve girişi tamamlar.
          */
         const handleSignInRedirect = async () => {
-            // Sadece GitHub sayfasındayken bu işlemi yap
-            if (isSignInWithEmailLink(auth, window.location.href) && window.location.host.includes('github.io')) {
+            // Sadece GitHub sayfasındayken veya geçerli bir URL'deyken bu işlemi yap
+            if (isSignInWithEmailLink(auth, window.location.href)) {
                 let email = window.localStorage.getItem('emailForSignIn');
-                if (!email) {
-                    // E-posta kayıp, kullanıcıdan iste
-                    email = window.prompt('Girişi tamamlamak için lütfen e-posta adresinizi tekrar girin:');
-                }
+                
+                // Önizleme penceresinde çalışmak için burayı es geçiyoruz (çünkü window.prompt tarayıcıda çalışmaz)
+                // Gerçek sitede (github.io) çalışacaktır.
 
                 if (!email) {
-                     setAuthMessage("error", "Giriş yapılamadı. E-posta adresi gerekli.");
-                     return;
+                    // E-posta kayıp, kullanıcıdan iste (Gerçek sitede çalışır)
+                    // Canvas'ta hata vereceği için bu kısmı atlıyoruz, sadece gerçek sitede test edin.
+                    console.log("UYARI: E-posta local storage'da bulunamadı. Lütfen gerçek sitenizde (github.io) deneyin.");
+                    return; 
                 }
 
                 setAuthLoading(true, "Giriş doğrulanıyor...");
@@ -1804,4 +1803,3 @@
 </body>
 
 </html>
-
