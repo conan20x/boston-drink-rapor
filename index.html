@@ -695,6 +695,7 @@
         </section>
 
         <!-- Yönetici Paneli -->
+        <!-- DÜZELTME: Bu bölüm artık authContainer ile aynı anda görünür olabilir -->
         <section id="admin-panel" class="glass-card mt-12 mb-12">
             <div class="flex flex-col sm:flex-row items-center justify-between gap-6">
                 <div>
@@ -769,6 +770,7 @@
         const authMessage = document.getElementById('auth-message');
         const loadingSpinner = document.getElementById('loading-spinner');
         const reportContainer = document.getElementById('report-container');
+        const adminPanel = document.getElementById('admin-panel'); // YENİ: Admin paneli
 
         // --- Para Formatlayıcı ---
         const formatter = new Intl.NumberFormat('tr-TR', {
@@ -1433,8 +1435,7 @@
                 console.log("Veritabanı başarıyla güncellendi.");
             } catch (error) {
                 console.error("Veri güncelleme hatası: ", error);
-                authMessage.textContent = `Veri güncelleme hatası: ${error.message}`;
-                authMessage.className = 'auth-message-error';
+                setAuthMessage("error", `Veri güncelleme hatası: ${error.message}. Lütfen yönetici ile iletişime geçin.`);
             } finally {
                  btn.disabled = false;
                  btn.textContent = 'Örnek Veriyi Güncelle';
@@ -1490,7 +1491,7 @@
                 if (!isAllowed) {
                     // Yetkili değilse, Firebase oturumunu hemen kapat
                     await auth.signOut();
-                    throw new Error("Bu Google hesabı (${email}) için erişim izni bulunmuyor.");
+                    throw new Error(`Bu Google hesabı (${email}) için erişim izni bulunmuyor.`);
                 }
 
                 // 3. Adım: Başarılı. onAuthStateChanged tetiklenecek ve raporu gösterecek.
@@ -1540,6 +1541,8 @@
         const showReport = () => {
             authContainer.classList.add('hidden');
             loadingSpinner.classList.remove('hidden'); 
+            // DÜZELTME: Rapor konteynerini ve admin panelini burada gösterme,
+            // Sadece onSnapshot'ta (veri bulunduğunda) göster.
         };
 
         /**
@@ -1548,7 +1551,8 @@
         const showLogin = () => {
             authContainer.classList.remove('hidden');
             loadingSpinner.classList.add('hidden');
-            reportContainer.classList.add('hidden');
+            reportContainer.classList.add('hidden'); // Raporu gizle
+            adminPanel.classList.add('hidden'); // Admin panelini gizle
             unsubscribeReport();
             unsubscribeReport = () => {};
         };
@@ -1577,10 +1581,14 @@
                                 if (docRef) {
                                     unsubscribeReport = onSnapshot(docRef, (doc) => {
                                         loadingSpinner.classList.add('hidden'); 
-                                        reportContainer.classList.remove('hidden'); 
                                         
                                         if (doc.exists()) {
+                                            // --- VERİ BULUNDU ---
                                             console.log("Rapor verisi yüklendi.");
+                                            reportContainer.classList.remove('hidden'); // Raporu GÖSTER
+                                            adminPanel.classList.remove('hidden'); // Admin panelini GÖSTER
+                                            authContainer.classList.add('hidden'); // Girişi gizle
+                                            
                                             const reportData = doc.data();
                                             const activeMonth = reportData.activeMonth || Object.keys(reportData.reports)[0];
                                             
@@ -1600,10 +1608,20 @@
                                                 window.listenersAttached = true;
                                             }
                                         } else {
+                                            // --- VERİ BULUNAMADI (DÜZELTME) ---
                                             console.error("Rapor veri dokümanı bulunamadı!");
-                                            authContainer.classList.remove('hidden');
+                                            authContainer.classList.remove('hidden'); // Giriş ekranını göster
                                             loadingSpinner.classList.add('hidden');
-                                            setAuthMessage("error", "Rapor verisi bulunamadı. Lütfen yönetici ile iletişime geçin.");
+                                            reportContainer.classList.add('hidden'); // Raporu gizle
+                                            adminPanel.classList.remove('hidden'); // Admin panelini GÖSTER (Veri yüklemek için)
+                                            
+                                            setAuthMessage("error", "Rapor verisi bulunamadı. Lütfen sayfanın altındaki 'Örnek Veriyi Güncelle' butonuna tıklayın.");
+                                            
+                                            // Admin butonu dinleyicisini burada da kur (ilk yükleme için)
+                                            if (!window.listenersAttached) {
+                                                document.getElementById('updateDataBtn').onclick = handleUpdateData;
+                                                window.listenersAttached = true; // Sadece bir kez kur
+                                            }
                                         }
                                     }, (error) => {
                                         console.error("Rapor dinleme hatası: ", error);
