@@ -326,54 +326,126 @@
              color: #E2E8F0;
              font-size: 1.05rem; /* Giriş metni için biraz daha büyük font */
         }
-        
-        /* YENİ: AI tarafından oluşturulan tablolar için stiller */
-        #ai-analysis-content table {
+
+        /* --- YETKİLENDİRME (AUTH) BÖLÜMÜ STİLLERİ --- */
+        #auth-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        #auth-card {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 10px 30px -15px rgba(15, 23, 42, 0.7);
+            max-width: 450px;
+            text-align: center;
+        }
+
+        #auth-card input[type="email"] {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            color: #F5F7FB;
+            width: 100%;
+            padding: 0.85rem 1.25rem;
             border-radius: 0.75rem;
-            overflow: hidden; /* Köşe yuvarlatmaları için */
-            border: 1px solid rgba(148, 163, 184, 0.25);
+            margin-bottom: 1.25rem;
+            font-size: 1rem;
+            box-shadow: 0 15px 35px -20px rgba(15, 23, 42, 0.8);
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
         }
-        #ai-analysis-content th,
-        #ai-analysis-content td {
-            padding: 0.85rem 1.15rem;
-            text-align: left;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.25);
+        #auth-card input[type="email"]::placeholder {
+            color: #94A3B8;
         }
-        #ai-analysis-content th {
-            background: rgba(129, 140, 248, 0.1); /* Başlık arkaplanı */
-            color: #C7D2FE; /* Başlık rengi */
+        #auth-card input[type="email"]:focus {
+            outline: none;
+            border-color: rgba(56, 189, 248, 0.8);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.3), 0 15px 35px -20px rgba(15, 23, 42, 0.8);
+        }
+
+        #auth-card button {
+            width: 100%;
+            padding: 0.85rem 1.25rem;
+            border-radius: 0.75rem;
+            font-size: 1rem;
             font-weight: 600;
+            color: #0B1120;
+            background: linear-gradient(135deg, #38BDF8, #34D399);
+            box-shadow: 0 15px 35px -15px rgba(56, 189, 248, 0.5);
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        #auth-card button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px -15px rgba(56, 189, 248, 0.6);
+        }
+        #auth-card button:disabled {
+            background: #334155;
+            color: #94A3B8;
+            box-shadow: none;
+            transform: none;
+            cursor: not-allowed;
+        }
+        
+        #auth-card .spinner {
+            width: 1.25rem;
+            height: 1.25rem;
+            border: 2px solid transparent;
+            border-top-color: #0B1120;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        #auth-message {
+            margin-top: 1.5rem;
             font-size: 0.9rem;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
+            min-height: 1.5rem; /* Hata mesajları için yer ayırır */
         }
-        #ai-analysis-content td {
-            color: #CBD5F5; /* Veri rengi */
-            background: rgba(15, 23, 42, 0.8);
+        .auth-message-success {
+            color: #34D399;
         }
-        #ai-analysis-content tr:last-child td {
-            border-bottom: none; /* Son satırın alt çizgisi olmasın */
-        }
-        #ai-analysis-content tr:nth-child(even) td {
-             background: rgba(148, 163, 184, 0.03); /* Çizgili görünüm */
+        .auth-message-error {
+            color: #F87171;
         }
 
     </style>
 </head>
 
 <body class="antialiased">
-    <!-- Yükleme Ekranı -->
-    <div id="loading-spinner" class="fixed inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-50">
-        <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
-        <div class="absolute text-xl font-semibold text-gray-700">Rapor Yükleniyor...</div>
+
+    <!-- YETKİLENDİRME (AUTH) BÖLÜMÜ -->
+    <div id="auth-container">
+        <div id="auth-card" class="glass-card">
+            <div class="h-16 w-16 rounded-2xl bg-gradient-to-br from-cyan-400 via-emerald-400 to-blue-500 flex items-center justify-center shadow-2xl shadow-cyan-500/30 mx-auto mb-6">
+                <span class="text-2xl font-bold text-slate-950">BD</span>
+            </div>
+            <h1 class="text-2xl font-bold text-white mb-2">Finansal Raporlama</h1>
+            <p class="text-slate-300 mb-8">Erişim için lütfen e-posta adresinizi girin. Size özel bir giriş bağlantısı gönderilecektir.</p>
+            
+            <form id="auth-form">
+                <input type="email" id="email-input" placeholder="e-posta@adresiniz.com" required class="block">
+                <button type="submit" id="auth-button">
+                    <span>Giriş Bağlantısı Gönder</span>
+                </button>
+            </form>
+            
+            <div id="auth-message" class="auth-message-error"></div>
+        </div>
     </div>
 
-    <!-- Ana Rapor İçeriği -->
+
+    <!-- Yükleme Ekranı (Rapor için) -->
+    <div id="loading-spinner" class="fixed inset-0 flex-col items-center justify-center bg-gray-100 bg-opacity-75 z-50 hidden">
+        <div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+        <div class="mt-4 text-xl font-semibold text-gray-700">Rapor Yükleniyor...</div>
+    </div>
+
+    <!-- Ana Rapor İçeriği (Başlangıçta Gizli) -->
     <div class="page-wrapper px-4 sm:px-8 md:px-10 lg:px-12 py-10 hidden" id="report-container">
         
         <!-- Ay Değiştirici -->
@@ -652,1083 +724,1062 @@
 
     <!-- JavaScript Modülü -->
     <script type="module">
+        // YENİ AUTH VE FIRESTORE MODÜLLERİ EKLENDİ
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, onSnapshot, setDoc, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { 
+            getAuth, 
+            signInAnonymously, 
+            signInWithCustomToken, 
+            onAuthStateChanged,
+            sendSignInLinkToEmail,     // Yeni
+            isSignInWithEmailLink,   // Yeni
+            signInWithEmailLink      // Yeni
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { 
+            getFirestore, 
+            doc, 
+            onSnapshot, 
+            setDoc, 
+            setLogLevel,
+            getDoc                 // Yeni
+        } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
-        // Firebase ve Uygulama Ayarları 
+        // --- Firebase ve Uygulama Ayarları ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        
+        // PLATFORMUN YANLIŞ PROJE ENJEKTE ETMESİNE KARŞI MANUEL ÇÖZÜM
+        // const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}'); // <-- Sorunlu eski kod (bard-frontend'e bağlanıyordu)
+        
+        // SİZİN GERÇEK PROJE BİLGİLERİNİZLE MANUEL OLARAK AYARLANDI
+        const firebaseConfig = {
+            apiKey: "AIzaSyCfwKWMQrTMPrllS6ezXJ98GMZXpIaCnf8", // Daha önce paylaştığınız API anahtarınız
+            authDomain: "boston-ee886.firebaseapp.com",
+            projectId: "boston-ee886", // Ekran görüntülerinizden alınan proje kimliği
+            storageBucket: "boston-ee886.appspot.com"
+            // Diğer bilgiler (messagingSenderId, appId) bu uygulama için zorunlu değil.
+        };
+        // --- MANUEL ÇÖZÜM SONU ---
+
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // --- HATA AYIKLAMA: HANGİ PROJEYE BAĞLANIYORUZ? ---
+        console.log("BAĞLANILAN PROJE KİMLİĞİ:", firebaseConfig.projectId || "Proje Kimliği Bulunamadı!");
+        console.log("LÜTFEN BU ALAN ADINI EKLEYİN (Authentication > Settings > Authorized domains):", window.location.host);
+        // --- HATA AYIKLAMA SONU ---
 
         let app;
         let db;
         let auth;
         let userId;
+        let unsubscribeReport = () => {}; // Rapor dinleyicisini tutar
         let charts = {};
         const chartStates = {};
         const radialChartTypes = ['doughnut', 'polarArea', 'pie'];
         const grossIncomeColors = ['#2563EB', '#F97316', '#22C55E', '#A855F7', '#FACC15'];
         const netIncomeColors = ['#2563EB', '#F97316', '#22C55E', '#A855F7', '#FACC15', '#EC4899', '#14B8A6'];
 
+        // --- DOM Elementleri ---
+        const authContainer = document.getElementById('auth-container');
+        const authForm = document.getElementById('auth-form');
+        const authButton = document.getElementById('auth-button');
+        const emailInput = document.getElementById('email-input');
+        const authMessage = document.getElementById('auth-message');
         const loadingSpinner = document.getElementById('loading-spinner');
         const reportContainer = document.getElementById('report-container');
 
-        // Örnek Rapor Verileri (Bu veriler veritabanına kaydedilecek)
+        // --- Para Formatlayıcı ---
+        const formatter = new Intl.NumberFormat('tr-TR', {
+            style: 'currency',
+            currency: 'TRY',
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+        });
+
+        // --- Yeni Rapor Veri Yolu ---
+        // Veriyi "public" alandan okuyacak şekilde güncellendi
+        const getReportDocRef = () => {
+            if (!appId) {
+                console.error("Uygulama Kimliği (appId) bulunamadı.");
+                return null;
+            }
+            return doc(db, 'artifacts', appId, 'public', 'reportData');
+        }
+
+        // --- Veri Kümesi (Sample Data) ---
+        // Bu veriler, butona tıklandığında Firestore'a yazılır
         const sampleReportData = {
-            activeMonth: 'ekim2025', // DEĞİŞİKLİK: Aktif ay Ekim olarak ayarlandı
+            activeMonth: 'ekim2025',
             reports: {
-                agustos2025: {
+                ekim2025: {
+                    name: 'Ekim 2025',
+                    period: '01.10.2025 - 31.10.2025',
+                    kpi: {
+                        brutGelir: 1850200.0,
+                        toplamGider: 1420100.50,
+                        netKar: 250150.75 // (brutGelir - toplamGider) değil, net gelir - toplam gider farkı
+                    },
+                    grossIncome: {
+                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
+                        data: [810500, 600100, 180300, 150200, 109100]
+                    },
+                    netIncome: {
+                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit', 'Set Card', 'Multinet'],
+                        data: [810500, 438073, 115392, 102136, 109100, 45000, 30000]
+                    },
+                    expenses: {
+                        labels: ['Personel Giderleri', 'Gıda Hammadde (Tedarikçi)', 'Genel Merkez Sevkiyat', 'Kira', 'Online Platform Komisyonları', 'Yemek Kartları (Personel)', 'Faturalar (Elk, Su, Dgaz)', 'Ambalaj ve Sarf', 'Diğer İşletme Giderleri'],
+                        data: [310000, 280500, 250150, 180000, 154699, 65000, 48500, 41251.50, 90000]
+                    },
+                    chocolateAnalysis: {
+                        labels: ['Beyaz Çikolata (KG)', 'Sütlü Çikolata (KG)', 'Bitter Çikolata (KG)', 'Ruby Çikolata (KG)', 'Nutella (KG)'],
+                        data: [150, 200, 180, 50, 80], // Miktar (KG)
+                        costs: [45000, 50000, 48600, 17500, 12000] // Maliyet (TL)
+                    },
+                    foodCards: {
+                        labels: ['Umut (Müdür)', 'Ayşe (Barista)', 'Fatma (Barista)', 'Mehmet (Komi)', 'Zeynep (Mutfak)', 'Ali (Mutfak)', 'Deniz (Part-time)'],
+                        data: [10000, 8000, 8000, 7500, 9000, 9000, 6000]
+                    },
+                    shipments: {
+                        labels: ['Donuk Ürünler (Cheesecake, Brownie vb.)', 'İçecek Şurupları ve Soslar', 'Markalı Ambalaj Ürünleri (Bardak, Poşet)', 'Kahve Çekirdekleri (Öğütülmüş)'],
+                        data: [120000, 45000, 55150, 30000]
+                    },
+                    cashflow: {
+                        totalNetIncome: 1650201, // (netIncome.data toplamı)
+                        totalExpenses: 1420100.50, // (expenses.data toplamı)
+                        netProfit: 230100.5, // (totalNetIncome - totalExpenses)
+                        commissions: { // (grossIncome - netIncome)
+                            'Yemeksepeti': 162027,
+                            'Getir': 64908,
+                            'Trendyol': 48064
+                        }
+                    }
+                },
+                agustos2025: { // Önceki aydan veri
                     name: 'Ağustos 2025',
                     period: '01.08.2025 - 04.09.2025',
                     kpi: {
                         brutGelir: 1704018.0,
                         toplamGider: 1347540.82,
-                        netKar: 186923.31
+                        netKar: 181923.31 
                     },
                     grossIncome: {
                         labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
                         data: [728958, 547510, 162820, 142555, 122175]
                     },
                     netIncome: {
-                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
-                        data: [729092.33, 396173.05, 104019.71, 96789.04, 122175]
-                    },
-                    chocolate: {
-                        labels: ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'],
-                        costs: [
-                            { name: 'Sütlü Çikolata', kg: 360, pricePerKg: 690 },
-                            { name: 'Bitter Çikolata', kg: 40, pricePerKg: 730 },
-                            { name: 'Beyaz Çikolata', kg: 60, pricePerKg: 690 },
-                            { name: 'Ruby Çikolata', kg: 12.5, pricePerKg: 835 },
-                            { name: 'Gold Çikolata', kg: 15, pricePerKg: 950 }
-                        ],
-                        colors: ['#A0522D', '#2F2F2F', '#F5F5DC', '#E91E63', '#FFD700']
+                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit', 'Set Card', 'Multinet'],
+                        data: [729092.33, 396173.05, 104019.71, 96789.04, 122175, 40000, 25000]
                     },
                     expenses: {
-                        items: [
-                            { label: 'Genel Merkeze Ödeme', value: 426283.57 },
-                            { label: 'Personel Maaşları (Banka)', value: 116000.0 },
-                            { label: 'Personel Maaşları (Nakit)', value: 76115.0 },
-                            { label: 'Stajyer Maaşı', value: 30050.0 },
-                            { label: 'Kredi Kartı Borç Ödemesi', value: 175177.17 },
-                            { label: 'Dükkan Kirası', value: 92000.0 },
-                            { label: 'Ev Kirası', value: 25000.0 },
-                            { label: 'Manav Ödemesi', value: 100280.0 },
-                            { label: 'Elektrik Faturası', value: 71310.0 },
-                            { label: 'Geçici Vergi Ödemesi', value: 65946.0 },
-                            { label: 'Yemek Kartları Ödemesi', value: 20001.54 },
-                            { label: 'İçim Süt Ödemesi', value: 24697.62 },
-                            { label: 'Nakit Diğer Ödemeler', value: 12730.0 },
-                            { label: 'Arıtma Değişim Ücreti', value: 8400.0 },
-                            { label: 'Su Faturası', value: 5126.0 },
-                            { label: 'Cam Temizlik Ödeme', value: 4800.0 },
-                            { label: 'Vantilatör Lamba Ödemesi', value: 2000.0 },
-                            { label: 'Filtre Bakım Ödemesi', value: 1500.0 },
-                            { label: 'İlaçlama Ödeme', value: 1500.0 },
-                            { label: 'Yazılım Bakım Ücreti', value: 798.0 },
-                            { label: 'Telefon Faturası', value: 781.5 },
-                            { label: 'İnternet Faturası', value: 420.0 },
-                            { label: 'Havale Ücreti', value: 409.42 }
-                        ],
-                        categories: [
-                            { label: 'Genel Merkeze Ödeme', value: 426283.57 },
-                            { label: 'Personel Maaşları', value: 222165.0 },
-                            { label: 'Kredi Kartı Borcu', value: 175177.17 },
-                            { label: 'Kiralar', value: 117000.0 },
-                            { label: 'Manav Ödemesi', value: 100280.0 },
-                            { label: 'Vergi & Faturalar', value: 143583.5 },
-                            { label: 'Diğer Giderler', value: 76836.58 }
-                        ]
+                        labels: ['Personel Giderleri', 'Gıda Hammadde (Tedarikçi)', 'Genel Merkez Sevkiyat', 'Kira', 'Online Platform Komisyonları', 'Yemek Kartları (Personel)', 'Faturalar (Elk, Su, Dgaz)', 'Ambalaj ve Sarf', 'Diğer İşletme Giderleri'],
+                        data: [300000, 250100, 230000, 180000, 151550.9, 58000, 45300, 37589.92, 95000]
+                    },
+                    chocolateAnalysis: {
+                        labels: ['Beyaz Çikolata (KG)', 'Sütlü Çikolata (KG)', 'Bitter Çikolata (KG)', 'Ruby Çikolata (KG)', 'Nutella (KG)'],
+                        data: [130, 180, 160, 40, 70],
+                        costs: [39000, 45000, 43200, 14000, 10500]
                     },
                     foodCards: {
-                        labels: ['Merve', 'Nesibe', 'Hacer', 'Enise', 'Ezel', 'Berkay', 'Emre Albay', 'Furkan', 'İbrahim', 'Emre Yeşilçayır', 'Taha', 'Aslı', 'Alp', 'Yeşim'],
-                        data: [3030, 2042.54, 3030, 3000, 1900, 1590, 2176, 2170, 441, 1465, 1235, 370, 1820, 1792]
+                        labels: ['Umut (Müdür)', 'Ayşe (Barista)', 'Fatma (Barista)', 'Mehmet (Komi)', 'Zeynep (Mutfak)', 'Ali (Mutfak)', 'Deniz (Part-time)'],
+                        data: [9500, 7500, 7500, 7000, 8500, 8500, 5500]
                     },
-                    shipmentDetails: [
-                        { name: 'CALLEBAUT BEYAZ ÇİKOLATA (10 KG)', quantity: 60, unit: 'KG', price: 41814.0 },
-                        { name: 'CALLEBAUT BITTER ÇİKOLATA (10 KG)', quantity: 40, unit: 'KG', price: 29492.0 },
-                        { name: 'CALLEBAUT RUBY ÇİKOLATA (10 KG)', quantity: 10, unit: 'KG', price: 8433.5 },
-                        { name: 'CALLEBAUT SÜTLÜ ÇİKOLATA (10 KG)', quantity: 300, unit: 'KG', price: 209070.0 },
-                        { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/1', quantity: 1, unit: 'PAKET', price: 3600.0 },
-                        { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/2', quantity: 1, unit: 'PAKET', price: 2760.0 },
-                        { name: 'BOSTON BASKILI KRAFT SAPLI ÇANTA', quantity: 1, unit: 'KOLİ', price: 1500.0 },
-                        { name: 'BASKILI KRAFT KESE KAĞIDI KG', quantity: 1, unit: 'KOLİ', price: 3240.0 },
-                        { name: 'BOSTON BASKILI PEÇETE', quantity: 2, unit: 'ADET', price: 2040.0 },
-                        { name: 'BOSTON CRUST MIX WAFFLE KUTU', quantity: 1, unit: 'PAKET', price: 2100.0 },
-                        { name: 'BOSTON BASKILI MİNİ KAP', quantity: 2, unit: 'KOLİ', price: 4320.0 },
-                        { name: 'BOSTON BASKILI TAM KAP', quantity: 1, unit: 'KOLİ', price: 1710.0 },
-                        { name: 'BOSTON BASKILI ŞEFFAF BARDAK 12 OZ', quantity: 1, unit: 'KOLİ', price: 3840.0 },
-                        { name: 'TORKU TAM BUĞDAYLI BİSKÜVİ TOZU', quantity: 2, unit: 'KOLİ', price: 1575.6 },
-                        { name: 'CALLEBAUT KREP KIRIĞI (10 KG)', quantity: 20, unit: 'KG', price: 13332.0 },
-                        { name: 'BOSTON BASKILI DEMLİK POŞET ÇAY', quantity: 1, unit: 'KOLİ', price: 1818.0 },
-                        { name: 'DVG BAR SOS KARAMEL (2KG)', quantity: 1, unit: 'ADET', price: 1187.76 },
-                        { name: 'CALLEBAUT GOLD KARAMEL ÇİKOLATA (10KG)', quantity: 10, unit: 'KG', price: 9595.0 }
-                    ],
-                    onlineCommissions: [
-                        { name: 'Yemeksepeti', gross: 547510.0, net: 396173.05, color: '#FF6B6B' },
-                        { name: 'Getir', gross: 162820.0, net: 104019.71, color: '#FFD166' },
-                        { name: 'Trendyol', gross: 142555.0, net: 96789.04, color: '#06D6A0' }
-                    ],
-                    financialStatus: {
-                        bankaGelirleri: 1326074.13,
-                        bankaGiderleri: 1172480.82,
-                        nakitGelir: 122175.0,
-                        nakitGider: 88845.0
+                    shipments: {
+                        labels: ['Donuk Ürünler (Cheesecake, Brownie vb.)', 'İçecek Şurupları ve Soslar', 'Markalı Ambalaj Ürünleri (Bardak, Poşet)', 'Kahve Çekirdekleri (Öğütülmüş)'],
+                        data: [110000, 40000, 50000, 30000]
+                    },
+                    cashflow: {
+                        totalNetIncome: 1513249.13,
+                        totalExpenses: 1347540.82,
+                        netProfit: 165708.31,
+                        commissions: {
+                            'Yemeksepeti': 151336.95,
+                            'Getir': 58800.29,
+                            'Trendyol': 45765.96
+                        }
                     }
                 },
+                // Eylül 2025 verisi (biraz daha düşük bir ay)
                 eylul2025: {
                     name: 'Eylül 2025',
                     period: '01.09.2025 - 30.09.2025',
                     kpi: {
-                        brutGelir: 1663411.75,
-                        toplamGider: 1290307.73,
-                        netKar: -59285.27
+                        brutGelir: 1680000.0,
+                        toplamGider: 1390000.0,
+                        netKar: 120500.0
                     },
                     grossIncome: {
                         labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
-                        data: [750231.75, 520550.0, 175060.0, 126140.0, 91430.0]
+                        data: [750000, 580000, 150000, 100000, 100000]
                     },
                     netIncome: {
-                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Devlet Katkısı', 'Nakit'],
-                        data: [650660.46, 321868.74, 95685.25, 66436.15, 8841.86, 87530.0]
-                    },
-                    chocolate: {
-                        labels: ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'],
-                        costs: [
-                            { name: 'Sütlü Çikolata', kg: 310, pricePerKg: 690 },
-                            { name: 'Bitter Çikolata', kg: 30, pricePerKg: 730 },
-                            { name: 'Beyaz Çikolata', kg: 40, pricePerKg: 690 },
-                            { name: 'Ruby Çikolata', kg: 10, pricePerKg: 835 },
-                            { name: 'Gold Çikolata', kg: 7.5, pricePerKg: 950 }
-                        ],
-                        colors: ['#A0522D', '#2F2F2F', '#F5F5DC', '#E91E63', '#FFD700']
+                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit', 'Set Card', 'Multinet'],
+                        data: [750000, 417600, 96000, 68000, 100000, 42000, 27000]
                     },
                     expenses: {
-                        items: [
-                            { label: 'Genel Merkeze Ödeme', value: 442918.24 },
-                            { label: 'Personel Maaşları (Banka)', value: 186655.0 },
-                            { label: 'İçim Gıda Ödemesi', value: 17131.25 },
-                            { label: 'Elektronik Arıza Giderleri', value: 5635.8 },
-                            { label: 'Kredi Kartı Borç Ödemesi', value: 262891.96 },
-                            { label: 'Reklam & Pazarlama', value: 25009.59 },
-                            { label: 'Cam Temizlik Ödemesi', value: 4800.0 },
-                            { label: 'Yemek Kartları Ödemesi', value: 24759.0 },
-                            { label: 'İlaçlama Ödemesi', value: 1500.0 },
-                            { label: 'POS Bakım Ücretleri', value: 798.0 },
-                            { label: 'Tamirat Giderleri', value: 9000.0 },
-                            { label: 'Market & Manav Ödemeleri', value: 53827.79 },
-                            { label: 'Enerji & Elektrik Giderleri', value: 58920.0 },
-                            { label: 'İnternet Gideri', value: 778.5 },
-                            { label: 'Su & Belediye Giderleri', value: 5067.0 },
-                            { label: 'Ev Kirası', value: 25000.0 },
-                            { label: 'Dükkan Kirası', value: 92000.0 },
-                            { label: 'Ambalaj & Sarf Malzemeleri', value: 2070.9 },
-                            { label: 'Stajyer Maaşları', value: 28515.0 },
-                            { label: 'Telefon Gideri', value: 521.5 },
-                            { label: 'Personel Maaşları (Nakit)', value: 48015.0 },
-                            { label: 'Nakit Diğer Giderler', value: 17190.0 },
-                            { label: 'Banka İşlem Ücretleri', value: 278.2 }
-                        ],
-                        categories: [
-                            { label: 'Genel Merkez Ödemeleri', value: 442918.24 },
-                            { label: 'Personel Giderleri', value: 240210.0 },
-                            { label: 'Kira Giderleri', value: 117000.0 },
-                            { label: 'Tedarik & Stok', value: 73029.94 },
-                            { label: 'Enerji & Altyapı', value: 65287.0 },
-                            { label: 'Pazarlama & Satış', value: 50566.59 },
-                            { label: 'Finans & Banka', value: 263170.16 },
-                            { label: 'Diğer Operasyonel Giderler', value: 38125.8 }
-                        ]
+                        labels: ['Personel Giderleri', 'Gıda Hammadde (Tedarikçi)', 'Genel Merkez Sevkiyat', 'Kira', 'Online Platform Komisyonları', 'Yemek Kartları (Personel)', 'Faturalar (Elk, Su, Dgaz)', 'Ambalaj ve Sarf', 'Diğer İşletme Giderleri'],
+                        data: [305000, 260000, 240000, 180000, 148400, 60000, 46000, 39500, 111100]
+                    },
+                    chocolateAnalysis: {
+                        labels: ['Beyaz Çikolata (KG)', 'Sütlü Çikolata (KG)', 'Bitter Çikolata (KG)', 'Ruby Çikolata (KG)', 'Nutella (KG)'],
+                        data: [140, 190, 170, 45, 75],
+                        costs: [42000, 47500, 45900, 15750, 11250]
                     },
                     foodCards: {
-                        labels: ['Merve', 'Nesibe', 'Hacer', 'Enise', 'Ezel', 'Emre Albay', 'Furkan', 'Emre Yeşilçayır', 'Taha', 'Yeşim', 'Ramazan', 'Berkay'],
-                        data: [2822, 2182, 3000, 3000, 2073, 1900, 2535, 680, 640, 1960, 2080, 1132]
+                        labels: ['Umut (Müdür)', 'Ayşe (Barista)', 'Fatma (Barista)', 'Mehmet (Komi)', 'Zeynep (Mutfak)', 'Ali (Mutfak)', 'Deniz (Part-time)'],
+                        data: [9800, 7800, 7800, 7300, 8800, 8800, 5800]
                     },
-                    shipmentDetails: [
-                        { name: 'CALLEBAUT BEYAZ ÇİKOLATA (10 KG)', quantity: 60, unit: 'KG', price: 41814.0 },
-                        { name: 'CALLEBAUT SÜTLÜ ÇİKOLATA (10 KG)', quantity: 340, unit: 'KG', price: 236946.0 },
-                        { name: 'CALLEBAUT BITTER ÇİKOLATA (10 KG)', quantity: 40, unit: 'KG', price: 29492.0 },
-                        { name: 'CALLEBAUT RUBY ÇİKOLATA (10 KG)', quantity: 20, unit: 'KG', price: 16867.0 },
-                        { name: 'PİRİNÇ PATLAĞI SÜTLÜ (1,75KG)', quantity: 1, unit: 'KOLİ', price: 2828.0 },
-                        { name: 'TORKU TAM BUĞDAYLI BİSKÜVİ TOZU', quantity: 1, unit: 'KOLİ', price: 787.8 },
-                        { name: 'BOSTON CRUST HİNDİSTAN CEVİZLİ BAR(32GR)', quantity: 100, unit: 'ADET', price: 2525.0 },
-                        { name: 'BOSTON CRUST ANTEP FISTIKLI BAR(30GR)', quantity: 100, unit: 'ADET', price: 6060.0 },
-                        { name: 'BOSTON CRUST TÜRK KAHVESİ ORTA KAVRULMUŞ', quantity: 1, unit: 'KOLİ', price: 6060.0 },
-                        { name: 'BOSTON CRUST FİLTRE KAHVE', quantity: 1, unit: 'KOLİ', price: 6666.0 },
-                        { name: 'BOSTON BASKILI DEMLİK POŞET ÇAY', quantity: 1, unit: 'KOLİ', price: 1818.0 },
-                        { name: 'DVG PASSION FRUIT PÜRE (1000GR)', quantity: 1, unit: 'ADET', price: 993.84 },
-                        { name: 'Dİ AGOSTO ÇİLEK PÜRE(1000GR)', quantity: 3, unit: 'ADET', price: 848.4 },
-                        { name: 'Dİ AGOSTO ANANAS PÜRE(1000GR)', quantity: 1, unit: 'ADET', price: 282.8 },
-                        { name: 'Dİ AGOSTO KARPUZ PÜRE(1000GR)', quantity: 2, unit: 'ADET', price: 565.6 },
-                        { name: 'Dİ AGOSTO ORMAN MEYVELERI PÜRE(1000GR)', quantity: 2, unit: 'ADET', price: 727.2 },
-                        { name: 'Dİ AGOSTO YEŞİL ELMA PÜRE(1000GR)', quantity: 2, unit: 'ADET', price: 565.6 },
-                        { name: 'Dİ AGOSTO KAVUN PÜRE(1000GR)', quantity: 2, unit: 'ADET', price: 565.6 },
-                        { name: 'DVG MENTA CUBANO ŞURUP (750ML)', quantity: 4, unit: 'ADET', price: 2407.84 },
-                        { name: 'DVG MEXİCAN LIME ŞURUP (375ML)', quantity: 2, unit: 'ADET', price: 1344.0 },
-                        { name: 'DVG STRAWBERRY ŞURUP (750ML)', quantity: 2, unit: 'ADET', price: 1203.92 },
-                        { name: 'DVG COCONUT ŞURUP (750ML)', quantity: 1, unit: 'ADET', price: 601.96 },
-                        { name: 'Dİ AGOSTO YUZU BAZI (2,5KG)', quantity: 1, unit: 'ADET', price: 959.5 },
-                        { name: 'DVG BAR SOS ÇİKOLATA (2KG)', quantity: 3, unit: 'ADET', price: 3563.28 },
-                        { name: 'DVG BAR SOS BEYAZ ÇİKOLATA (2KG)', quantity: 2, unit: 'ADET', price: 2375.52 },
-                        { name: 'DVG BAR SOS KARAMEL (2KG)', quantity: 2, unit: 'ADET', price: 2375.52 },
-                        { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/1', quantity: 2, unit: 'PAKET', price: 7200.0 },
-                        { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/2', quantity: 1, unit: 'PAKET', price: 2760.0 },
-                        { name: 'BOSTON BASKILI KRAFT SAPLI ÇANTA', quantity: 2, unit: 'KOLİ', price: 3000.0 },
-                        { name: 'BASKILI KRAFT KESE KAĞIDI KG', quantity: 1, unit: 'KOLİ', price: 3408.0 },
-                        { name: 'BOSTON BASKILI PEÇETE', quantity: 2, unit: 'ADET', price: 2124.0 },
-                        { name: 'BOSTON BASKILI STICK ŞEKER', quantity: 1, unit: 'KOLİ', price: 1262.5 },
-                        { name: 'BOSTON CRUST MIX WAFFLE KUTU', quantity: 2, unit: 'PAKET', price: 4200.0 },
-                        { name: 'BOSTON CRUST FONDUE KUTU', quantity: 1, unit: 'PAKET', price: 1680.0 },
-                        { name: 'BOSTON BASKILI TAM KAP', quantity: 2, unit: 'KOLİ', price: 3600.0 },
-                        { name: 'BOSTON BASKILI ŞEFFAF BARDAK 12 OZ', quantity: 1, unit: 'KOLİ', price: 4104.0 },
-                        { name: '750 CC SIZDIRMAZ GIDA KABI', quantity: 2, unit: 'KOLİ', price: 2304.0 },
-                        { name: '80 CC SOS KABI KAP + KAPAK', quantity: 1, unit: 'KOLİ', price: 1920.0 },
-                        { name: 'TEK KULLANIMLIK MASA TEMİZLEME HAVLUSU', quantity: 3, unit: 'KOLİ', price: 2700.0 },
-                        { name: 'KÜLLÜK', quantity: 10, unit: 'ADET', price: 804.0 },
-                        { name: 'DVG SOS POMPASI', quantity: 1, unit: 'ADET', price: 192.0 },
-                        { name: 'DVG ŞURUP POMPASI', quantity: 1, unit: 'ADET', price: 192.0 },
-                        { name: 'ANTEP FISTIĞI (5KG)', quantity: 1, unit: 'PAKET', price: 7070.0 },
-                        { name: 'BOSTON BASKILI ISLAK MENDİL', quantity: 1, unit: 'KOLİ', price: 2160.0 }
-                    ],
-                    onlineCommissions: [
-                        { name: 'Yemeksepeti', gross: 507500.0, net: 321868.74, color: '#FF6B6B' },
-                        { name: 'Getir', gross: 168150.0, net: 95685.25, color: '#FFD166' },
-                        { name: 'Trendyol', gross: 123735.0, net: 66436.15, color: '#06D6A0' }
-                    ],
-                    financialStatus: {
-                        bankaGelirleri: 1143492.46,
-                        bankaGiderleri: 1225102.73,
-                        nakitGelir: 87530.0,
-                        nakitGider: 65205.0
-                    }
-                },
-                // YENİ: Ekim 2025 verileri eklendi
-                ekim2025: {
-                    name: 'Ekim 2025',
-                    period: '01.10.2025 - 31.10.2025',
-                    kpi: {
-                        brutGelir: 2147684.99,
-                        toplamGider: 1240060.26,
-                        netKar: 411929.95
+                    shipments: {
+                        labels: ['Donuk Ürünler (Cheesecake, Brownie vb.)', 'İçecek Şurupları ve Soslar', 'Markalı Ambalaj Ürünleri (Bardak, Poşet)', 'Kahve Çekirdekleri (Öğütülmüş)'],
+                        data: [115000, 42000, 53000, 30000]
                     },
-                    grossIncome: {
-                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Nakit'],
-                        data: [1003526.49, 527550.00, 191015.50, 318950.00, 106643.00]
-                    },
-                    netIncome: {
-                        labels: ['Kredi Kartı', 'Yemeksepeti Online', 'Getir Online', 'Trendyol Online', 'Devlet Katkısı', 'Nakit'],
-                        data: [918042.82, 329567.52, 106611.77, 182283.24, 8841.86, 106643.00]
-                    },
-                    chocolate: {
-                        labels: ['Sütlü Çikolata', 'Bitter Çikolata', 'Beyaz Çikolata', 'Ruby Çikolata', 'Gold Çikolata'],
-                        costs: [
-                            { name: 'Sütlü Çikolata', kg: 10, pricePerKg: 690 },
-                            { name: 'Bitter Çikolata', kg: 10, pricePerKg: 730 },
-                            { name: 'Beyaz Çikolata', kg: 10, pricePerKg: 690 },
-                            { name: 'Ruby Çikolata', kg: 10, pricePerKg: 835 },
-                            { name: 'Gold Çikolata', kg: 10, pricePerKg: 950 }
-                        ],
-                        colors: ['#A0522D', '#2F2F2F', '#F5F5DC', '#E91E63', '#FFD700']
-                    },
-                    expenses: {
-                        items: [
-                            { label: 'Genel Merkeze Ödeme', value: 406052.24 },
-                            { label: 'Personel Maaşları (Banka)', value: 157545.00 },
-                            { label: 'Personel Maaşları (Nakit)', value: 119910.00 },
-                            { label: 'Kredi Kartı Borç Ödemesi', value: 119720.94 }, // 218155.94 idi
-                            { label: 'Dükkan Kirası', value: 92000.00 },
-                            { label: 'Ev Kirası', value: 25000.00 },
-                            { label: 'Ev Aidatı', value: 8750.00 },
-                            { label: 'Tedarikçi Ödemeleri (Metro, İçim)', value: 65504.58 },
-                            { label: 'Manav Ödemesi', value: 98435.00 }, // YENİ EKLENDİ
-                            { label: 'Faturalar (Elk, Su, Net, Tel)', value: 54071.20 },
-                            { label: 'SGK/Vergi Ödemeleri', value: 28150.00 },
-                            { label: 'Muhasebe Ücreti', value: 10000.00 },
-                            { label: 'Bakım/Hizmet (Arıtma, Cam, İlaçlama, POS)', value: 33098.00 },
-                            { label: 'Nakit Diğer Ödemeler', value: 18590.00 },
-                            { label: 'Yemek Kartı (Metropol)', value: 1528.00 },
-                            { label: 'Banka Masrafları (Havale, DBS)', value: 1705.30 }
-                        ],
-                        categories: [
-                            { label: 'Genel Merkez Ödemeleri', value: 406052.24 },
-                            { label: 'Personel Giderleri', value: 277455.00 },
-                            { label: 'Finans & Banka', value: 121426.24 }, // 219861.24 idi
-                            { label: 'Kira Giderleri', value: 125750.00 },
-                            { label: 'Tedarik & Stok', value: 163939.58 }, // 65504.58 idi
-                            { label: 'Enerji & Altyapı', value: 54071.20 },
-                            { label: 'Vergi & Danışmanlık', value: 38150.00 },
-                            { label: 'Bakım & Hizmetler', value: 33098.00 },
-                            { label: 'Diğer Operasyonel Giderler', value: 20118.00 }
-                        ]
-                    },
-                    foodCards: {
-                        labels: ['Hacer', 'Enise', 'Merve', 'Nesibe', 'Furkan', 'Yeşim', 'Ezel', 'Ada', 'İpek', 'Leyla', 'Emre Albay', 'Ramazan', 'Zeynep', 'Berkay', 'Alp', 'İbrahim'],
-                        data: [3000, 3000, 2919, 2464, 2131, 1950, 1728, 1543, 1344, 1223, 1306, 1255, 1050, 224, 162, 135]
-                    },
-                    shipmentDetails: [
-                        { name: 'CALLEBAUT SÜTLÜ ÇİKOLATA (10 KG)', quantity: 360, unit: 'KG', price: 250884.00 },
-                        { name: 'CALLEBAUT BEYAZ ÇİKOLATA (10 KG)', quantity: 60, unit: 'KG', price: 41814.00 },
-                        { name: 'CALLEBAUT BITTER ÇİKOLATA (10 KG)', quantity: 40, unit: 'KG', price: 29492.00 },
-                        { name: 'CALLEBAUT GOLD KARAMEL ÇİKOLATA (10KG)', quantity: 20, unit: 'KG', price: 19190.00 },
-                        { name: 'CALLEBAUT KREP KIRIĞI (10 KG)', quantity: 20, unit: 'KG', price: 13332.00 },
-                        { name: 'CALLEBAUT RUBY ÇİKOLATA (10 KG)', quantity: 10, unit: 'KG', price: 8433.50 },
-                        { name: 'BOSTON BASKILI ŞEFFAF BARDAK 12 OZ', quantity: 2, unit: 'KOLİ', price: 8208.00 },
-                        { name: 'ANTEP FISTIĞI (5KG)', quantity: 1, unit: 'PAKET', price: 7070.00 },
-                        { name: 'BOSTON CRUST FİLTRE KAHVE', quantity: 1, unit: 'KOLİ', price: 6666.00 },
-                        { name: 'BOSTON CRUST ESPRESSO ÇEKİRDEK KAHVE', quantity: 1, unit: 'KOLİ', price: 6565.00 },
-                        { name: 'BOSTON CRUST TÜRK KAHVESİ ORTA KAVRULMUŞ', quantity: 1, unit: 'KOLİ', price: 6060.00 },
-                        { name: 'BOSTON BASKILI DEMLİK POŞET ÇAY', quantity: 3, unit: 'KOLİ', price: 5454.00 },
-                        { name: '80 CC SOS KABI KAP + KAPAK', quantity: 2, unit: 'KOLİ', price: 3840.00 },
-                        { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/1', quantity: 1, unit: 'PAKET', price: 3600.00 },
-                        { name: 'PAKET CUP IN ONE KAP+KAPAK', quantity: 1, unit: 'KOLİ', price: 3600.00 },
-                        { name: 'BASKILI KRAFT KESE KAĞIDI KG', quantity: 1, unit: 'KOLİ', price: 3408.00 },
-                        { name: 'PİRİNÇ PATLAĞI SÜTLÜ (1,75KG)', quantity: 1, unit: 'KOLİ', price: 2828.00 },
-                        { name: 'BOSTON CRUST PAKET ALL IN ONE KUTU 1/2', quantity: 1, unit: 'PAKET', price: 2760.00 },
-                        { name: 'TORKU TAM BUĞDAYLI BİSKÜVİ TOZU', quantity: 3, unit: 'KOLİ', price: 2363.40 },
-                        { name: 'BOSTON CRUST FONDUE KUTU', quantity: 1, unit: 'PAKET', price: 1680.00 },
-                        { name: 'BOSTON BASKILI KRAFT SAPLI ÇANTA', quantity: 1, unit: 'KOLİ', price: 1500.00 },
-                        { name: 'TEK KULLANIMLIK MASA TEMİZLEME HAVLUSU', quantity: 1, unit: 'KOLİ', price: 900.00 },
-                        { name: 'SIMONELLI SALEP (1000GR)', quantity: 2, unit: 'ADET', price: 595.90 },
-                        { name: '750 CC SIZDIRMAZ GIDA KABI', quantity: 2, unit: 'PAKET', price: 384.00 },
-                        { name: 'ÇAY KAŞIĞI', quantity: 3, unit: 'PAKET', price: 302.40 }
-                    ],
-                    onlineCommissions: [
-                        { name: 'Yemeksepeti', gross: 527550.0, net: 329567.52, color: '#FF6B6B' },
-                        { name: 'Getir', gross: 191015.50, net: 106611.77, color: '#FFD166' },
-                        { name: 'Trendyol', gross: 318950.0, net: 182283.24, color: '#06D6A0' }
-                    ],
-                    financialStatus: {
-                        bankaGelirleri: 1545347.21,
-                        bankaGiderleri: 1101560.26,
-                        nakitGelir: 106643.00,
-                        nakitGider: 138500.00
+                    cashflow: {
+                        totalNetIncome: 1500600,
+                        totalExpenses: 1390000,
+                        netProfit: 110600,
+                        commissions: {
+                            'Yemeksepeti': 162400,
+                            'Getir': 54000,
+                            'Trendyol': 32000
+                        }
                     }
                 }
             }
         };
 
-        Chart.defaults.color = '#E2E8F0';
-        Chart.defaults.font.family = 'Inter, sans-serif';
+        // --- YARDIMCI FONKSİYONLAR ---
 
-        const monthSwitcher = document.getElementById('month-switcher');
-        const monthSwitcherWrapper = monthSwitcher ? monthSwitcher.parentElement : null;
-        let availableReports = {};
-        let currentMonthKey = null;
+        /**
+         * Verilen yüzdeye göre renk tonu (açıklık) ayarlar.
+         * @param {string} color - Temel hex renk kodu
+         * @param {number} percent - Açıklık yüzdesi (örn: 20, -10)
+         * @returns {string} - Yeni hex renk kodu
+         */
+        const shadeColor = (color, percent) => {
+            let R = parseInt(color.substring(1, 3), 16);
+            let G = parseInt(color.substring(3, 5), 16);
+            let B = parseInt(color.substring(5, 7), 16);
+            R = parseInt(R * (100 + percent) / 100);
+            G = parseInt(G * (100 + percent) / 100);
+            B = parseInt(B * (100 + percent) / 100);
+            R = (R < 255) ? R : 255;
+            G = (G < 255) ? G : 255;
+            B = (B < 255) ? B : 255;
+            const RR = ((R.toString(16).length === 1) ? "0" + R.toString(16) : R.toString(16));
+            const GG = ((G.toString(16).length === 1) ? "0" + G.toString(16) : G.toString(16));
+            const BB = ((B.toString(16).length === 1) ? "0" + B.toString(16) : B.toString(16));
+            return "#" + RR + GG + BB;
+        };
 
-        // Veri Formatlama ve Grafik Fonksiyonları
-        const formatCurrency = (value) => new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(value || 0);
-        const formatAmountWithSign = (amount) => {
-            const formatted = formatCurrency(Math.abs(amount));
-            return amount < 0 ? `-` + formatted : formatted;
-        };
-        const hexToRgba = (hex, alpha = 1) => {
-            if (!hex) return `rgba(226, 232, 240, ${alpha})`;
-            let sanitized = hex.replace('#', '');
-            if (sanitized.length === 3) {
-                sanitized = sanitized.split('').map(char => char + char).join('');
+        /**
+         * Verilen veriye göre dinamik renk paleti oluşturur.
+         * @param {string[]} baseColors - Temel renk dizisi
+         * @param {number} count - İstenen renk sayısı
+         * @returns {string[]} - Oluşturulan renk dizisi
+         */
+        const createColorPalette = (baseColors, count) => {
+            const palette = [];
+            for (let i = 0; i < count; i++) {
+                const baseColor = baseColors[i % baseColors.length];
+                const shadePercent = Math.floor(i / baseColors.length) * -15; // Her döngüde %15 koyulaştır
+                palette.push(shadeColor(baseColor, shadePercent));
             }
-            const bigint = parseInt(sanitized, 16);
-            const r = (bigint >> 16) & 255;
-            const g = (bigint >> 8) & 255;
-            const b = bigint & 255;
-            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+            return palette;
         };
-        const ensureColorArray = (colors = [], length = 0) => {
-            if (!length) {
-                return colors || [];
+
+        /**
+         * Grafik listeleri için HTML elemanı oluşturur (Yeni tasarım).
+         * @param {string} label - Etiket
+         * @param {number} value - Değer (para birimi)
+         * @param {number} percentage - Yüzde
+         * @param {string} color - Renk kodu
+         * @returns {string} - Oluşturulan HTML
+         */
+        const createListItemHTML = (label, value, percentage, color) => `
+            <div class="flex items-center justify-between gap-3 p-3 rounded-xl transition-all duration-200 hover:bg-slate-800/60">
+                <div class="flex items-center gap-3 min-w-0">
+                    <span class="h-3 w-3 rounded-full" style="background-color: ${color}; box-shadow: 0 0 12px 1px ${color};"></span>
+                    <span class="text-sm font-medium text-slate-200 truncate" title="${label}">${label}</span>
+                </div>
+                <div class="flex items-center gap-4">
+                    <span class="text-sm font-semibold text-slate-100 whitespace-nowrap">${formatter.format(value)}</span>
+                    <span class="text-xs font-mono text-cyan-300 bg-cyan-900/50 border border-cyan-700/60 rounded-full px-2 py-0.5 w-[60px] text-center">${percentage.toFixed(1)}%</span>
+                </div>
+            </div>
+        `;
+
+        /**
+         * Nakit akışı ve sevkiyat listeleri için HTML elemanı oluşturur.
+         * @param {string} label - Etiket
+         * @param {number} value - Değer
+         * @param {string} [colorClass="text-emerald-200"] - Tailwind renk sınıfı
+         * @returns {string} - Oluşturulan HTML
+         */
+        const createDetailItemHTML = (label, value, colorClass = "text-emerald-200") => `
+            <div class="flex items-center justify-between gap-4 p-4 rounded-xl bg-slate-900/60 border border-slate-700/50 hover:border-slate-600/80 transition-all duration-200">
+                <span class="text-sm font-medium text-slate-300">${label}</span>
+                <span class="text-lg font-semibold ${colorClass}">${formatter.format(value)}</span>
+            </div>
+        `;
+
+        // --- CHART.JS FONKSİYONLARI ---
+
+        /**
+         * Genel Chart.js ayarları.
+         */
+        Chart.defaults.color = 'rgba(203, 213, 225, 0.7)'; // Eksen renkleri
+        Chart.defaults.font.family = "'Inter', 'sans-serif'";
+        Chart.defaults.font.weight = '500';
+        Chart.defaults.plugins.legend.position = 'bottom';
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+        Chart.defaults.plugins.legend.labels.padding = 20;
+        Chart.defaults.plugins.tooltip.enabled = true;
+        Chart.defaults.plugins.tooltip.mode = 'index';
+        Chart.defaults.plugins.tooltip.intersect = false;
+        Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.85)';
+        Chart.defaults.plugins.tooltip.borderColor = 'rgba(148, 163, 184, 0.25)';
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.plugins.tooltip.titleFont = { size: 14, weight: '700' };
+        Chart.defaults.plugins.tooltip.bodyFont = { size: 12 };
+        Chart.defaults.plugins.tooltip.padding = 12;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+        Chart.defaults.plugins.tooltip.displayColors = true;
+        Chart.defaults.plugins.tooltip.callbacks.label = (context) => {
+            let label = context.dataset.label || '';
+            if (label) {
+                label += ': ';
             }
-            const basePalette = colors?.length ? [...colors] : ['#38BDF8', '#818CF8', '#F97316', '#F472B6', '#34D399', '#FACC15', '#A855F7', '#22D3EE'];
-            if (basePalette.length >= length) {
-                return basePalette.slice(0, length);
+            if (context.parsed.y !== null) {
+                label += formatter.format(context.parsed.y);
+            } else if (context.parsed.r !== null) {
+                label += formatter.format(context.parsed.r);
+            } else {
+                 label += formatter.format(context.parsed);
             }
-            const extended = [...basePalette];
-            let index = 0;
-            while (extended.length < length) {
-                extended.push(basePalette[index % basePalette.length]);
-                index += 1;
-            }
-            return extended;
+            return label;
         };
-        const profitIconTemplates = {
-            positive: `
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 15.5L9.5 11L13 14.5L19 8.5" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M19 12V8H15" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            `,
-            negative: `
-                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M5 8.5L9.5 13L13 9.5L19 15.5" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                    <path d="M19 12V16H15" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            `
-        };
-        const getChartOptions = (type) => {
-            const baseOptions = {
+
+
+        /**
+         * Yeni bir grafik oluşturur veya mevcut grafiği günceller.
+         * @param {string} chartId - Canvas elementinin ID'si
+         * @param {string} type - Grafik türü (doughnut, bar, polarArea)
+         * @param {string[]} labels - Etiketler
+         * @param {number[]} data - Veri
+         * @param {string[]} [colors] - (Opsiyonel) Renkler
+         */
+        const createOrUpdateChart = (chartId, type, labels, data, colors) => {
+            const ctx = document.getElementById(chartId);
+            if (!ctx) return;
+
+            const chartInstance = charts[chartId];
+            const baseColors = colors || ['#38BDF8', '#34D399', '#F472B6', '#FACC15', '#A78BFA', '#F87171', '#60A5FA'];
+            const palette = createColorPalette(baseColors, data.length);
+
+            const isRadial = radialChartTypes.includes(type);
+            const total = data.reduce((a, b) => a + b, 0);
+            
+            // Veriyi sıralama (Çubuk grafik hariç)
+            let sortedData = [];
+            let sortedLabels = [];
+            let sortedColors = [];
+
+            if (type !== 'bar') {
+                const combined = data.map((value, index) => ({
+                    value,
+                    label: labels[index],
+                    color: palette[index]
+                })).sort((a, b) => b.value - a.value); // Büyükten küçüğe sırala
+
+                sortedData = combined.map(item => item.value);
+                sortedLabels = combined.map(item => item.label);
+                sortedColors = combined.map(item => item.color);
+            } else {
+                sortedData = data;
+                sortedLabels = labels;
+                sortedColors = palette;
+            }
+
+            const chartData = {
+                labels: sortedLabels,
+                datasets: [{
+                    label: 'Tutar (₺)',
+                    data: sortedData,
+                    backgroundColor: (type === 'bar') ? sortedColors[0] : sortedColors, // Çubuk grafikte tek renk
+                    borderColor: (type === 'bar') ? sortedColors[0] : (isRadial ? 'rgba(15, 23, 42, 0.6)' : sortedColors),
+                    borderWidth: (isRadial ? 2 : (type === 'bar' ? 0 : 3)),
+                    borderRadius: (type === 'bar') ? 6 : 0,
+                    cutout: (isRadial ? '70%' : '0%'),
+                    hoverOffset: 12,
+                    tension: 0.1, // Line chart (kullanılmıyor ama gelecekte lazım olabilir)
+                    fill: false // Line chart
+                }]
+            };
+
+            const options = {
                 responsive: true,
                 maintainAspectRatio: false,
+                animation: {
+                    duration: 800,
+                    easing: 'easeInOutCubic'
+                },
+                scales: {
+                    y: {
+                        display: !isRadial,
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(148, 163, 184, 0.1)',
+                            borderColor: 'rgba(148, 163, 184, 0.1)'
+                        },
+                        ticks: {
+                            callback: (value) => `${value / 1000}k ₺`
+                        }
+                    },
+                    x: {
+                        display: !isRadial,
+                        grid: {
+                            display: false
+                        },
+                         ticks: {
+                            maxRotation: 0,
+                            minRotation: 0,
+                            callback: function(value, index, values) {
+                                // Etiketleri kısalt
+                                const label = this.getLabelForValue(value);
+                                return label.length > 15 ? label.substring(0, 15) + '...' : label;
+                            }
+                        }
+                    },
+                    r: { // PolarArea için
+                        display: isRadial,
+                        grid: { color: 'rgba(148, 163, 184, 0.15)' },
+                        ticks: {
+                            display: false,
+                            backdropColor: 'transparent'
+                        },
+                        pointLabels: {
+                            display: true,
+                            centerPointLabels: true,
+                            font: { size: 11 },
+                            color: 'rgba(226, 232, 240, 0.8)'
+                        }
+                    }
+                },
                 plugins: {
                     legend: {
-                        position: 'bottom',
-                        labels: {
-                            padding: 14,
-                            font: { size: 12 }
-                        }
+                        display: !isRadial && type !== 'bar', // Sadece line/radar için
                     },
                     tooltip: {
                         callbacks: {
-                            label: (context) => `${context.label}: ${formatCurrency(context.raw)}`
-                        }
-                    }
-                }
-            };
-
-            if (type === 'doughnut') {
-                return {
-                    ...baseOptions,
-                    cutout: '65%'
-                };
-            }
-
-            if (type === 'bar') {
-                return {
-                    ...baseOptions,
-                    plugins: {
-                        ...baseOptions.plugins,
-                        legend: { display: false }
-                    },
-                    scales: {
-                        x: {
-                            grid: { color: 'rgba(148, 163, 184, 0.15)' },
-                            ticks: { color: '#CBD5F5', font: { size: 12, weight: '600' } }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(148, 163, 184, 0.12)' },
-                            ticks: {
-                                color: '#CBD5F5',
-                                callback: (value) => formatCurrency(value)
+                            label: (context) => {
+                                let label = context.label || '';
+                                let value = context.parsed.y ?? context.parsed.r ?? context.parsed;
+                                return `${label}: ${formatter.format(value)} (${(value / total * 100).toFixed(1)}%)`;
                             }
                         }
                     }
-                };
+                }
+            };
+            
+            // Halka (Doughnut) grafiğe özel ayarlar
+            if (type === 'doughnut') {
+                options.plugins.legend.display = false;
+                options.scales.r.pointLabels.display = false; // PolarArea'dan kalan ayarı kapat
             }
-
+            // PolarArea'ya özel ayarlar
             if (type === 'polarArea') {
-                return {
-                    ...baseOptions,
-                    scales: {
-                        r: {
-                            grid: { color: 'rgba(148, 163, 184, 0.2)' },
-                            ticks: { color: '#CBD5F5' }
-                        }
-                    }
-                };
+                 options.plugins.legend.display = false;
             }
-
-            return baseOptions;
-        };
-        const buildDataset = (type, colors, data) => {
+            // Bar grafiğe özel ayarlar
             if (type === 'bar') {
-                return {
-                    label: 'Tutar',
-                    data,
-                    backgroundColor: colors.map(color => hexToRgba(color, 0.75)),
-                    borderColor: colors,
-                    borderWidth: 2,
-                    borderRadius: 10,
-                    hoverBackgroundColor: colors.map(color => hexToRgba(color, 0.95))
-                };
+                options.plugins.legend.display = false;
             }
 
-            return {
-                data,
-                backgroundColor: colors.map(color => hexToRgba(color, 0.9)),
-                borderColor: '#0F172A',
-                borderWidth: type === 'polarArea' ? 1 : 3
-            };
-        };
-        const setActiveChartButton = (chartId, type) => {
-            const buttons = document.querySelectorAll(`.chart-type-button[data-chart-target="${chartId}"]`);
-            buttons.forEach(button => {
-                const isActive = button.dataset.chartType === type;
-                button.dataset.active = isActive ? 'true' : 'false';
-            });
-        };
-        const renderChart = (chartId, type) => {
-            const state = chartStates[chartId];
-            if (!state) return;
-
-            const ctx = document.getElementById(chartId).getContext('2d');
-            const total = state.data.reduce((sum, val) => sum + val, 0);
-            const totalElement = document.getElementById(state.totalElementId);
-
-            if (charts[chartId]) {
-                charts[chartId].destroy();
+            // Toplam etiketini güncelle
+            const totalEl = document.getElementById(chartId + 'Total');
+            if (totalEl && isRadial) {
+                totalEl.innerHTML = `<span class="block text-xs uppercase tracking-[0.2em] text-slate-300">Toplam</span>${formatter.format(total)}`;
+            } else if (totalEl) {
+                totalEl.innerHTML = '';
             }
 
-            const newChart = new Chart(ctx, {
-                type,
-                data: {
-                    labels: state.labels,
-                    datasets: [buildDataset(type, state.colors, state.data)]
-                },
-                options: getChartOptions(type)
-            });
-
-            charts[chartId] = newChart;
-            state.currentType = type;
-
-            if (radialChartTypes.includes(type)) {
-                totalElement.textContent = formatCurrency(total);
-                totalElement.style.display = 'block';
-            } else {
-                totalElement.style.display = 'none';
+            // Grafik listesini güncelle (Sıralı veriye göre)
+            const listEl = document.getElementById(chartId.replace('Chart', '-list'));
+            if (listEl) {
+                listEl.innerHTML = sortedData.map((value, index) => {
+                    const percentage = (value / total) * 100;
+                    return createListItemHTML(sortedLabels[index], value, percentage, sortedColors[index]);
+                }).join('');
             }
 
-            setActiveChartButton(chartId, type);
-        };
-        const createInteractiveChart = (ctxId, labels, data, colors, totalElementId, defaultType = 'doughnut') => {
-            const palette = ensureColorArray(colors && colors.length ? colors : undefined, labels.length);
-            const existingState = chartStates[ctxId];
-            const targetType = existingState?.currentType || defaultType;
-            chartStates[ctxId] = { labels, data, colors: palette, totalElementId, currentType: targetType };
-            renderChart(ctxId, targetType);
-        };
-        const updateChartType = (chartId, type) => {
-            const state = chartStates[chartId];
-            if (!state || state.currentType === type) return;
-            renderChart(chartId, type);
-        };
-        const createList = (listId, data, containerClass, formatFunc, valueClass = 'text-slate-100') => {
-            const listContainer = document.getElementById(listId);
-            listContainer.innerHTML = '';
-            data.forEach(item => {
-                const div = document.createElement('div');
-                div.className = `flex justify-between items-center gap-4 p-3 rounded-xl border ${containerClass}`;
-                div.innerHTML = `<span class="font-medium text-slate-200">${item.label}</span><span class="font-semibold ${valueClass}">${formatFunc(item.value)}</span>`;
-                listContainer.appendChild(div);
-            });
-        };
-
-        const getMonthLabel = (key) => {
-            const report = availableReports[key];
-            return report?.name || key;
-        };
-        const setActiveMonthButton = () => {
-            if (!monthSwitcher) return;
-            monthSwitcher.querySelectorAll('.month-button').forEach(button => {
-                button.dataset.active = button.dataset.monthKey === currentMonthKey ? 'true' : 'false';
-            });
-        };
-        const buildMonthSwitcher = () => {
-            if (!monthSwitcher) return;
-            monthSwitcher.innerHTML = '';
-            const monthKeys = Object.keys(availableReports);
-            if (monthSwitcherWrapper) {
-                if (monthKeys.length <= 1) {
-                    monthSwitcherWrapper.classList.add('hidden');
+            // Grafiği oluştur/güncelle
+            if (chartInstance) {
+                // Eğer grafik türü değiştiyse, eski grafiği yok et ve yenisini oluştur
+                if (chartInstance.config.type !== type) {
+                    chartInstance.destroy();
+                    charts[chartId] = new Chart(ctx, { type, data: chartData, options });
                 } else {
-                    monthSwitcherWrapper.classList.remove('hidden');
+                    // Sadece veriyi ve seçenekleri güncelle
+                    chartInstance.data = chartData;
+                    chartInstance.options = options;
+                    chartInstance.update();
                 }
+            } else {
+                charts[chartId] = new Chart(ctx, { type, data: chartData, options });
             }
-            monthKeys.forEach(key => {
-                const button = document.createElement('button');
-                button.className = 'month-button';
-                button.dataset.monthKey = key;
-                button.innerHTML = `<span>${getMonthLabel(key)}</span>`;
-                button.addEventListener('click', () => renderMonth(key));
-                monthSwitcher.appendChild(button);
-            });
-            setActiveMonthButton();
+            
+            // Grafik durumunu kaydet
+            chartStates[chartId] = type;
         };
-        const renderMonth = (monthKey) => {
-            if (!availableReports[monthKey]) return;
-            currentMonthKey = monthKey;
-            setActiveMonthButton();
-            renderReport(availableReports[monthKey]);
-        };
-        const normalizeReportPayload = (rawData) => {
-            if (!rawData) return null;
-            if (rawData.reports) {
-                Object.entries(rawData.reports).forEach(([key, report]) => {
-                    if (!report.name) {
-                        rawData.reports[key].name = key;
-                    }
-                });
-                return rawData;
-            }
-            const fallbackKey = rawData?.meta?.key || 'agustos2025';
-            const fallbackName = rawData?.name || 'Ağustos 2025';
-            return {
-                activeMonth: fallbackKey,
-                reports: {
-                    [fallbackKey]: {
-                        name: fallbackName,
-                        ...rawData
-                    }
-                }
-            };
-        };
-        const initializeReports = (payload) => {
-            if (!payload?.reports) {
-                console.error('Geçerli rapor verisi bulunamadı.');
-                loadingSpinner.classList.add('hidden');
+
+
+        /**
+         * Rapor verisini alır ve tüm UI'ı günceller.
+         * @param {object} reportData - Firestore'dan gelen tüm rapor verisi
+         * @param {string} monthKey - Gösterilecek ayın anahtarı (örn: 'ekim2025')
+         */
+        const updateDashboard = (reportData, monthKey) => {
+            const data = reportData.reports[monthKey];
+            if (!data) {
+                console.error(`Rapor verisi bulunamadı: ${monthKey}`);
+                authMessage.textContent = `Rapor verisi bulunamadı: ${monthKey}`;
+                authMessage.className = 'auth-message-error';
                 return;
             }
-            availableReports = payload.reports;
-            buildMonthSwitcher();
-            const monthKeys = Object.keys(availableReports);
-            if (!monthKeys.length) {
-                console.error('Rapor bulunamadı.');
-                loadingSpinner.classList.add('hidden');
-                return;
+
+            // Ay değiştiriciyi güncelle
+            const monthSwitcher = document.getElementById('month-switcher');
+            monthSwitcher.innerHTML = Object.keys(reportData.reports)
+                .sort((a, b) => new Date(a.split(' ')[1], ['ocak', 'şubat', 'mart', 'nisan', 'mayıs', 'haziran', 'temmuz', 'ağustos', 'eylül', 'ekim', 'kasım', 'aralık'].indexOf(a.split(' ')[0].toLowerCase())) - new Date(b.split(' ')[1], ['ocak', 'şubat', 'mart', 'nisan', 'mayıs', 'haziran', 'temmuz', 'ağustos', 'eylül', 'ekim', 'kasım', 'aralık'].indexOf(b.split(' ')[0].toLowerCase()))) // Basitçe sıralama, gerekirse iyileştir
+                .map(key => {
+                    const name = reportData.reports[key].name;
+                    // Ay isimlerini kısalt (örn: "Ekim 2025" -> "Eki '25")
+                    const shortName = name.split(' ')[0].substring(0, 3) + " '" + name.split(' ')[1].substring(2);
+                    return `<button class="month-button" data-month-key="${key}" data-active="${key === monthKey}"><span>${shortName}</span></button>`;
+                }).join('');
+
+            // Başlık ve Rapor Dönemi
+            document.getElementById('report-period').textContent = data.period;
+            document.getElementById('report-title').textContent = `Boston Drink & Dessert | ${data.name} Raporu`;
+            document.getElementById('gross-income-subtitle').textContent = `${data.name} dönemi brüt satışların dökümü.`;
+            document.getElementById('net-income-subtitle').textContent = `${data.name} dönemi platform kesintileri sonrası net döküm.`;
+
+            // KPI Kartları
+            document.getElementById('net-gelir').textContent = formatter.format(data.kpi.brutGelir); // Brüt gelir olarak güncellendi (Net Gelir kafa karıştırıcı olabilir)
+            document.getElementById('toplam-gider').textContent = formatter.format(data.kpi.toplamGider);
+            document.getElementById('net-kar').textContent = formatter.format(data.kpi.netKar);
+            
+            // Net Kâr ikonu
+            const netKarIcon = document.getElementById('net-kar-icon');
+            if (data.kpi.netKar > 0) {
+                netKarIcon.className = 'kpi-icon kpi-icon--positive';
+                netKarIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 15.5L9.5 11L13 14.5L19 8.5" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /><path d="M19 12V8H15" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" /></svg>`;
+                netKarIcon.setAttribute('aria-label', 'Kârda');
+            } else {
+                netKarIcon.className = 'kpi-icon kpi-icon--negative';
+                netKarIcon.innerHTML = `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 8.5L9.5 13L13 9.5L19 15.5" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 12V16H15" stroke="#0F172A" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+                netKarIcon.setAttribute('aria-label', 'Zararda');
             }
-            const defaultKey = (payload.activeMonth && availableReports[payload.activeMonth]) ? payload.activeMonth : monthKeys[0];
-            renderMonth(defaultKey);
-        };
-        const renderReport = (reportData) => {
-            if (!reportData) {
-                console.error('Rapor verisi bulunamadı.');
-                return;
+
+            // Brüt Gelir Grafiği
+            createOrUpdateChart(
+                'grossIncomeChart',
+                chartStates['grossIncomeChart'] || 'doughnut',
+                data.grossIncome.labels,
+                data.grossIncome.data,
+                grossIncomeColors
+            );
+
+            // Net Gelir Grafiği
+            createOrUpdateChart(
+                'netIncomeChart',
+                chartStates['netIncomeChart'] || 'doughnut',
+                data.netIncome.labels,
+                data.netIncome.data,
+                netIncomeColors
+            );
+
+            // Giderler Grafiği
+            createOrUpdateChart(
+                'expenseChart',
+                chartStates['expenseChart'] || 'doughnut',
+                data.expenses.labels,
+                data.expenses.data
+            );
+            
+            // Çikolata Analizi (Maliyetleri göster)
+            createOrUpdateChart(
+                'chocolateChart',
+                chartStates['chocolateChart'] || 'doughnut',
+                data.chocolateAnalysis.labels,
+                data.chocolateAnalysis.costs // Maliyetleri (TL) grafiğe dök
+            );
+            // Çikolata Listesini (KG ve TL) güncelle
+            const chocolateListEl = document.getElementById('chocolate-list');
+            const totalKg = data.chocolateAnalysis.data.reduce((a, b) => a + b, 0);
+            const totalCost = data.chocolateAnalysis.costs.reduce((a, b) => a + b, 0);
+            chocolateListEl.innerHTML = data.chocolateAnalysis.labels.map((label, index) => {
+                const kg = data.chocolateAnalysis.data[index];
+                const cost = data.chocolateAnalysis.costs[index];
+                const percentage = (cost / totalCost) * 100;
+                const newLabel = `${label.replace(' (KG)', '')} (${kg} kg)`;
+                return createListItemHTML(newLabel, cost, percentage, charts['chocolateChart'].data.datasets[0].backgroundColor[index]);
+            }).join('');
+
+
+            // Yemek Kartları Grafiği
+            createOrUpdateChart(
+                'foodCardChart',
+                chartStates['foodCardChart'] || 'doughnut',
+                data.foodCards.labels,
+                data.foodCards.data
+            );
+            // Yemek kartları listesini güncelle (Sıralı)
+            const foodCardListEl = document.getElementById('food-card-list');
+            const totalFoodCard = data.foodCards.data.reduce((a, b) => a + b, 0);
+            const foodCardChartInstance = charts['foodCardChart'];
+            // Grafikten alınan sıralı veriyi kullan
+            foodCardListEl.innerHTML = foodCardChartInstance.data.datasets[0].data.map((value, index) => {
+                const label = foodCardChartInstance.data.labels[index];
+                const color = foodCardChartInstance.data.datasets[0].backgroundColor[index];
+                const percentage = (value / totalFoodCard) * 100;
+                return createListItemHTML(label, value, percentage, color);
+            }).join('');
+
+            // Sevkiyat Detayları
+            const shipmentListEl = document.getElementById('shipment-list');
+            const shipmentTotal = data.shipments.data.reduce((a, b) => a + b, 0);
+            shipmentListEl.innerHTML = data.shipments.labels.map((label, index) => {
+                return createDetailItemHTML(label, data.shipments.data[index]);
+            }).join('');
+            document.getElementById('shipment-total').textContent = formatter.format(shipmentTotal);
+
+            // Nakit Akışı ve Komisyon Analizi
+            const commissionListEl = document.getElementById('online-commission-list');
+            const cashflowListEl = document.getElementById('financial-status-list');
+            const { totalNetIncome, totalExpenses, netProfit, commissions } = data.cashflow;
+
+            let commissionHTML = '';
+            for (const [platform, commission] of Object.entries(commissions)) {
+                commissionHTML += createDetailItemHTML(platform + ' Komisyon Kesintisi', commission, 'text-amber-300');
             }
-             // Her ay değiştiğinde AI analizini gizle
+            commissionListEl.innerHTML = commissionHTML;
+            
+            const totalCommission = Object.values(commissions).reduce((a, b) => a + b, 0);
+            document.getElementById('total-commission-header').textContent = `Toplam ${formatter.format(totalCommission)} Komisyon Kesintisi`;
+            document.getElementById('total-commission-text').textContent = `Online platformlar (Yemeksepeti, Getir, Trendyol) brüt satışlar üzerinden dönemsel olarak toplam bu tutarı kesmiştir. Bu tutar, Giderler grafiğindeki 'Online Platform Komisyonları' kalemi ile eşleşmektedir.`;
+
+            cashflowListEl.innerHTML = `
+                ${createDetailItemHTML('Bankaya Yansıyan Net Gelirler', totalNetIncome, 'text-emerald-200')}
+                ${createDetailItemHTML('Tüm Giderler (Banka + Nakit)', totalExpenses, 'text-rose-300')}
+                <div class="mt-4 pt-4 border-t border-slate-700/70">
+                ${createDetailItemHTML('Dönem Sonu Net Kâr (Nakit Akışı)', netProfit, 'text-sky-300')}
+                </div>
+            `;
+            
+            // AI Analiz bölümünü gizle (kullanıcı isterse açar)
             document.getElementById('ai-analysis-section').classList.add('hidden');
             document.getElementById('ai-analysis-content').innerHTML = '';
-
-            const monthName = reportData.name || getMonthLabel(currentMonthKey) || 'Finansal';
-            const reportTitle = document.getElementById('report-title');
-            if (reportTitle) {
-                reportTitle.textContent = `Boston Drink & Dessert | Cadde Şube ${monthName} Raporu`;
-            }
-            document.title = `Boston Drink & Dessert Cadde Şube ${monthName} Raporu`;
-            document.getElementById('report-period').textContent = `Dönem: ${reportData.period}`;
-
-            const grossIncomeLabels = Array.isArray(reportData.grossIncome?.labels) ? reportData.grossIncome.labels : [];
-            const grossIncomeValues = Array.isArray(reportData.grossIncome?.data) ? reportData.grossIncome.data : [];
-            const netIncomeLabels = Array.isArray(reportData.netIncome?.labels) ? reportData.netIncome.labels : [];
-            const netIncomeValues = Array.isArray(reportData.netIncome?.data) ? reportData.netIncome.data : [];
-            const expenseItems = (reportData.expenses?.items || []).map(item => ({ ...item }));
-
-            const totalGrossIncome = grossIncomeValues.reduce((sum, val) => sum + (val || 0), 0);
-            const totalNetIncome = netIncomeValues.reduce((sum, val) => sum + (val || 0), 0);
-            const totalExpenses = expenseItems.reduce((sum, item) => sum + (item.value || 0), 0);
-            const computedNetProfit = totalNetIncome - totalExpenses;
-
-            document.getElementById('net-gelir').textContent = formatCurrency(totalNetIncome);
-            document.getElementById('toplam-gider').textContent = formatCurrency(totalExpenses);
-            document.getElementById('net-kar').textContent = formatCurrency(computedNetProfit);
-
-            const netProfitIcon = document.getElementById('net-kar-icon');
-            if (netProfitIcon) {
-                const isPositive = computedNetProfit >= 0;
-                netProfitIcon.classList.toggle('kpi-icon--positive', isPositive);
-                netProfitIcon.classList.toggle('kpi-icon--negative', !isPositive);
-                netProfitIcon.setAttribute('aria-label', isPositive ? 'Kârda' : 'Zararda');
-                netProfitIcon.innerHTML = isPositive ? profitIconTemplates.positive : profitIconTemplates.negative;
-            }
-
-            document.getElementById('gross-income-subtitle').textContent = `Kasa raporuna göre toplam ${formatCurrency(totalGrossIncome)}'lik brüt gelirin kaynaklara göre dökümü.`;
-            const sortedGrossIncome = grossIncomeLabels.map((label, i) => ({
-                label,
-                value: grossIncomeValues[i]
-            })).sort((a, b) => b.value - a.value);
-            createList('gross-income-list', sortedGrossIncome, 'border-emerald-400/20 bg-emerald-500/10', formatCurrency, 'text-emerald-200');
-            createInteractiveChart('grossIncomeChart', grossIncomeLabels, grossIncomeValues, grossIncomeColors, 'grossIncomeTotal');
-
-            document.getElementById('net-income-subtitle').textContent = `Bankaya yatan ve kasadaki net gelirin kaynaklara göre dökümü.`;
-            const sortedNetIncome = netIncomeLabels.map((label, i) => ({
-                label,
-                value: netIncomeValues[i]
-            })).sort((a, b) => b.value - a.value);
-            createList('net-income-list', sortedNetIncome, 'border-sky-400/20 bg-sky-500/10', formatCurrency, 'text-sky-200');
-            createInteractiveChart('netIncomeChart', netIncomeLabels, netIncomeValues, netIncomeColors, 'netIncomeTotal');
-
-            const chocolateDetails = reportData.chocolate.costs.map((c, i) => ({
-                ...c,
-                totalCost: c.kg * c.pricePerKg,
-                color: reportData.chocolate.colors[i]
-            })).sort((a, b) => b.totalCost - a.totalCost);
-
-            const chocolateData = chocolateDetails.map(c => c.totalCost);
-            const chocolateLabels = chocolateDetails.map(c => c.name);
-            const chocolateColors = chocolateDetails.map(c => c.color);
-            createInteractiveChart('chocolateChart', chocolateLabels, chocolateData, chocolateColors, 'chocolateTotal');
-
-            const chocolateList = document.getElementById('chocolate-list');
-            chocolateList.innerHTML = '';
-            chocolateDetails.forEach(c => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center gap-4 p-3 rounded-xl border border-slate-700/60 bg-slate-900/60';
-                const accent = hexToRgba(c.color, 0.7);
-                div.style.boxShadow = `0 12px 30px -20px ${accent}`;
-                div.innerHTML = `<span class="font-medium text-slate-200">${c.name}</span><span class="font-semibold" style="color:${hexToRgba(c.color, 0.9)}">${c.kg} KG (${formatCurrency(c.totalCost)})</span>`;
-                chocolateList.appendChild(div);
-            });
-
-            const sortedExpenses = [...expenseItems].sort((a, b) => b.value - a.value);
-            createList('expense-list', sortedExpenses, 'border-rose-500/30 bg-rose-500/10', (value) => formatAmountWithSign(-value), 'text-rose-200');
-
-            const expenseCategories = (reportData.expenses?.categories || []).map(item => ({ ...item }));
-            const sortedCategorizedExpenses = expenseCategories.sort((a, b) => b.value - a.value);
-            const expenseLabels = sortedCategorizedExpenses.map(item => item.label);
-            const expenseData = sortedCategorizedExpenses.map(item => item.value);
-            const expenseColors = ['#FB7185', '#38BDF8', '#818CF8', '#F97316', '#2DD4BF', '#FACC15', '#A855F7', '#14B8A6'];
-            createInteractiveChart('expenseChart', expenseLabels, expenseData, expenseColors, 'expenseTotal');
-
-            const combinedFoodCards = reportData.foodCards.labels.map((label, i) => ({
-                label,
-                value: reportData.foodCards.data[i]
-            })).sort((a, b) => b.value - a.value);
-
-            const sortedFoodCardLabels = combinedFoodCards.map(item => item.label);
-            const sortedFoodCardData = combinedFoodCards.map(item => item.value);
-            const foodCardColors = ['#8B5CF6', '#6366F1', '#F97316', '#FACC15', '#14B8A6', '#F472B6', '#0EA5E9', '#22D3EE', '#10B981', '#FB7185', '#A855F7', '#F59E0B', '#38BDF8', '#2DD4BF'];
-            createInteractiveChart('foodCardChart', sortedFoodCardLabels, sortedFoodCardData, foodCardColors, 'foodCardTotal');
-            createList('food-card-list', combinedFoodCards, 'border-indigo-400/30 bg-indigo-500/10', formatCurrency, 'text-indigo-200');
-
-            const shipmentListContainer = document.getElementById('shipment-list');
-            shipmentListContainer.innerHTML = '';
-            let totalShipmentCost = 0;
-            const sortedShipments = [...reportData.shipmentDetails].sort((a, b) => b.price - a.price);
-
-            sortedShipments.forEach(item => {
-                totalShipmentCost += item.price;
-                const div = document.createElement('div');
-                div.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 p-4 rounded-xl border border-slate-700/60 bg-slate-900/60 shadow-lg shadow-slate-900/40';
-                div.innerHTML = `
-                    <div class="font-medium text-slate-200">${item.name} <span class="text-sm text-slate-400 font-normal">(${item.quantity} ${item.unit})</span></div>
-                    <div class="font-semibold text-lg text-emerald-200 mt-1 sm:mt-0">${formatCurrency(item.price)}</div>
-                `;
-                shipmentListContainer.appendChild(div);
-            });
-            document.getElementById('shipment-total').textContent = formatCurrency(totalShipmentCost);
-
-            const onlineCommissionList = document.getElementById('online-commission-list');
-            onlineCommissionList.innerHTML = '';
-            let totalCommission = 0;
-            reportData.onlineCommissions.forEach(platform => {
-                const commission = platform.gross - platform.net;
-                totalCommission += commission;
-                const commissionPercentage = platform.gross > 0 ? ((commission / platform.gross) * 100).toFixed(1) : '0.0';
-
-                const div = document.createElement('div');
-                div.className = 'space-y-2 p-4 rounded-xl border border-slate-700/60 bg-slate-900/60 shadow-inner shadow-sky-500/10';
-                div.innerHTML = `
-                    <div class="flex justify-between font-semibold text-slate-200"><span>${platform.name}</span><span class="text-rose-300">${formatAmountWithSign(-commission)} (%${commissionPercentage})</span></div>
-                    <div class="w-full bg-slate-800/70 rounded-full h-3">
-                        <div class="bg-gradient-to-r from-rose-400 via-amber-300 to-emerald-300 h-3 rounded-full" style="width:${commissionPercentage}%"></div>
-                    </div>
-                    <div class="flex justify-between text-xs text-slate-400"><span>Brüt: ${formatCurrency(platform.gross)}</span><span>Net Gelen: ${formatCurrency(platform.net)}</span></div>
-                `;
-                onlineCommissionList.appendChild(div);
-            });
-
-            document.getElementById('total-commission-header').textContent = `Toplam Komisyon Gideri: ${formatCurrency(totalCommission)}`;
-            document.getElementById('total-commission-text').textContent = `Online platformlardan elde edilen ${formatCurrency(reportData.onlineCommissions.reduce((sum, p) => sum + p.gross, 0))} brüt cironun bankaya yatan net karşılığı ${formatCurrency(reportData.onlineCommissions.reduce((sum, p) => sum + p.net, 0))}'dir. Aradaki fark, platformların hizmet bedeli ve komisyonlarıdır.`;
-
-            const cashIncome = netIncomeLabels.reduce((sum, label, index) => {
-                return label?.toLowerCase().includes('nakit') ? sum + (netIncomeValues[index] || 0) : sum;
-            }, 0);
-            const bankIncome = totalNetIncome - cashIncome;
-            const cashExpense = expenseItems.reduce((sum, item) => {
-                return item.label?.toLowerCase().includes('nakit') ? sum + (item.value || 0) : sum;
-            }, 0);
-            const bankExpense = totalExpenses - cashExpense;
-            const bankNetFlow = bankIncome - bankExpense;
-            const cashNetFlow = cashIncome - cashExpense;
-            const totalAssets = bankNetFlow + cashNetFlow;
-
-            const financialStatusList = document.getElementById('financial-status-list');
-            financialStatusList.innerHTML = `
-                <div class="flex justify-between items-center p-4 rounded-xl border border-slate-700/60 bg-slate-900/60"><span class="text-slate-300">Toplam Banka Gelirleri</span><span class="font-semibold text-emerald-200">${formatCurrency(bankIncome)}</span></div>
-                <div class="flex justify-between items-center p-4 rounded-xl border border-slate-700/60 bg-slate-900/60"><span class="text-slate-300">Toplam Banka Giderleri</span><span class="font-semibold text-rose-300">${formatAmountWithSign(-bankExpense)}</span></div>
-                <div class="flex justify-between items-center p-4 rounded-xl border border-sky-500/30 bg-sky-500/10 font-semibold text-slate-100"><span>Banka Net Akışı</span><span>${formatAmountWithSign(bankNetFlow)}</span></div>
-                <hr class="my-3 border-slate-700/60">
-                <div class="flex justify-between items-center p-4 rounded-xl border border-slate-700/60 bg-slate-900/60"><span class="text-slate-300">Nakit Gelir (Kasa)</span><span class="font-semibold text-emerald-200">${formatCurrency(cashIncome)}</span></div>
-                <div class="flex justify-between items-center p-4 rounded-xl border border-slate-700/60 bg-slate-900/60"><span class="text-slate-300">Nakit Gider (Kasa)</span><span class="font-semibold text-rose-300">${formatAmountWithSign(-cashExpense)}</span></div>
-                <div class="flex justify-between items-center p-4 rounded-xl border border-sky-500/30 bg-sky-500/10 font-semibold text-slate-100"><span>Kasa Net Akışı</span><span>${formatAmountWithSign(cashNetFlow)}</span></div>
-                <hr class="my-3 border-dashed border-slate-600/60">
-                <div class="flex justify-between items-center p-5 rounded-2xl bg-gradient-to-r from-amber-400/20 via-emerald-400/20 to-sky-400/20 text-lg font-semibold text-slate-100 border border-amber-200/30"><span>Toplam Nakit + Banka Varlığı</span><span>${formatAmountWithSign(totalAssets)}</span></div>
-            `;
-
-            loadingSpinner.classList.add('hidden');
-            reportContainer.classList.remove('hidden');
+            document.getElementById('runAiAnalysisBtn').disabled = false;
         };
 
-         // --- GÜNCELLENEN YAPAY ZEKA FONKSİYONLARI ---
-         // API anahtarı, güvenlik ve kurallar gereği boş bırakılmalıdır.
-        const GEMINI_API_KEY = "AIzaSyBhFNahLBWvzoM70OPW3HqAwIhpScubVNQ"; 
-        
-        async function runAiAnalysis() {
+
+        // --- GRAFİK TÜRÜ DEĞİŞTİRİCİ ---
+        const setupChartToggleListeners = () => {
+            document.querySelectorAll('.chart-type-group').forEach(group => {
+                group.addEventListener('click', (e) => {
+                    const button = e.target.closest('.chart-type-button');
+                    if (!button) return;
+
+                    const chartId = button.dataset.chartTarget;
+                    const newType = button.dataset.chartType;
+
+                    // Butonların aktif durumunu güncelle
+                    group.querySelectorAll('.chart-type-button').forEach(btn => {
+                        btn.dataset.active = (btn === button);
+                    });
+
+                    // Grafiği yeniden çiz
+                    const chartInstance = charts[chartId];
+                    if (chartInstance) {
+                        createOrUpdateChart(
+                            chartId,
+                            newType,
+                            chartInstance.data.labels, // Mevcut etiketleri kullan
+                            chartInstance.data.datasets[0].data, // Mevcut veriyi kullan
+                            chartId === 'grossIncomeChart' ? grossIncomeColors : (chartId === 'netIncomeChart' ? netIncomeColors : undefined)
+                        );
+                    }
+                });
+            });
+
+            // Başlangıçta tüm 'doughnut' butonlarını aktif et
+            document.querySelectorAll('.chart-type-button[data-chart-type="doughnut"]').forEach(btn => {
+                btn.dataset.active = 'true';
+            });
+        };
+
+        // --- AY DEĞİŞTİRİCİ ---
+        const setupMonthSwitcherListener = (reportData) => {
+            document.getElementById('month-switcher').addEventListener('click', (e) => {
+                const button = e.target.closest('.month-button');
+                if (!button || button.dataset.active === 'true') return;
+
+                const monthKey = button.dataset.monthKey;
+                // AI analizi hariç tüm dashboard'u güncelle
+                updateDashboard(reportData, monthKey);
+            });
+        };
+
+        // --- YAPAY ZEKA ANALİZ FONKSİYONU ---
+        const handleAiAnalysis = async (reportData, monthKey) => {
+            const aiButton = document.getElementById('runAiAnalysisBtn');
             const aiSection = document.getElementById('ai-analysis-section');
             const aiLoader = document.getElementById('ai-analysis-loader');
             const aiContent = document.getElementById('ai-analysis-content');
-            const aiButton = document.getElementById('runAiAnalysisBtn');
 
+            aiButton.disabled = true;
+            aiButton.querySelector('span').textContent = 'Analiz Başlatılıyor...';
+            aiButton.insertAdjacentHTML('afterbegin', '<div class="spinner"></div>');
+            
             aiSection.classList.remove('hidden');
             aiLoader.classList.remove('hidden');
             aiContent.innerHTML = '';
-            aiButton.disabled = true;
-            aiButton.querySelector('span').textContent = 'Analiz Ediliyor...';
+
+            // API'ye gönderilecek veriyi hazırla
+            const data = reportData.reports[monthKey];
+            const previousMonthKey = Object.keys(reportData.reports).find((k, i, arr) => arr[i+1] === monthKey);
+            const previousData = previousMonthKey ? reportData.reports[previousMonthKey] : null;
+
+            // Veriyi sadeleştir
+            const simplifiedData = {
+                donem: data.name,
+                kpi: data.kpi,
+                gelirler: data.netIncome,
+                giderler: data.expenses,
+                hammadde: data.chocolateAnalysis,
+                oncekiDonem: previousData ? { donem: previousData.name, kpi: previousData.kpi } : null
+            };
             
-            // Analiz bölümüne kaydır (Mobil cihazlar için)
-            aiSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            const systemPrompt = `
+                Sen, Boston Drink & Dessert (Umut AI) adlı şirketin kıdemli finansal analistisin. 
+                Sana JSON formatında bir şubenin bu aylık ve (varsa) önceki aylık finansal verileri verilecek. 
+                Görevin, bu verileri analiz ederek net, profesyonel ve eyleme geçirilebilir bir özet çıkarmaktır.
+                
+                Kurallar:
+                1.  **Dil:** Sadece Türkçe kullan.
+                2.  **Format:** Cevabını MARKDOWN formatında ver.
+                3.  **Başlıklar:** 3 adet ana başlık kullan: '### Finansal Performans Özeti', '### Öne Çıkan Gözlemler ve Fırsatlar', '### Aksiyon Önerileri'.
+                4.  **Ton:** Profesyonel, kendinden emin ve yapıcı ol.
+                5.  **Veri Odaklı Ol:** Mutlaka verilerden spesifik yüzdeler veya TL tutarları ile bahset.
+                6.  **Karşılaştırma:** Eğer 'oncekiDonem' verisi varsa, MUTLAKA bu ayla karşılaştır (örn: "Net kâr, Ağustos ayına göre %X arttı/azaldı").
+                7.  **Odak Noktaları:** Gelir, gider (özellikle en yüksek gider kalemleri) ve net kâr (nakit akışı) üzerinde dur.
+                8.  **Listeleme:** Gözlemleri ve önerileri madde imli (bullet points) liste olarak sun.
+            `;
+            
+            const userQuery = `
+                Lütfen şu finansal verileri analiz et:
+                ${JSON.stringify(simplifiedData, null, 2)}
+            `;
 
             try {
-                const reportAug = availableReports['agustos2025'];
-                const reportSep = availableReports['eylul2025'];
-                const reportOct = availableReports['ekim2025']; // YENİ: Ekim verisi eklendi
+                // Gemini API Çağrısı
+                const apiKey = ""; // API anahtarı Canvas tarafından sağlanır
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
 
-                if (!reportAug || !reportSep || !reportOct) { // YENİ: Ekim kontrolü eklendi
-                    throw new Error("Analiz için Ağustos, Eylül ve Ekim rapor verileri bulunamadı.");
-                }
-
-                const formatReportDataForPrompt = (report) => {
-                    const netIncome = (report.netIncome?.data || []).reduce((a, b) => a + b, 0);
-                    const totalExpenses = (report.expenses?.items || []).reduce((a, b) => a + b.value, 0);
-                    const netProfit = netIncome - totalExpenses;
-                    const chocolateUsage = report.chocolate.costs.reduce((sum, item) => sum + item.kg, 0);
-                    const chocolateCost = report.chocolate.costs.reduce((sum, item) => sum + (item.kg * item.pricePerKg), 0);
-                    const grossIncome = (report.grossIncome?.data || []).reduce((a,b) => a + b, 0);
-                    // DÜZELTME: 'Genel Merkeze' -> 'Genel Merkez' olarak değiştirildi
-                    const cogs = (report.expenses.categories.find(c => c.label.includes('Genel Merkez'))?.value || 0) + (report.expenses.categories.find(c => c.label.includes('Manav'))?.value || 0) + (report.expenses.categories.find(c => c.label.includes('Tedarik'))?.value || 0) ;
-                    const labor = report.expenses.categories.find(c => c.label.includes('Personel'))?.value || 0;
-                    const rent = report.expenses.categories.find(c => c.label.includes('Kira'))?.value || 0;
-
-                    return `
-- Toplam Brüt Gelir: ${formatCurrency(grossIncome)}
-- Toplam Net Gelir: ${formatCurrency(netIncome)}
-- Toplam Gider: ${formatCurrency(totalExpenses)}
-- Net Dönem Kârı/Zararı: ${formatCurrency(netProfit)}
-- Gelir Kaynakları (Net):
-${report.netIncome.labels.map((label, i) => `  - ${label}: ${formatCurrency(report.netIncome.data[i])}`).join('\n')}
-- Gider Kategorileri:
-${(report.expenses.categories || []).map(item => `  - ${item.label}: ${formatCurrency(item.value)}`).join('\n')}
-- Ana Gider Oranları için Ham Veriler:
-  - Gıda/Sarf Malzemesi Maliyeti (COGS): ${formatCurrency(cogs)}
-  - Personel Maliyeti: ${formatCurrency(labor)}
-  - Kira Maliyeti: ${formatCurrency(rent)}
-- Toplam Çikolata Kullanımı: ${chocolateUsage.toFixed(1)} KG
-- Toplam Çikolata Maliyeti: ${formatCurrency(chocolateCost)}
-`;
-                };
-                
-                let prompt = `
-                    Sen bir kafe ve restoran endüstrisinde uzmanlaşmış bir finansal analistsin.
-                    Aşağıdaki finansal verileri "Boston Drink & Dessert" adlı kafe için analiz et. Üç dönemin verileri aşağıdadır: Ağustos 2025, Eylül 2025 ve Ekim 2025.
-
-                    **Ağustos 2025 Verileri:**
-                    ${formatReportDataForPrompt(reportAug)}
-
-                    **Eylül 2025 Verileri:**
-                    ${formatReportDataForPrompt(reportSep)}
-
-                    **Ekim 2025 Verileri:**
-                    ${formatReportDataForPrompt(reportOct)}
-
-                    Bu verilere dayanarak, Türkçe dilinde ve Markdown formatında, işletme sahibinin kolayca anlayabileceği profesyonel bir dille kapsamlı bir finansal analiz hazırla.
-                    
-                    **ÖNEMLİ FORMATLAMA KURALLARI:**
-                    1.  Analizi SADECE şu başlıkları (\`### Başlık\`) ve sırayı takip ederek yap: \`### Ekim 2025 Detaylı Analizi\` ve \`### Üç Aylık Karşılaştırma ve Stratejik Özet\`.
-                    2.  **KESİNLİKLE HTML veya metin-tablo (örn: Kategori | Ağustos | Eylül) KULLANMA.**
-                    3.  Tüm karşılaştırmaları ve analizleri, her madde için (\`- Madde 1\`) formatını kullanarak **Markdown listeleri** halinde sun. Bu, görsel düzen için kritiktir.
-
-                    **İçerik İsteği:**
-
-                    ### Ekim 2025 Detaylı Analizi
-                    (Bu bölümü liste maddeleri kullanarak hazırla)
-                    - **Yüzdesel Dağılım:** En büyük 3 gelir ve en büyük 3 gider kategorisinin toplam içindeki yüzdelik paylarını belirt.
-                    - **Endüstri Standartları ile Karşılaştırma:** Aşağıdaki standartları kullanarak Ekim ayının verilerini yorumla. Hesaplamaları Toplam Brüt Gelir'e (Ekim: ${formatCurrency(reportOct.grossIncome.data.reduce((a,b) => a + b, 0))}) göre yap:
-                        - Gıda ve Sarf Malzemesi (COGS) Standardı: %25-%35
-                        - İşçilik Giderleri Standardı: %25-%35
-                        - Kira Gideri Standardı: %5-%10
-                        - Net Kâr Marjı Standardı: %3-%10
-                    
-                    ### Üç Aylık Karşılaştırma ve Stratejik Özet
-                    (Bu bölümü de **tablo yerine** liste maddeleri kullanarak hazırla)
-                    - **Kârlılık Trendi (Liste Olarak):** Her ay için bir madde oluştur (örn: \`- **Ağustos 2025:** Brüt Gelir: X ₺, Gider: Y ₺, Net Kâr/Zarar: Z ₺\`). Ağustos kârı, Eylül zararı ve Ekim kârını vurgula.
-                    - **Gider Kategorisi Karşılaştırması (Liste Olarak):** Ana gider kategorilerindeki (Genel Merkez, Personel, Finans/Banka, Kiralar) 3 aylık değişimi her kategori için bir madde olarak analiz et.
-                    - **Nihai Yorum:** İşletmenin üç aylık finansal gidişatı ve özellikle Ekim ayındaki güçlü toparlanma hakkında genel bir sonuç cümlesi kur.
-                `;
-
-                // GÜNCELLENEN MODEL ADI
-                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`;
-                
                 const payload = {
-                    contents: [{
-                        parts: [{
-                            text: prompt
-                        }]
-                    }]
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
                 };
 
-                // YENİ: Exponential Backoff ile Yeniden Deneme Mantığı
-                let response;
-                let data;
-                const maxRetries = 5;
-                let initialDelay = 1000; // 1 saniye
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-                for (let attempt = 0; attempt < maxRetries; attempt++) {
-                    try {
-                        response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(payload),
-                        });
-
-                        if (response.ok) {
-                            data = await response.json();
-                            break; // Başarılı, döngüden çık
-                        }
-
-                        // Yanıt 'ok' değilse (örn. 429, 5xx)
-                        if (attempt === maxRetries - 1) {
-                            // Son deneme de başarısız oldu
-                            const errorBody = await response.json();
-                            throw new Error(`API Hatası: ${response.status} ${response.statusText} - ${JSON.stringify(errorBody)}`);
-                        }
-                        
-                        // Yeniden denemeden önce bekle
-                        await new Promise(resolve => setTimeout(resolve, initialDelay));
-                        initialDelay *= 2; // Üstel gecikme
-
-                    } catch (error) {
-                        // Ağ hatası veya fetch başarısız oldu
-                        if (attempt === maxRetries - 1) {
-                            throw new Error(`Ağ Hatası (${maxRetries} deneme sonunda): ${error.message}`);
-                        }
-                        await new Promise(resolve => setTimeout(resolve, initialDelay));
-                        initialDelay *= 2;
-                    }
+                if (!response.ok) {
+                    throw new Error(`API hatası: ${response.statusText}`);
                 }
-                
-                if (!data || !data.candidates) {
-                    throw new Error("AI analizi yeniden denemelerden sonra başarısız oldu veya geçersiz veri alındı.");
-                }
-                
-                const text = data.candidates[0].content.parts[0].text;
-                aiContent.innerHTML = marked.parse(text);
+
+                const result = await response.json();
+                const aiText = result.candidates[0].content.parts[0].text;
+
+                // İçeriği 'marked' kütüphanesi ile HTML'e çevir ve göster
+                aiContent.innerHTML = marked.parse(aiText);
+                aiLoader.classList.add('hidden');
 
             } catch (error) {
-                console.error("AI analysis error:", error);
-                aiContent.innerHTML = `<p class="text-center text-red-400 font-semibold">Analiz sırasında bir hata oluştu. Lütfen internet bağlantınızı kontrol edin. <br><small>${error.message}</small></p>`;
-            } finally {
+                console.error("Yapay zeka analiz hatası:", error);
                 aiLoader.classList.add('hidden');
+                aiContent.innerHTML = `<p class="text-rose-400">Yapay zeka analizi sırasında bir hata oluştu. Lütfen konsolu kontrol edin. (Hata: ${error.message})</p>`;
+            } finally {
                 aiButton.disabled = false;
                 aiButton.querySelector('span').textContent = 'Kapsamlı Yapay Zeka Analizi';
+                aiButton.querySelector('.spinner')?.remove();
             }
-        }
+        };
 
-
-        // Veritabanı ve kimlik doğrulama işlemleri
-        document.addEventListener('DOMContentLoaded', async () => {
-            document.querySelectorAll('.chart-type-button').forEach(button => {
-                button.addEventListener('click', () => {
-                    updateChartType(button.dataset.chartTarget, button.dataset.chartType);
-                });
-            });
-
-            // YENİ BUTON İÇİN EVENT LISTENER
-            document.getElementById('runAiAnalysisBtn').addEventListener('click', runAiAnalysis);
+        // --- VERİ GÜNCELLEME FONKSİYONU (YÖNETİCİ) ---
+        const handleUpdateData = async () => {
+            const docRef = getReportDocRef();
+            if (!docRef) return;
+            
+            const btn = document.getElementById('updateDataBtn');
+            btn.disabled = true;
+            btn.textContent = 'Güncelleniyor...';
 
             try {
-                if (firebaseConfig && Object.keys(firebaseConfig).length > 0) {
-                    app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    auth = getAuth(app);
-                    setLogLevel('debug');
+                await setDoc(docRef, sampleReportData);
+                console.log("Veritabanı başarıyla güncellendi.");
+                // Veri güncellendiğinde onSnapshot tetiklenecek ve UI otomatik yenilenecek.
+            } catch (error) {
+                console.error("Veri güncelleme hatası: ", error);
+                authMessage.textContent = `Veri güncelleme hatası: ${error.message}`;
+                authMessage.className = 'auth-message-error';
+            } finally {
+                 btn.disabled = false;
+                 btn.textContent = 'Örnek Veriyi Güncelle';
+            }
+        };
 
-                    if (initialAuthToken) {
-                        await signInWithCustomToken(auth, initialAuthToken);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
 
-                    onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            console.log("Successfully logged into Firebase. UID:", userId);
+        // --- YETKİLENDİRME (AUTH) FONKSİYONLARI ---
 
-                            const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
-                            onSnapshot(docRef, (docSnap) => {
-                                if (docSnap.exists()) {
-                                    initializeReports(normalizeReportPayload(docSnap.data()));
-                                } else {
-                                    console.log("Report data not found. Saving sample data...");
-                                    setDoc(docRef, sampleReportData)
-                                        .then(() => console.log("Sample data saved successfully."))
-                                        .catch(error => console.error("Error saving data:", error));
-                                }
-                            }, (error) => {
-                                console.error("Database listening error:", error);
-                                loadingSpinner.classList.add('hidden');
-                                document.getElementById('report-container').innerHTML = '<p class="text-center text-red-500 text-xl font-bold mt-10">An error occurred while loading the report. Please check the console.</p>';
-                            });
+        /**
+         * E-postanın whitelist'te olup olmadığını kontrol eder.
+         * @param {string} email - Kontrol edilecek e-posta
+         * @returns {Promise<boolean>} - E-posta listede varsa true
+         */
+        const isEmailWhitelisted = async (email) => {
+            console.log("Whitelist sorgulanıyor: app-access/whitelist");
+            try {
+                const docRef = doc(db, "app-access", "whitelist");
+                const docSnap = await getDoc(docRef);
 
-                        } else {
-                            console.log("User is not signed in. Using local sample data.");
-                            initializeReports(sampleReportData);
-                        }
-                    });
-
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    // E-postaları küçük harfe çevirerek kontrol et
+                    const allowedEmails = data.allowedEmails.map(e => e.toLowerCase());
+                    return allowedEmails.includes(email.toLowerCase());
                 } else {
-                    console.error("Firebase configuration is missing. Using local sample data.");
-                    initializeReports(sampleReportData);
+                    console.error("Whitelist dokümanı bulunamadı!");
+                    return false;
+                }
+            } catch (error) {
+                // Bu hata genellikle "Missing or insufficient permissions" hatasıdır.
+                // Firebase Kurallarının doğru ayarlandığından emin olun.
+                console.error("Whitelist kontrol hatası:", error);
+                throw new Error("Erişim hatası (Permissions). Lütfen Firebase > Firestore > Kurallar bölümünü kontrol edin ve yayınladığınızdan emin olun.");
+            }
+        };
+
+
+        /**
+         * E-posta giriş bağlantısı gönderme işlemini yönetir.
+         * @param {Event} e - Form gönderme olayı
+         */
+        const handleSendSignInLink = async (e) => {
+            e.preventDefault();
+            const email = emailInput.value;
+            
+            setAuthLoading(true, "Doğrulanıyor...");
+
+            try {
+                // 1. Adım: E-postayı whitelist'te kontrol et
+                const isAllowed = await isEmailWhitelisted(email);
+                
+                if (!isAllowed) {
+                    throw new Error("Bu e-posta adresi için erişim izni bulunmuyor.");
                 }
 
-                document.getElementById('updateDataBtn').addEventListener('click', async () => {
-                    if (!db) {
-                        // Basit bir custom modal/mesaj kutusu
-                        const adminPanel = document.getElementById('admin-panel');
-                        let msg = adminPanel.querySelector('.admin-message');
-                        if (!msg) {
-                            msg = document.createElement('p');
-                            msg.className = 'admin-message text-red-400 text-sm text-right mt-2';
-                            adminPanel.appendChild(msg);
-                        }
-                        msg.textContent = 'Veri güncelleme yetkiniz bulunmamaktadır.';
-                        setTimeout(() => msg.textContent = '', 3000);
-                        return;
-                    }
-                    const docRef = doc(db, `artifacts/${appId}/public/data/reports`, 'agustos2025-rapor');
-                    try {
-                        await setDoc(docRef, sampleReportData);
-                        console.log("Data update request sent.");
-                        
-                        const adminPanel = document.getElementById('admin-panel');
-                        let msg = adminPanel.querySelector('.admin-message');
-                         if (!msg) {
-                            msg = document.createElement('p');
-                            msg.className = 'admin-message text-green-400 text-sm text-right mt-2';
-                            adminPanel.appendChild(msg);
-                        }
-                        msg.className = 'admin-message text-green-400 text-sm text-right mt-2';
-                        msg.textContent = 'Örnek veriler başarıyla güncellendi!';
-                        setTimeout(() => msg.textContent = '', 3000);
+                // 2. Adım: E-posta bağlantısını gönder
+                setAuthLoading(true, "Bağlantı gönderiliyor...");
+                const actionCodeSettings = {
+                    url: window.location.href, // Kullanıcı bu URL'e geri dönecek
+                    handleCodeInApp: false
+                };
 
-                    } catch (e) {
-                        console.error("Error updating data:", e);
+                await sendSignInLinkToEmail(auth, email, actionCodeSettings);
+                
+                // Kullanıcıya bilgi ver ve e-postayı kaydet
+                window.localStorage.setItem('emailForSignIn', email);
+                setAuthMessage("success", "Giriş bağlantınız e-posta adresinize gönderildi. Lütfen gelen kutunuzu kontrol edin.");
+
+            } catch (error) {
+                console.error("Yetki kontrolü veya e-posta gönderme hatası:", error);
+                setAuthMessage("error", error.message);
+            } finally {
+                setAuthLoading(false);
+            }
+        };
+
+        /**
+         * Giriş ekranının yükleme durumunu ayarlar.
+         * @param {boolean} isLoading - Yükleniyor mu?
+         * @param {string} [message=""] - Buton mesajı
+         */
+        const setAuthLoading = (isLoading, message = "") => {
+            if (isLoading) {
+                authButton.disabled = true;
+                authButton.innerHTML = `<div class="spinner"></div> <span>${message || "Yükleniyor..."}</span>`;
+            } else {
+                authButton.disabled = false;
+                authButton.innerHTML = '<span>Giriş Bağlantısı Gönder</span>';
+            }
+        };
+
+        /**
+         * Giriş ekranında mesaj gösterir.
+         * @param {'success' | 'error'} type - Mesaj türü
+         * @param {string} message - Gösterilecek mesaj
+         */
+        const setAuthMessage = (type, message) => {
+            authMessage.textContent = message;
+            authMessage.className = type === 'success' ? 'auth-message-success' : 'auth-message-error';
+        };
+
+        /**
+         * Raporu ve ilgili UI elemanlarını gösterir.
+         */
+        const showReport = () => {
+            authContainer.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden'); // Rapor yükleniyor...
+            // Rapor verisi onSnapshot'tan geldiğinde loadingSpinner gizlenecek
+        };
+
+        /**
+         * Giriş ekranını gösterir.
+         */
+        const showLogin = () => {
+            authContainer.classList.remove('hidden');
+            loadingSpinner.classList.add('hidden');
+            reportContainer.classList.add('hidden');
+            // Aktif dinleyicileri (onSnapshot) durdur
+            unsubscribeReport();
+            unsubscribeReport = () => {};
+        };
+
+
+        /**
+         * Sayfa yüklendiğinde e-posta bağlantısını kontrol eder ve girişi tamamlar.
+         */
+        const handleSignInRedirect = async () => {
+            if (isSignInWithEmailLink(auth, window.location.href)) {
+                let email = window.localStorage.getItem('emailForSignIn');
+                if (!email) {
+                    // E-posta kayıp, kullanıcıdan iste
+                    email = window.prompt('Girişi tamamlamak için lütfen e-posta adresinizi tekrar girin:');
+                }
+
+                if (!email) {
+                     setAuthMessage("error", "Giriş yapılamadı. E-posta adresi gerekli.");
+                     return;
+                }
+
+                setAuthLoading(true, "Giriş doğrulanıyor...");
+                
+                try {
+                    await signInWithEmailLink(auth, email, window.location.href);
+                    window.localStorage.removeItem('emailForSignIn');
+                    // onAuthStateChanged tetiklenecek ve raporu gösterecek
+                } catch (error) {
+                    console.error("E-posta ile giriş hatası:", error);
+                    setAuthMessage("error", `Giriş hatası: ${error.message}`);
+                    setAuthLoading(false);
+                }
+            }
+        };
+
+
+        // --- UYGULAMANIN BAŞLATILMASI (ANA FONKSİYON) ---
+        const initializeMainApp = () => {
+            try {
+                // Firebase'i manuel yapılandırma ile başlat
+                app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                // Firebase log seviyesini ayarla (debug için)
+                // setLogLevel('debug');
+
+                // 1. Adım: Sayfa URL'sinin bir giriş bağlantısı olup olmadığını kontrol et
+                handleSignInRedirect();
+
+                // 2. Adım: Kullanıcının oturum durumunu dinle
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        // KULLANICI GİRİŞ YAPTI
+                        console.log("Kullanıcı oturum açtı:", user.uid);
+                        userId = user.uid;
+                        showReport(); // Rapor yükleme ekranını göster
+                        
+                        // Rapor verisini dinlemeye başla
+                        const docRef = getReportDocRef();
+                        if (docRef) {
+                            unsubscribeReport = onSnapshot(docRef, (doc) => {
+                                loadingSpinner.classList.add('hidden'); // Veri geldi, yüklemeyi gizle
+                                reportContainer.classList.remove('hidden'); // Raporu göster
+                                
+                                if (doc.exists()) {
+                                    console.log("Rapor verisi yüklendi.");
+                                    const reportData = doc.data();
+                                    const activeMonth = reportData.activeMonth || Object.keys(reportData.reports)[0];
+                                    
+                                    // Dashboard'u bu veriyle güncelle
+                                    updateDashboard(reportData, activeMonth);
+                                    
+                                    // Dinleyicileri (sadece bir kez) ayarla
+                                    if (!window.listenersAttached) {
+                                        setupChartToggleListeners();
+                                        setupMonthSwitcherListener(reportData);
+                                        
+                                        // AI Analiz butonu
+                                        document.getElementById('runAiAnalysisBtn').onclick = () => {
+                                            const currentMonthKey = document.querySelector('.month-button[data-active="true"]').dataset.monthKey;
+                                            handleAiAnalysis(reportData, currentMonthKey);
+                                        };
+                                        
+                                        // Veri Güncelleme butonu (Admin)
+                                        document.getElementById('updateDataBtn').onclick = handleUpdateData;
+                                        
+                                        window.listenersAttached = true;
+                                    }
+                                } else {
+                                    console.error("Rapor veri dokümanı bulunamadı!");
+                                    authContainer.classList.remove('hidden');
+                                    loadingSpinner.classList.add('hidden');
+                                    setAuthMessage("error", "Rapor verisi bulunamadı. Lütfen yönetici ile iletişime geçin.");
+                                }
+                            }, (error) => {
+                                console.error("Rapor dinleme hatası: ", error);
+                                loadingSpinner.classList.add('hidden');
+                                setAuthMessage("error", `Rapor verisi okunurken hata: ${error.message}`);
+                            });
+                        }
+                    } else {
+                        // KULLANICI GİRİŞ YAPMADI (veya çıkış yaptı)
+                        console.log("Kullanıcı oturumu kapalı.");
+                        showLogin(); // Giriş ekranını göster
                     }
                 });
 
+                // 3. Adım: Giriş formu dinleyicisini ayarla
+                authForm.addEventListener('submit', handleSendSignInLink);
+
             } catch (error) {
-                console.error("Error during application initialization:", error);
-                loadingSpinner.classList.add('hidden');
-                document.getElementById('report-container').innerHTML = '<p class="text-center text-red-500 text-xl font-bold mt-10">An error occurred during application startup. Please check the console.</p>';
+                console.error("Firebase başlatma hatası:", error);
+                document.body.innerHTML = `<div style="color: red; padding: 2rem;">Firebase başlatılamadı. Lütfen konsolu kontrol edin. Hata: ${error.message}</div>`;
             }
-        });
+        };
+
+        // Uygulamayı Başlat
+        document.addEventListener('DOMContentLoaded', initializeMainApp);
 
     </script>
+
 </body>
 
 </html>
-
-
-
-
-
 
