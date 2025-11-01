@@ -504,7 +504,7 @@
                 </div>
                 <!-- DEĞİŞTİRİLEN BUTON -->
                 <button id="runAiAnalysisBtn" class="ai-button">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/></svg>
                     <!-- GÜNCELLENEN METİN -->
                     <span>Kapsamlı Yapay Zeka Analizi</span>
                 </button>
@@ -732,7 +732,7 @@
             signInWithCustomToken, 
             onAuthStateChanged,
             sendSignInLinkToEmail,     // Yeni
-            isSignInWithEmailLink,   // Yeni
+            isSignInWithEmailLink,    // Yeni
             signInWithEmailLink      // Yeni
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { 
@@ -741,14 +741,14 @@
             onSnapshot, 
             setDoc, 
             setLogLevel,
-            getDoc                 // Yeni
+            getDoc             // Yeni
         } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         
         // --- Firebase ve Uygulama Ayarları ---
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
         
         // PLATFORMUN YANLIŞ PROJE ENJEKTE ETMESİNE KARŞI MANUEL ÇÖZÜM
-        // const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}'); // <-- Sorunlu eski kod (bard-frontend'e bağlanıyordu)
+        // const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}'); 
         
         // SİZİN GERÇEK PROJE BİLGİLERİNİZLE MANUEL OLARAK AYARLANDI
         const firebaseConfig = {
@@ -1054,7 +1054,7 @@
             } else if (context.parsed.r !== null) {
                 label += formatter.format(context.parsed.r);
             } else {
-                 label += formatter.format(context.parsed);
+                label += formatter.format(context.parsed);
             }
             return label;
         };
@@ -1605,10 +1605,11 @@
                 // 2. Adım: E-posta bağlantısını gönder
                 setAuthLoading(true, "Bağlantı gönderiliyor...");
                 
-                // --- DÜZELTME: auth/argument-error için ---
-                // Geri dönüş URL'sini sizin GitHub sayfanıza sabitliyoruz.
+                // --- DÜZELTME: auth/argument-error ve Authorized Domain sorunu için ---
+                // Geri dönüş URL'sini, Firebase'in genellikle sorunsuz kabul ettiği ana alan adına sabitliyoruz.
                 const actionCodeSettings = {
-                    url: 'https://conan20x.github.io/boston-drink-rapor/', // <-- KULLANILACAK ADRES
+                    // Yalnızca ana domain kullanılıyor. Firebase ayarlarında da sadece bu domain yetkilendirilmeli.
+                    url: 'https://conan20x.github.io/', 
                     handleCodeInApp: false
                 };
                 // --- DÜZELTME SONU ---
@@ -1623,7 +1624,8 @@
                 console.error("Yetki kontrolü veya e-posta gönderme hatası:", error);
                 // Hata mesajlarını daha kullanıcı dostu yap
                 if (error.code === 'auth/invalid-continue-uri' || error.code === 'auth/argument-error') {
-                     setAuthMessage("error", "Güvenlik hatası: Alan adınız (conan20x.github.io) Firebase'de yetkilendirilmemiş. Lütfen 'Authentication > Settings > Authorized domains' bölümüne ekleyin.");
+                     // Kodun istediği URL, Firebase'in Eylem URL'si ayarıyla eşleşmediğinde bu hata alınır.
+                     setAuthMessage("error", "Güvenlik hatası: Alan adınız (conan20x.github.io) Firebase'de yetkilendirilmemiş. Lütfen 'Authentication > Settings > Authorized domains' bölümüne ve Eylem URL'sine eklediğinizden emin olun.");
                 } else {
                     setAuthMessage("error", error.message);
                 }
